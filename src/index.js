@@ -1,4 +1,9 @@
 require('dotenv').config();
+const dns = require('dns');
+// Force IPv4 to avoid ENETUNREACH errors on Railway/Supabase
+if (dns.setDefaultResultOrder) {
+    dns.setDefaultResultOrder('ipv4first');
+}
 const express = require('express');
 const { middleware } = require('@line/bot-sdk');
 const { handleEvent } = require('./handlers/webhook');
