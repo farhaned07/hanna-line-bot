@@ -6,14 +6,27 @@ const { logCheckIn, logMedication, getHealthSummary } = require('./healthData');
 
 const handleFollow = async (event) => {
     const userId = event.source.userId;
-    // Create user if not exists
-    await db.query(
-        `INSERT INTO chronic_patients (line_user_id, enrollment_status, onboarding_step) 
-     VALUES ($1, 'onboarding', 0) 
-     ON CONFLICT (line_user_id) DO UPDATE SET enrollment_status = 'onboarding', onboarding_step = 0`,
-        [userId]
-    );
-    return onboarding.start(event);
+    try {
+        // Create user if not exists
+        await db.query(
+            `INSERT INTO chronic_patients (line_user_id, enrollment_status, onboarding_step) 
+         VALUES ($1, 'onboarding', 0) 
+         ON CONFLICT (line_user_id) DO UPDATE SET enrollment_status = 'onboarding', onboarding_step = 0`,
+            [userId]
+        );
+        return onboarding.start(event);
+    } catch (error) {
+        console.error('❌ Database Error in handleFollow:', error);
+        // Still try to send welcome message even if DB fails? 
+        // Maybe better to let them know something is wrong or just fail silently but log it.
+        // For now, let's just log it so we don't crash the whole process if possible, 
+        // but rethrowing might be better for Railway to restart.
+        // Let's reply with a generic error so the user isn't left hanging.
+        return line.replyMessage(event.replyToken, {
+            type: 'text',
+            text: 'ขออภัยค่ะ ระบบขัดข้องชั่วคราว กรุณาลองใหม่ภายหลังนะคะ 😓'
+        });
+    }
 };
 
 const handleMessage = async (event) => {
