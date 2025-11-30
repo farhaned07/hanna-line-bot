@@ -18,9 +18,17 @@
 ### 📋 Next Steps (Will be automated)
 - [ ] Create `.env` file with credentials
 - [ ] Update PromptPay ID in `src/handlers/payment.js`  
+- [x] **Deploy to Railway**
+  - [x] Create project
+  - [x] Push code
+  - [x] Add environment variables
+  - [x] Generate domain: `hanna-line-bot-production.up.railway.app`
+
+- [x] **Configure LINE Webhook**
+  - [x] Set Webhook URL: `https://hanna-line-bot-production.up.railway.app/webhook`
+  - [x] Verify Webhook
+  - [x] Enable "Use webhook"
 - [ ] Setup Supabase database
-- [ ] Deploy to Railway
-- [ ] Configure LINE webhook
 - [ ] Test complete flow
 - [ ] Go live!
 

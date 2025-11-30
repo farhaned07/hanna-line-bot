@@ -6,11 +6,11 @@ const start = async (event) => {
     await line.replyMessage(event.replyToken, [
         {
             type: 'text',
-            text: '✨ สวัสดีค่ะ! ฉันชื่อฮันนา พยาบาล AI ที่จะช่วยดูแลคุณทุกวัน 💚'
+            text: '✨ สวัสดีค่ะ! ฮันนาเองนะคะ พยาบาลส่วนตัวของคุณ 💚\nฮันนาพร้อมดูแลสุขภาพคุณให้ดีขึ้นทุกวันค่ะ'
         },
         {
             type: 'text',
-            text: 'เพื่อเริ่มดูแลคุณ ฮันนาขอทราบชื่อเล่นหน่อยนะคะ 😊'
+            text: 'ก่อนอื่น... ฮันนาขอทราบ **ชื่อเล่น** ของคุณหน่อยนะคะ 😊'
         }
     ]);
     await db.query('UPDATE chronic_patients SET onboarding_step = 1 WHERE line_user_id = $1', [userId]);
@@ -33,22 +33,22 @@ const handleInput = async (event, user) => {
         await db.query('UPDATE chronic_patients SET name = $1, onboarding_step = 2 WHERE line_user_id = $2', [input, userId]);
         await line.replyMessage(event.replyToken, {
             type: 'text',
-            text: `ยินดีที่ได้รู้จักนะคะ คุณ${input}! \nอายุเท่าไหร่คะ?`
+            text: `ยินดีที่ได้รู้จักค่ะ คุณ${input}! 👋\n\nขออนุญาตถาม **อายุ** หน่อยนะคะ (เพื่อการดูแลที่เหมาะสมค่ะ) 👵`
         });
     } else if (step === 2) {
         // Age received
         const age = parseInt(input);
         if (isNaN(age)) {
-            return line.replyMessage(event.replyToken, { type: 'text', text: 'กรุณาระบุอายุเป็นตัวเลขนะคะ' });
+            return line.replyMessage(event.replyToken, { type: 'text', text: 'ฮันนาขอตัวเลขล้วนๆ เลยนะคะ (เช่น 55) 😊' });
         }
         await db.query('UPDATE chronic_patients SET age = $1, onboarding_step = 3 WHERE line_user_id = $2', [age, userId]);
         await line.replyMessage(event.replyToken, {
             type: 'text',
-            text: 'คุณเป็นเบาหวานชนิดไหนคะ?',
+            text: 'คุณหมอวินิจฉัยว่าเป็น **เบาหวานชนิดไหน** คะ? 🏥',
             quickReply: {
                 items: [
-                    { type: 'action', action: { type: 'postback', label: 'Type 1', data: 'value=Type 1' } },
-                    { type: 'action', action: { type: 'postback', label: 'Type 2', data: 'value=Type 2' } },
+                    { type: 'action', action: { type: 'postback', label: 'Type 1 (ฉีดอินซูลิน)', data: 'value=Type 1' } },
+                    { type: 'action', action: { type: 'postback', label: 'Type 2 (ทั่วไป)', data: 'value=Type 2' } },
                     { type: 'action', action: { type: 'postback', label: 'ยังไม่แน่ใจ', data: 'value=Unknown' } }
                 ]
             }
@@ -58,7 +58,7 @@ const handleInput = async (event, user) => {
         await db.query('UPDATE chronic_patients SET condition = $1, onboarding_step = 4 WHERE line_user_id = $2', [input, userId]);
         await line.replyMessage(event.replyToken, {
             type: 'text',
-            text: 'ปกติวัดน้ำตาลบ่อยแค่ไหนคะ?',
+            text: `ปกติคุณ${user.name || 'คนเก่ง'} **วัดระดับน้ำตาล** บ่อยแค่ไหนคะ? 🩸`,
             quickReply: {
                 items: [
                     { type: 'action', action: { type: 'postback', label: 'ทุกวัน', data: 'value=Daily' } },
@@ -75,12 +75,12 @@ const handleInput = async (event, user) => {
         // Flex Message for Trial Offer
         const flexMessage = {
             type: 'flex',
-            altText: 'ทดลองใช้ฟรี 14 วัน',
+            altText: '🎁 ของขวัญต้อนรับจากฮันนา',
             contents: {
                 type: 'bubble',
                 hero: {
                     type: 'image',
-                    url: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80', // Placeholder medical image
+                    url: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
                     size: 'full',
                     aspectRatio: '20:13',
                     aspectMode: 'cover'
@@ -89,11 +89,12 @@ const handleInput = async (event, user) => {
                     type: 'box',
                     layout: 'vertical',
                     contents: [
-                        { type: 'text', text: 'ทดลองใช้ฟรี 14 วัน', weight: 'bold', size: 'xl' },
-                        { type: 'text', text: 'ให้ฮันนาช่วยดูแลคุณตั้งแต่วันนี้', margin: 'md' },
-                        { type: 'text', text: '• โทรเช็คสุขภาพทุกเช้า', size: 'sm', color: '#666666', margin: 'sm' },
-                        { type: 'text', text: '• เตือนกินยาไม่ให้พลาด', size: 'sm', color: '#666666' },
-                        { type: 'text', text: '• สรุปสุขภาพให้ลูกหลาน', size: 'sm', color: '#666666' }
+                        { type: 'text', text: 'ทดลองใช้ฟรี 14 วัน', weight: 'bold', size: 'xl', color: '#1DB446' },
+                        { type: 'text', text: 'ให้ฮันนาช่วยดูแลคุณตั้งแต่วันนี้', margin: 'md', weight: 'bold' },
+                        { type: 'separator', margin: 'md' },
+                        { type: 'text', text: '✅ โทรเช็คสุขภาพทุกเช้า', size: 'sm', color: '#666666', margin: 'md' },
+                        { type: 'text', text: '✅ เตือนกินยาไม่ให้พลาด', size: 'sm', color: '#666666', margin: 'sm' },
+                        { type: 'text', text: '✅ สรุปสุขภาพให้ลูกหลาน', size: 'sm', color: '#666666', margin: 'sm' }
                     ]
                 },
                 footer: {
@@ -109,7 +110,9 @@ const handleInput = async (event, user) => {
                         {
                             type: 'button',
                             action: { type: 'postback', label: 'ดูแพ็คเกจรายเดือน', data: 'action=select_plan&plan=monthly' },
-                            margin: 'sm'
+                            margin: 'sm',
+                            height: 'sm',
+                            style: 'link'
                         }
                     ]
                 }
