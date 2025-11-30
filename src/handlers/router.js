@@ -2,6 +2,7 @@ const onboarding = require('./onboarding');
 const payment = require('./payment');
 const db = require('../services/db');
 const line = require('../services/line');
+const { logCheckIn, logMedication, getHealthSummary } = require('./healthData');
 
 const handleFollow = async (event) => {
     const userId = event.source.userId;
@@ -60,6 +61,23 @@ const handleMessage = async (event) => {
             });
         }
 
+        // Log health responses
+        if (text === 'สบายดี' || text === 'good') {
+            await logCheckIn(userId, 'good');
+            return line.replyMessage(event.replyToken, {
+                type: 'text',
+                text: 'ดีใจด้วยนะคะ! ขอให้วันนี้เป็นวันที่ดีต่อไปนะคะ 💚'
+            });
+        }
+
+        if (text === 'ไม่สบาย' || text === 'bad') {
+            await logCheckIn(userId, 'bad', 'ไม่สบาย');
+            return line.replyMessage(event.replyToken, {
+                type: 'text',
+                text: 'เสียใจด้วยนะคะ ดูแลสุขภาพให้ดีๆ นะคะ หากอาการไม่ดีขึ้น ควรพบแพทย์ค่ะ 🩺'
+            });
+        }
+
         // Medication Log
         if (text === 'บันทึกกินยา') {
             return line.replyMessage(event.replyToken, {
@@ -74,17 +92,47 @@ const handleMessage = async (event) => {
             });
         }
 
-        // Profile
+        // Log medication responses
+        if (text === 'กินยาแล้ว') {
+            await logMedication(userId, true);
+            return line.replyMessage(event.replyToken, {
+                type: 'text',
+                text: 'เก่งมากค่ะ! ✅ บันทึกเรียบร้อยแล้ว การกินยาสม่ำเสมอช่วยให้สุขภาพดีขึ้นนะคะ 💊'
+            });
+        }
+
+        if (text === 'ยังไม่ได้กินยา') {
+            await logMedication(userId, false, 'ยังไม่กิน');
+            return line.replyMessage(event.replyToken, {
+                type: 'text',
+                text: 'อย่าลืมกินยาให้ตรงเวลานะคะ 💊 หากมีปัญหาเรื่องยา สามารถปรึกษาฮันนาได้เสมอค่ะ'
+            });
+        }
+
+        // Profile with health summary
         if (text === 'โปรไฟล์ของฉัน') {
             const status = user.enrollment_status === 'trial' ? 'ทดลองใช้ฟรี' :
                 user.enrollment_status === 'active' ? 'สมาชิกปกติ' : 'หมดอายุ';
+
+            // Get 7-day summary
+            const summary = await getHealthSummary(userId, 7);
+
+            let summaryText = '';
+            if (summary && summary.totalCheckIns > 0) {
+                summaryText = `\n\n📊 สรุป 7 วันที่ผ่านมา:\n` +
+                    `✅ เช็คอิน: ${summary.totalCheckIns} ครั้ง\n` +
+                    `💊 กินยา: ${summary.medicationsTaken}/${summary.medicationsTaken + summary.medicationsMissed} ครั้ง (${summary.adherencePercent}%)\n` +
+                    `😊 รู้สึกดี: ${summary.goodMoodDays} วัน`;
+            }
+
             return line.replyMessage(event.replyToken, {
                 type: 'text',
                 text: `👤 โปรไฟล์ของคุณ${user.name}\n\n` +
                     `อายุ: ${user.age} ปี\n` +
                     `ประเภท: ${user.condition || 'ไม่ระบุ'}\n` +
-                    `สถานะ: ${status}\n\n` +
-                    `หากต้องการแก้ไขข้อมูล กรุณาติดต่อฮันนาค่ะ`
+                    `สถานะ: ${status}` +
+                    summaryText +
+                    `\n\nหากต้องการแก้ไขข้อมูล กรุณาติดต่อฮันนาค่ะ`
             });
         }
 

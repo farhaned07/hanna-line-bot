@@ -26,17 +26,15 @@ db.serialize(() => {
   )`);
 
     db.run(`CREATE TABLE IF NOT EXISTS check_ins (
-    id TEXT PRIMARY KEY,
-    patient_id TEXT,
-    date TEXT DEFAULT CURRENT_DATE,
-    time_of_day TEXT,
-    glucose INTEGER,
-    systolic INTEGER,
-    diastolic INTEGER,
-    medication_taken INTEGER,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    line_user_id TEXT NOT NULL,
+    check_in_time TEXT DEFAULT CURRENT_TIMESTAMP,
+    mood TEXT,
     symptoms TEXT,
-    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(patient_id) REFERENCES chronic_patients(id)
+    glucose_level INTEGER,
+    medication_taken INTEGER DEFAULT 0,
+    medication_notes TEXT,
+    FOREIGN KEY(line_user_id) REFERENCES chronic_patients(line_user_id)
   )`);
 });
 
