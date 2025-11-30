@@ -45,16 +45,16 @@ const logMedication = async (userId, taken, notes = null) => {
             // Update existing check-in
             await db.query(
                 `UPDATE check_ins 
-                 SET medication_taken = ?, medication_notes = ?
-                 WHERE id = ?`,
-                [taken ? 1 : 0, notes, existing.rows[0].id]
+                 SET medication_taken = $1, medication_notes = $2
+                 WHERE id = $3`,
+                [taken, notes, existing.rows[0].id]
             );
         } else {
             // Create new check-in just for medication
             await db.query(
                 `INSERT INTO check_ins (line_user_id, medication_taken, medication_notes, check_in_time)
-                 VALUES (?, ?, ?, datetime('now'))`,
-                [userId, taken ? 1 : 0, notes]
+                 VALUES ($1, $2, $3, CURRENT_TIMESTAMP)`,
+                [userId, taken, notes]
             );
         }
 
@@ -76,15 +76,15 @@ const getHealthSummary = async (userId, days = 7) => {
         const result = await db.query(
             `SELECT 
                 COUNT(*) as total_checkins,
-                SUM(CASE WHEN medication_taken = 1 THEN 1 ELSE 0 END) as meds_taken,
-                SUM(CASE WHEN medication_taken = 0 THEN 1 ELSE 0 END) as meds_missed,
+                SUM(CASE WHEN medication_taken = true THEN 1 ELSE 0 END) as meds_taken,
+                SUM(CASE WHEN medication_taken = false THEN 1 ELSE 0 END) as meds_missed,
                 AVG(glucose_level) as avg_glucose,
                 SUM(CASE WHEN mood = 'good' OR mood = 'สบายดี' THEN 1 ELSE 0 END) as good_mood_days,
                 SUM(CASE WHEN mood = 'bad' OR mood = 'ไม่สบาย' THEN 1 ELSE 0 END) as bad_mood_days
              FROM check_ins
-             WHERE line_user_id = ?
-             AND date(check_in_time) >= date('now', '-' || ? || ' days')`,
-            [userId, days]
+             WHERE line_user_id = $1
+             AND check_in_time >= CURRENT_TIMESTAMP - INTERVAL '${days} days'`,
+            [userId]
         );
 
         if (result.rows.length === 0) {
@@ -124,16 +124,16 @@ const getRecentCheckIns = async (userId, limit = 7) => {
     try {
         const result = await db.query(
             `SELECT 
-                date(check_in_time) as date,
+                DATE(check_in_time) as date,
                 mood,
                 symptoms,
                 glucose_level,
                 medication_taken,
                 medication_notes
              FROM check_ins
-             WHERE line_user_id = ?
+             WHERE line_user_id = $1
              ORDER BY check_in_time DESC
-             LIMIT ?`,
+             LIMIT $2`,
             [userId, limit]
         );
 
