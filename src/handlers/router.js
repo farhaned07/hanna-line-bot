@@ -18,8 +18,15 @@ const handleFollow = async (event) => {
 
 const handleMessage = async (event) => {
     const userId = event.source.userId;
-    const userResult = await db.query('SELECT * FROM chronic_patients WHERE line_user_id = $1', [userId]);
-    const user = userResult.rows[0];
+    let user;
+    try {
+        const userResult = await db.query('SELECT * FROM chronic_patients WHERE line_user_id = $1', [userId]);
+        user = userResult.rows[0];
+    } catch (error) {
+        console.error('❌ Database Error in handleMessage:', error);
+        // Fallback or rethrow
+        throw error;
+    }
 
     if (!user) {
         // Should not happen if followed, but handle edge case
