@@ -7,8 +7,15 @@ const { initScheduler } = require('./scheduler');
 
 const app = express();
 
+// Logging Middleware
+app.use((req, res, next) => {
+    console.log(`Incoming ${req.method} request to ${req.url}`);
+    next();
+});
+
 // LINE Webhook
 app.post('/webhook', middleware(config.line), (req, res) => {
+    console.log('Webhook received events:', JSON.stringify(req.body.events));
     Promise.all(req.body.events.map(handleEvent))
         .then((result) => res.json(result))
         .catch((err) => {
