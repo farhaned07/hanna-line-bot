@@ -73,7 +73,7 @@ const createRichMenu = async () => {
         const response = await fetch('https://api.line.me/v2/bot/richmenu', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${config.line.channelAccessToken}`,
+                'Authorization': `Bearer ${config.config.line.channelAccessToken}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(richMenuObject)
@@ -106,7 +106,7 @@ const setDefaultRichMenu = async (richMenuId) => {
         const response = await fetch(`https://api.line.me/v2/bot/user/all/richmenu/${richMenuId}`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${config.line.channelAccessToken}`
+                'Authorization': `Bearer ${config.config.line.channelAccessToken}`
             }
         });
 
@@ -130,7 +130,7 @@ const listRichMenus = async () => {
         const response = await fetch('https://api.line.me/v2/bot/richmenu/list', {
             method: 'GET',
             headers: {
-                'Authorization': `Bearer ${config.line.channelAccessToken}`
+                'Authorization': `Bearer ${config.config.line.channelAccessToken}`
             }
         });
 
@@ -143,6 +143,36 @@ const listRichMenus = async () => {
 };
 
 /**
+ * Upload image to Rich Menu
+ */
+const uploadRichMenuImage = async (richMenuId, imagePath) => {
+    const fs = require('fs');
+
+    try {
+        const imageBuffer = fs.readFileSync(imagePath);
+
+        const response = await fetch(`https://api-data.line.me/v2/bot/richmenu/${richMenuId}/content`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${config.config.line.channelAccessToken}`,
+                'Content-Type': 'image/png'
+            },
+            body: imageBuffer
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(`Failed to upload rich menu image: ${error}`);
+        }
+
+        console.log('✅ Rich Menu image uploaded');
+    } catch (error) {
+        console.error('❌ Error uploading rich menu image:', error);
+        throw error;
+    }
+};
+
+/**
  * Delete a rich menu
  */
 const deleteRichMenu = async (richMenuId) => {
@@ -150,7 +180,7 @@ const deleteRichMenu = async (richMenuId) => {
         const response = await fetch(`https://api.line.me/v2/bot/richmenu/${richMenuId}`, {
             method: 'DELETE',
             headers: {
-                'Authorization': `Bearer ${config.line.channelAccessToken}`
+                'Authorization': `Bearer ${config.config.line.channelAccessToken}`
             }
         });
 
@@ -168,5 +198,6 @@ module.exports = {
     createRichMenu,
     setDefaultRichMenu,
     listRichMenus,
-    deleteRichMenu
+    deleteRichMenu,
+    uploadRichMenuImage
 };
