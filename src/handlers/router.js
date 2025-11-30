@@ -37,8 +37,11 @@ const handleMessage = async (event) => {
         user = userResult.rows[0];
     } catch (error) {
         console.error('❌ Database Error in handleMessage:', error);
-        // Fallback or rethrow
-        throw error;
+        // Send error message to user instead of crashing
+        return line.replyMessage(event.replyToken, {
+            type: 'text',
+            text: 'ขออภัยค่ะ ระบบฐานข้อมูลขัดข้องชั่วคราว กรุณาลองใหม่ภายหลังนะคะ 😓\n\nหากปัญหายังคงอยู่ กรุณาติดต่อทีมงานค่ะ'
+        });
     }
 
     if (!user) {
