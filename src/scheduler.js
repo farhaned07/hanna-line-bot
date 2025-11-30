@@ -1,13 +1,17 @@
 const cron = require('node-cron');
 const db = require('./services/db');
 const line = require('./services/line');
+const { checkTrialStatus } = require('./handlers/trial');
 
 const initScheduler = () => {
     console.log('Scheduler initialized');
 
     // Morning Check-in (8:00 AM)
     cron.schedule('0 8 * * *', async () => {
-        console.log('Running morning check-in job');
+        console.log('Running morning check-in...');
+
+        // First, check trial status and send reminders
+        await checkTrialStatus();
         try {
             const result = await db.query(
                 "SELECT line_user_id, name FROM chronic_patients WHERE enrollment_status IN ('active', 'trial')"

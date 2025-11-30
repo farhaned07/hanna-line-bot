@@ -29,6 +29,19 @@ const handleMessage = async (event) => {
         return onboarding.handleInput(event, user);
     }
 
+    // Handle expired trial users
+    if (user.enrollment_status === 'expired') {
+        return line.replyMessage(event.replyToken, {
+            type: 'text',
+            text: `สวัสดีค่ะคุณ${user.name}! 💚\n\nช่วงทดลองใช้ของคุณหมดอายุแล้วค่ะ หากต้องการใช้บริการต่อ พิมพ์ "สมัคร" เพื่อดูแพ็คเกจนะคะ 😊`,
+            quickReply: {
+                items: [
+                    { type: 'action', action: { type: 'postback', label: 'สมัครแพ็คเกจ 💳', data: 'action=select_plan&plan=monthly' } }
+                ]
+            }
+        });
+    }
+
     // Handle other messages (e.g. daily check-in responses)
     // For MVP, just echo or simple response if not in onboarding
     if (event.message.type === 'text') {
