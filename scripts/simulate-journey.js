@@ -1,5 +1,5 @@
 require('dotenv').config();
-const fetch = require('node-fetch');
+const https = require('https');
 const crypto = require('crypto');
 const db = require('../src/services/db');
 
@@ -13,6 +13,20 @@ const sign = (body) => {
         .createHmac('SHA256', CHANNEL_SECRET)
         .update(JSON.stringify(body))
         .digest('base64');
+};
+
+// Helper to make HTTPS request
+const makeRequest = (url, options, body) => {
+    return new Promise((resolve, reject) => {
+        const req = https.request(url, options, (res) => {
+            let data = '';
+            res.on('data', (chunk) => data += chunk);
+            res.on('end', () => resolve({ status: res.statusCode, statusText: res.statusMessage, body: data }));
+        });
+        req.on('error', reject);
+        if (body) req.write(body);
+        req.end();
+    });
 };
 
 async function simulateJourney() {
@@ -36,19 +50,19 @@ async function simulateJourney() {
     };
 
     try {
-        const res = await fetch(`${BASE_URL}/webhook`, {
+        const res = await makeRequest(`${BASE_URL}/webhook`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'x-line-signature': sign(followBody)
-            },
-            body: JSON.stringify(followBody)
-        });
+            }
+        }, JSON.stringify(followBody));
 
-        if (res.ok) {
+        if (res.status === 200) {
             console.log('✅ Webhook accepted request (200 OK)');
         } else {
             console.error(`❌ Webhook failed: ${res.status} ${res.statusText}`);
+            console.error('Response:', res.body);
             process.exit(1);
         }
 
@@ -56,6 +70,11 @@ async function simulateJourney() {
         console.log('\n2️⃣ Verifying Database Persistence...');
         // Give it a moment to write
         await new Promise(r => setTimeout(r, 2000));
+
+        // Note: This query runs LOCALLY. 
+        // If local env doesn't have the IPv4 fix or cannot reach the DB, this part might fail 
+        // even if the webhook worked. 
+        // But since I updated db.js to auto-fix, it SHOULD work locally too if I have internet.
 
         const result = await db.query('SELECT * FROM chronic_patients WHERE line_user_id = $1', [TEST_USER_ID]);
 
@@ -80,8 +99,12 @@ async function simulateJourney() {
     } finally {
         // Cleanup
         console.log('\n🧹 Cleaning up test data...');
-        await db.query('DELETE FROM chronic_patients WHERE line_user_id = $1', [TEST_USER_ID]);
-        console.log('✅ Cleanup complete.');
+        try {
+            await db.query('DELETE FROM chronic_patients WHERE line_user_id = $1', [TEST_USER_ID]);
+            console.log('✅ Cleanup complete.');
+        } catch (e) {
+            console.error('⚠️ Cleanup failed:', e.message);
+        }
         process.exit();
     }
 }
