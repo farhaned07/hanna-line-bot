@@ -42,10 +42,53 @@ const handleMessage = async (event) => {
         });
     }
 
-    // Handle other messages (e.g. daily check-in responses)
-    // For MVP, just echo or simple response if not in onboarding
+    // Handle Rich Menu commands
     if (event.message.type === 'text') {
-        // TODO: Add check-in logic here
+        const text = event.message.text.trim();
+
+        // Health Check
+        if (text === 'เช็คสุขภาพ') {
+            return line.replyMessage(event.replyToken, {
+                type: 'text',
+                text: `สวัสดีค่ะคุณ${user.name}! 💚\n\nวันนี้รู้สึกอย่างไรบ้างคะ?`,
+                quickReply: {
+                    items: [
+                        { type: 'action', action: { type: 'message', label: 'สบายดี 😊', text: 'สบายดี' } },
+                        { type: 'action', action: { type: 'message', label: 'ไม่ค่อยสบาย 😔', text: 'ไม่สบาย' } }
+                    ]
+                }
+            });
+        }
+
+        // Medication Log
+        if (text === 'บันทึกกินยา') {
+            return line.replyMessage(event.replyToken, {
+                type: 'text',
+                text: `💊 บันทึกการกินยา\n\nวันนี้กินยาครบแล้วหรือยังคะ?`,
+                quickReply: {
+                    items: [
+                        { type: 'action', action: { type: 'message', label: 'กินแล้ว ✅', text: 'กินยาแล้ว' } },
+                        { type: 'action', action: { type: 'message', label: 'ยังไม่กิน', text: 'ยังไม่ได้กินยา' } }
+                    ]
+                }
+            });
+        }
+
+        // Profile
+        if (text === 'โปรไฟล์ของฉัน') {
+            const status = user.enrollment_status === 'trial' ? 'ทดลองใช้ฟรี' :
+                user.enrollment_status === 'active' ? 'สมาชิกปกติ' : 'หมดอายุ';
+            return line.replyMessage(event.replyToken, {
+                type: 'text',
+                text: `👤 โปรไฟล์ของคุณ${user.name}\n\n` +
+                    `อายุ: ${user.age} ปี\n` +
+                    `ประเภท: ${user.condition || 'ไม่ระบุ'}\n` +
+                    `สถานะ: ${status}\n\n` +
+                    `หากต้องการแก้ไขข้อมูล กรุณาติดต่อฮันนาค่ะ`
+            });
+        }
+
+        // Default response
         return line.replyMessage(event.replyToken, {
             type: 'text',
             text: 'ขอบคุณค่ะ ฮันนาได้รับข้อความแล้ว 😊'
