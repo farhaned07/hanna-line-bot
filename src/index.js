@@ -1,0 +1,29 @@
+require('dotenv').config();
+const express = require('express');
+const { middleware } = require('@line/bot-sdk');
+const { handleEvent } = require('./handlers/webhook');
+const { config } = require('./config');
+const { initScheduler } = require('./scheduler');
+
+const app = express();
+
+// LINE Webhook
+app.post('/webhook', middleware(config.line), (req, res) => {
+    Promise.all(req.body.events.map(handleEvent))
+        .then((result) => res.json(result))
+        .catch((err) => {
+            console.error(err);
+            res.status(500).end();
+        });
+});
+
+// Health check
+app.get('/health', (req, res) => {
+    res.send('OK');
+});
+
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+    console.log(`listening on ${port}`);
+    initScheduler();
+});
