@@ -1,4 +1,3 @@
-```
 const { Pool } = require('pg');
 
 // List of common Supabase Pooler regions to probe
@@ -28,6 +27,10 @@ const testConnection = async (config) => {
 const getPool = async () => {
     if (pool) return pool;
 
+    if (!process.env.DATABASE_URL) {
+        throw new Error('DATABASE_URL environment variable is not set. Please configure your database connection string.');
+    }
+
     let connectionConfig = {
         connectionString: process.env.DATABASE_URL,
         ssl: { rejectUnauthorized: false }
@@ -41,7 +44,7 @@ const getPool = async () => {
         const match = hostname.match(/^db\.([a-z0-9]+)\.supabase\.co$/);
         if (match) {
             const projectRef = match[1];
-            console.log(`ℹ️ Detected Supabase Direct URL.Starting Pooler Discovery for project: ${ projectRef }...`);
+            console.log(`ℹ️ Detected Supabase Direct URL. Starting Pooler Discovery for project: ${projectRef}...`);
             
             const originalUser = url.username;
             const originalPass = url.password;
@@ -49,10 +52,10 @@ const getPool = async () => {
 
             // Try each region
             for (const regionHost of POOLER_REGIONS) {
-                console.log(`🔍 Probing region: ${ regionHost }...`);
+                console.log(`🔍 Probing region: ${regionHost}...`);
                 
                 const candidateConfig = {
-                    user: `${ originalUser }.${ projectRef } `,
+                    user: `${originalUser}.${projectRef}`,
                     password: originalPass,
                     host: regionHost,
                     port: 6543,
@@ -61,7 +64,7 @@ const getPool = async () => {
                 };
 
                 if (await testConnection(candidateConfig)) {
-                    console.log(`✅ FOUND VALID POOLER: ${ regionHost } `);
+                    console.log(`✅ FOUND VALID POOLER: ${regionHost}`);
                     console.log(`🔄 Switching connection to use this pooler.`);
                     connectionConfig = candidateConfig;
                     break;
@@ -95,4 +98,3 @@ module.exports = {
     },
     poolPromise
 };
-```
