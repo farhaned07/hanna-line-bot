@@ -13,7 +13,6 @@
   "license": "ISC",
   "dependencies": {
     "@line/bot-sdk": "^9.4.0",
-    "canvas": "^2.11.2",
     "dotenv": "^17.2.3",
     "express": "^4.21.2",
     "node-cron": "^3.0.3",
