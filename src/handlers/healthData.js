@@ -93,20 +93,27 @@ const getHealthSummary = async (userId, days = 7) => {
 
         const summary = result.rows[0];
 
+        // Parse strings to integers (pg returns BigInt/Count as strings)
+        const medsTaken = parseInt(summary.meds_taken || 0);
+        const medsMissed = parseInt(summary.meds_missed || 0);
+        const totalCheckIns = parseInt(summary.total_checkins || 0);
+        const goodMoodDays = parseInt(summary.good_mood_days || 0);
+        const badMoodDays = parseInt(summary.bad_mood_days || 0);
+
         // Calculate adherence percentage
-        const totalMedDays = (summary.meds_taken || 0) + (summary.meds_missed || 0);
+        const totalMedDays = medsTaken + medsMissed;
         const adherencePercent = totalMedDays > 0
-            ? Math.round((summary.meds_taken / totalMedDays) * 100)
+            ? Math.round((medsTaken / totalMedDays) * 100)
             : 0;
 
         return {
-            totalCheckIns: summary.total_checkins || 0,
-            medicationsTaken: summary.meds_taken || 0,
-            medicationsMissed: summary.meds_missed || 0,
+            totalCheckIns,
+            medicationsTaken: medsTaken,
+            medicationsMissed: medsMissed,
             adherencePercent,
             averageGlucose: summary.avg_glucose ? Math.round(summary.avg_glucose) : null,
-            goodMoodDays: summary.good_mood_days || 0,
-            badMoodDays: summary.bad_mood_days || 0,
+            goodMoodDays,
+            badMoodDays,
             days
         };
     } catch (error) {
