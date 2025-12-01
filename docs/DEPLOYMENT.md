@@ -98,6 +98,8 @@ heroku pg:psql < schema.sql
      LINE_CHANNEL_SECRET=<your_secret>
      DATABASE_URL=<your_postgres_url>
      PORT=3000
+     GEMINI_API_KEY=<your_gemini_key>
+     GEMINI_LIVE_MODEL=gemini-2.0-flash-exp
      ```
    - BASE_URL will be auto-generated after deployment
 

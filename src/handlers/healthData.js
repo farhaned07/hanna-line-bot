@@ -11,7 +11,7 @@ const logCheckIn = async (userId, mood, symptoms = null, glucoseLevel = null) =>
     try {
         await db.query(
             `INSERT INTO check_ins (line_user_id, mood, symptoms, glucose_level, check_in_time)
-             VALUES (?, ?, ?, ?, datetime('now'))`,
+             VALUES ($1, $2, $3, $4, NOW())`,
             [userId, mood, symptoms, glucoseLevel]
         );
         console.log(`✅ Check-in logged for ${userId}`);
