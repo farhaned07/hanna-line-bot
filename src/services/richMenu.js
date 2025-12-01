@@ -25,8 +25,9 @@ const createRichMenu = async () => {
                     height: 843
                 },
                 action: {
-                    type: 'message',
-                    text: 'เช็คสุขภาพ'
+                    type: 'uri',
+                    label: 'Call Hanna',
+                    uri: 'line://app/2008593893-Bj5k3djg'
                 }
             },
             {

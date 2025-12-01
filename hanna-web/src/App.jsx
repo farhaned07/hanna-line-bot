@@ -14,7 +14,7 @@ function App() {
 
   useEffect(() => {
     // Initialize LIFF
-    liff.init({ liffId: import.meta.env.VITE_LIFF_ID || 'mock-liff-id' })
+    liff.init({ liffId: import.meta.env.VITE_LIFF_ID || '2008593893-Bj5k3djg' })
       .then(() => {
         console.log('LIFF Initialized')
         if (!liff.isLoggedIn()) {
