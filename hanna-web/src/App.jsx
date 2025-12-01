@@ -1,133 +1,88 @@
-import { useState, useEffect, useRef } from 'react'
-import { Mic, Video, PhoneOff } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Mic, PhoneOff } from 'lucide-react'
 import { motion } from 'framer-motion'
 import liff from '@line/liff'
-import axios from 'axios'
+import { useGeminiLive } from './hooks/useGeminiLive'
 
 function App() {
-  const [status, setStatus] = useState('idle') // idle, listening, processing, speaking
-  const [isMicOn, setIsMicOn] = useState(false)
+  const [liffReady, setLiffReady] = useState(false)
   const [liffError, setLiffError] = useState(null)
-  const mediaRecorderRef = useRef(null)
-  const audioChunksRef = useRef([])
-  const audioPlayerRef = useRef(new Audio())
+  const [userId, setUserId] = useState(null)
 
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://hanna-line-bot-production.up.railway.app'
+
+  const {
+    status,
+    error: geminiError,
+    startListening,
+    stopListening,
+    disconnect
+  } = useGeminiLive(backendUrl, userId || 'guest')
+
+  // Initialize LIFF
   useEffect(() => {
-    // Initialize LIFF
     liff.init({ liffId: import.meta.env.VITE_LIFF_ID || '2008593893-Bj5k3djg' })
       .then(() => {
         console.log('LIFF Initialized')
-        if (!liff.isLoggedIn()) {
-          // liff.login() // Auto-login in prod
+        setLiffReady(true)
+
+        if (liff.isLoggedIn()) {
+          liff.getProfile().then(profile => {
+            setUserId(profile.userId)
+          })
+        } else {
+          setUserId(`guest_${Date.now()}`)
         }
       })
       .catch((err) => {
-        console.error(err)
+        console.error('LIFF Error:', err)
         setLiffError(err.message)
       })
   }, [])
 
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      mediaRecorderRef.current = new MediaRecorder(stream)
-      audioChunksRef.current = []
-
-      mediaRecorderRef.current.ondataavailable = (event) => {
-        audioChunksRef.current.push(event.data)
-      }
-
-      mediaRecorderRef.current.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' })
-        await sendAudioToBackend(audioBlob)
-      }
-
-      mediaRecorderRef.current.start()
-      setStatus('listening')
-      setIsMicOn(true)
-    } catch (err) {
-      console.error('Error accessing microphone:', err)
-      alert('Microphone access denied. Please allow microphone access to use Voice mode.')
+  // Get status message
+  const getStatusMessage = () => {
+    switch (status) {
+      case 'connecting': return 'กำลังเชื่อมต่อ...'
+      case 'ready': return 'พร้อมรับฟัง'
+      case 'listening': return 'กำลังฟัง...'
+      case 'thinking': return 'กำลังคิด...'
+      case 'speaking': return 'กำลังพูด...'
+      case 'error': return 'เกิดข้อผิดพลาด'
+      default: return 'กดไมค์เพื่อเริ่ม'
     }
   }
 
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && status === 'listening') {
-      mediaRecorderRef.current.stop()
-      setStatus('processing')
-      setIsMicOn(false)
+  // Get avatar animation based on status
+  const getAvatarAnimation = () => {
+    if (status === 'listening') {
+      return { scale: [1, 1.1, 1], transition: { repeat: Infinity, duration: 1.5 } }
     }
-  }
-
-  const sendAudioToBackend = async (audioBlob) => {
-    try {
-      // Convert Blob to Base64
-      const reader = new FileReader()
-      reader.readAsDataURL(audioBlob)
-      reader.onloadend = async () => {
-        const base64Audio = reader.result.split(',')[1] // Remove data URL prefix
-
-        // Send to Backend
-        // Note: In local dev, we need to point to the backend URL. 
-        // In prod, this will be relative if served from same domain or configured via env.
-        const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'
-
-        const response = await axios.post(`${backendUrl}/api/chat/voice`, {
-          audio: base64Audio
-        })
-
-        const { text, audioUrl, emotion } = response.data
-        console.log('Received response:', text, emotion)
-
-        playResponse(audioUrl)
-      }
-    } catch (error) {
-      console.error('Error sending audio:', error)
-      setStatus('idle')
-      alert('Failed to process voice. Please try again.')
+    if (status === 'speaking') {
+      return { scale: [1, 1.05, 1], transition: { repeat: Infinity, duration: 0.5 } }
     }
-  }
-
-  const playResponse = (audioUrl) => {
-    setStatus('speaking')
-    audioPlayerRef.current.src = audioUrl
-    audioPlayerRef.current.play()
-
-    audioPlayerRef.current.onended = () => {
-      setStatus('idle')
+    if (status === 'thinking') {
+      return { opacity: [1, 0.7, 1], transition: { repeat: Infinity, duration: 1 } }
     }
-  }
-
-  const toggleCall = () => {
-    if (status === 'idle') {
-      startRecording()
-    } else {
-      stopRecording() // Or end call completely
-      setStatus('idle')
-      audioPlayerRef.current.pause()
-    }
+    return { scale: 1, opacity: 1 }
   }
 
   return (
     <div className="flex flex-col items-center justify-between h-screen bg-gradient-to-b from-green-50 to-white p-6">
 
       {/* Header */}
-      <div className="w-full pt-4">
-        <h1 className="text-xl font-bold text-gray-700">Hanna Live</h1>
-        <div className="text-sm text-gray-500">
-          {status === 'idle' ? 'Tap Mic to Start' : 'Connected'}
+      <div className="w-full pt-4 text-center">
+        <h1 className="text-2xl font-bold text-gray-800">Hanna Live</h1>
+        <div className="text-sm text-gray-500 mt-1">
+          {liffReady ? 'เชื่อมต่อแล้ว' : 'กำลังเริ่มต้น...'}
         </div>
       </div>
 
       {/* Avatar Area */}
-      <div className="flex-1 flex items-center justify-center w-full relative">
+      <div className="flex-1 flex flex-col items-center justify-center w-full relative">
         <motion.div
-          animate={{
-            scale: status === 'listening' ? [1, 1.1, 1] : status === 'speaking' ? [1, 1.05, 1] : 1,
-            opacity: status === 'processing' ? 0.7 : 1
-          }}
-          transition={{ repeat: Infinity, duration: status === 'speaking' ? 0.5 : 2 }}
-          className="w-48 h-48 bg-white rounded-full shadow-2xl flex items-center justify-center border-4 border-primary relative z-10"
+          animate={getAvatarAnimation()}
+          className="w-48 h-48 bg-white rounded-full shadow-2xl flex items-center justify-center border-4 border-green-500 relative z-10 mb-8"
         >
           <img
             src="https://cdn-icons-png.flaticon.com/512/4228/4228704.png"
@@ -142,57 +97,59 @@ function App() {
             initial={{ scale: 1, opacity: 0.5 }}
             animate={{ scale: 2, opacity: 0 }}
             transition={{ repeat: Infinity, duration: 1.5 }}
-            className="absolute w-48 h-48 bg-primary rounded-full -z-0"
+            className="absolute w-48 h-48 bg-green-500 rounded-full"
+            style={{ top: '50%', left: '50%', transform: 'translate(-50%, -60%)' }}
           />
+        )}
+
+        {/* Status Text */}
+        <div className="text-lg font-medium text-green-600">
+          {getStatusMessage()}
+        </div>
+
+        {/* Error Display */}
+        {(geminiError || liffError) && (
+          <div className="mt-4 text-red-500 text-sm text-center">
+            {geminiError || liffError}
+          </div>
         )}
       </div>
 
-      {/* Status Text */}
-      <div className="h-12 mb-8 text-lg font-medium text-primary">
-        {status === 'listening' && "Listening..."}
-        {status === 'processing' && "Thinking..."}
-        {status === 'speaking' && "Speaking..."}
-      </div>
-
       {/* Controls */}
-      <div className="flex gap-6 mb-12">
+      <div className="flex flex-col items-center gap-4 mb-12 w-full max-w-xs">
+        {/* Primary Action - Mic Button */}
         <button
-          onMouseDown={startRecording}
-          onMouseUp={stopRecording}
-          onTouchStart={startRecording}
-          onTouchEnd={stopRecording}
-          className={`p-6 rounded-full shadow-xl transition-all transform active:scale-95 ${status === 'listening' ? 'bg-red-500 text-white' : 'bg-primary text-white'}`}
+          onMouseDown={startListening}
+          onMouseUp={stopListening}
+          onTouchStart={startListening}
+          onTouchEnd={stopListening}
+          disabled={status === 'connecting' || status === 'error'}
+          className={`w-20 h-20 rounded-full shadow-2xl transition-all transform active:scale-95 disabled:opacity-50 ${status === 'listening'
+              ? 'bg-red-500 text-white'
+              : 'bg-green-500 text-white'
+            }`}
         >
-          <Mic size={32} />
+          <Mic size={40} className="mx-auto" />
         </button>
 
+        {/* Instruction Text */}
+        <div className="text-xs text-gray-500 text-center">
+          กดค้างไมค์เพื่อพูด<br />
+          ปล่อยเพื่อส่งข้อความ
+        </div>
+
+        {/* End Call Button */}
         <button
           onClick={() => {
-            setStatus('idle')
-            audioPlayerRef.current.pause()
+            disconnect()
+            liff.closeWindow()
           }}
-          className="p-4 rounded-full bg-gray-200 text-gray-700 shadow-lg"
+          className="px-6 py-3 rounded-full bg-gray-200 text-gray-700 shadow-lg hover:bg-gray-300 transition-colors flex items-center gap-2"
         >
-          <PhoneOff size={28} />
-        </button>
-
-        <button
-          className="p-4 rounded-full bg-white text-gray-700 shadow-lg"
-          onClick={() => alert('Video Call Feature Coming Soon!')}
-        >
-          <Video size={28} />
+          <PhoneOff size={20} />
+          <span>วางสาย</span>
         </button>
       </div>
-
-      <div className="text-xs text-gray-400 mb-4">
-        Hold Mic button to speak
-      </div>
-
-      {liffError && (
-        <div className="absolute top-0 left-0 w-full bg-red-100 text-red-600 text-xs p-2 text-center">
-          LIFF Error: {liffError}
-        </div>
-      )}
     </div>
   )
 }

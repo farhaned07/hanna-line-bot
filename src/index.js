@@ -52,8 +52,38 @@ app.get('/health', async (req, res) => {
     }
 });
 
+});
+
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
-    console.log(`listening on ${port}`);
+const http = require('http');
+const WebSocket = require('ws');
+const GeminiLiveService = require('./services/geminiLive');
+
+// Create HTTP server
+const server = http.createServer(app);
+
+// Create WebSocket server for Gemini Live
+const wss = new WebSocket.Server({
+    server,
+    path: '/api/voice/live'
+});
+
+// Initialize Gemini Live service
+const geminiLive = new GeminiLiveService(process.env.GEMINI_API_KEY);
+
+wss.on('connection', (ws, req) => {
+    console.log('New WebSocket connection for Gemini Live');
+
+    // Extract userId from query string or generate one
+    const url = new URL(req.url, `http://${req.headers.host}`);
+    const userId = url.searchParams.get('userId') || `user_${Date.now()}`;
+
+    // Create Gemini Live session
+    geminiLive.createSession(userId, ws);
+});
+
+server.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
+    console.log(`WebSocket endpoint: ws://localhost:${port}/api/voice/live`);
     initScheduler();
 });
