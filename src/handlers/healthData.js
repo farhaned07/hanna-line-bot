@@ -1,24 +1,106 @@
 const db = require('../services/db');
+const lineNotify = require('../services/lineNotify');
 
 /**
- * Log a health check-in response
+ * Red Flag Keywords (Emergency Symptoms)
+ */
+const RED_FLAG_KEYWORDS = [
+    'เจ็บหน้าอก', 'chest pain', 'pain chest',
+    'หน้ามืด', 'faint', 'dizzy',
+    'หายใจไม่ออก', 'breathing', 'breath',
+    'เลือดออก', 'bleeding', 'blood',
+    'ช็อก', 'shock',
+    'ชัก', 'seizure', 'convulsion'
+];
+
+/**
+ * Log a health check-in response with Red Flag detection
  * @param {string} userId - LINE user ID
  * @param {string} mood - User's mood (good, bad, etc.)
  * @param {string} symptoms - Any symptoms reported
  * @param {number} glucoseLevel - Optional glucose reading
+ * @returns {object} { success: boolean, alertLevel: string, alertMessage: string }
  */
 const logCheckIn = async (userId, mood, symptoms = null, glucoseLevel = null) => {
+    let alertLevel = 'green';
+    let alertMessage = '';
+    let shouldNotifyStaff = false;
+
+    // 1. Check Glucose Levels (Critical Thresholds)
+    if (glucoseLevel) {
+        const glucose = parseInt(glucoseLevel);
+
+        if (glucose > 400) {
+            alertLevel = 'red';
+            alertMessage = `🚨 CRITICAL HIGH GLUCOSE: ${glucose} mg/dL`;
+            shouldNotifyStaff = true;
+        } else if (glucose < 70) {
+            alertLevel = 'red';
+            alertMessage = `🚨 CRITICAL LOW GLUCOSE: ${glucose} mg/dL`;
+            shouldNotifyStaff = true;
+        } else if (glucose > 250) {
+            alertLevel = 'yellow';
+            alertMessage = `⚠️ High glucose: ${glucose} mg/dL`;
+        } else if (glucose < 90) {
+            alertLevel = 'yellow';
+            alertMessage = `⚠️ Low glucose: ${glucose} mg/dL`;
+        }
+    }
+
+    // 2. Check for Emergency Symptoms (Red Flag Keywords)
+    if (symptoms) {
+        const symptomsLower = symptoms.toLowerCase();
+
+        for (const keyword of RED_FLAG_KEYWORDS) {
+            if (symptomsLower.includes(keyword.toLowerCase())) {
+                alertLevel = 'red';
+                alertMessage = `🚨 EMERGENCY SYMPTOM DETECTED: "${symptoms}"`;
+                shouldNotifyStaff = true;
+                break;
+            }
+        }
+    }
+
+    // 3. Send Alert to Staff (LINE Notify) if Red Flag
+    if (shouldNotifyStaff) {
+        try {
+            // Get patient name from database
+            const userResult = await db.query(
+                'SELECT name FROM chronic_patients WHERE line_user_id = $1',
+                [userId]
+            );
+            const patientName = userResult.rows[0]?.name || 'Unknown Patient';
+
+            const notifyMessage = `${alertMessage}\n\nPatient: ${patientName}\nUser ID: ${userId}\nTime: ${new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' })}`;
+
+            await lineNotify.sendAlert(notifyMessage);
+            console.log(`🚨 RED FLAG ALERT sent for ${userId}`);
+        } catch (error) {
+            console.error('❌ Error sending alert:', error);
+        }
+    }
+
+    // 4. Save to Database
     try {
         await db.query(
-            `INSERT INTO check_ins (line_user_id, mood, symptoms, glucose_level, check_in_time)
-             VALUES ($1, $2, $3, $4, NOW())`,
-            [userId, mood, symptoms, glucoseLevel]
+            `INSERT INTO check_ins (line_user_id, mood, symptoms, glucose_level, alert_level, check_in_time)
+             VALUES ($1, $2, $3, $4, $5, NOW())`,
+            [userId, mood, symptoms, glucoseLevel, alertLevel]
         );
-        console.log(`✅ Check-in logged for ${userId}`);
-        return true;
+        console.log(`✅ Check-in logged for ${userId} (Alert Level: ${alertLevel})`);
+
+        return {
+            success: true,
+            alertLevel,
+            alertMessage: alertMessage || 'Check-in recorded successfully'
+        };
     } catch (error) {
         console.error('❌ Error logging check-in:', error);
-        return false;
+        return {
+            success: false,
+            alertLevel: 'error',
+            alertMessage: 'Failed to save check-in'
+        };
     }
 };
 
