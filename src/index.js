@@ -52,7 +52,7 @@ app.get('/health', async (req, res) => {
     }
 });
 
-});
+
 
 const port = process.env.PORT || 3000;
 const http = require('http');
