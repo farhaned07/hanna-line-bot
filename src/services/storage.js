@@ -2,9 +2,15 @@ const { createClient } = require('@supabase/supabase-js');
 
 // Initialize Supabase
 const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_KEY; // Use Service Key for storage writes if RLS is strict, or Anon if public
+const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+let supabase = null;
+
+if (supabaseUrl && supabaseKey) {
+    supabase = createClient(supabaseUrl, supabaseKey);
+} else {
+    console.warn('⚠️ Supabase Storage credentials missing. Audio upload disabled.');
+}
 
 const BUCKET_NAME = 'audio-messages';
 
@@ -15,6 +21,11 @@ const BUCKET_NAME = 'audio-messages';
  * @returns {Promise<string>} - Public URL of the uploaded file
  */
 const uploadAudio = async (buffer, filename) => {
+    if (!supabase) {
+        console.warn('⚠️ Skipping upload: Supabase not configured.');
+        return null;
+    }
+
     try {
         console.log(`☁️ Uploading ${filename} to Supabase...`);
 
