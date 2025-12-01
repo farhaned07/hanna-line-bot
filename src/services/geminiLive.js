@@ -141,8 +141,8 @@ class GeminiLiveService {
         });
 
         // Handle Gemini close
-        geminiWs.on('close', () => {
-            console.log('Gemini connection closed');
+        geminiWs.on('close', (code, reason) => {
+            console.log(`Gemini connection closed. Code: ${code}, Reason: ${reason.toString()}`);
             session.connected = false;
             this.sessions.delete(userId);
         });
