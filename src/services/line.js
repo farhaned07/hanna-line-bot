@@ -8,4 +8,5 @@ module.exports = {
     replyMessage: (token, messages) => client.replyMessage(token, messages),
     pushMessage: (to, messages) => client.pushMessage(to, messages),
     getProfile: (userId) => client.getProfile(userId),
+    getMessageContent: (messageId) => client.getMessageContent(messageId),
 };
