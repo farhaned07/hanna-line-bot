@@ -10,7 +10,7 @@ const { handleEvent } = require('./handlers/webhook');
 const { config } = require('./config');
 const { initScheduler } = require('./scheduler');
 
-const app = express();
+});
 
 // Logging Middleware
 app.use((req, res, next) => {
@@ -18,25 +18,13 @@ app.use((req, res, next) => {
     next();
 });
 
-// Serve Static Files (Hanna Live Frontend)
-const path = require('path');
-app.use(express.static(path.join(__dirname, '../public')));
-
-
-// LINE Webhook
-app.post('/webhook', middleware(config.line), (req, res) => {
-    console.log('Webhook received events:', JSON.stringify(req.body.events));
-    Promise.all(req.body.events.map(handleEvent))
-        .then((result) => res.json(result))
-        .catch((err) => {
-            console.error(err);
-            res.status(500).end();
-        });
-});
-
 // Enable CORS for LIFF
 const cors = require('cors');
 app.use(cors());
+
+// Serve Static Files (Hanna Live Frontend)
+const path = require('path');
+app.use(express.static(path.join(__dirname, '../public')));
 
 // Voice API endpoint for LIFF audio processing
 app.post('/api/chat/voice', express.json({ limit: '10mb' }), require('./routes/voice'));

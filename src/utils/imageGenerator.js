@@ -66,7 +66,7 @@ const generateRichMenuImage = () => {
     };
 
     // Draw buttons
-    drawButton(0, 0, '🩺', 'เช็คสุขภาพ', '#E8F5E9');
+    drawButton(0, 0, '🎙️', 'โทรหาฮันนา', '#E8F5E9');
     drawButton(cellWidth, 0, '💊', 'บันทึกกินยา', '#FFF3E0');
     drawButton(0, cellHeight, '👤', 'โปรไฟล์ของฉัน', '#E3F2FD');
     drawButton(cellWidth, cellHeight, 'ℹ️', 'ช่วยเหลือ', '#F3E5F5');
