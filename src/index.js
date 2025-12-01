@@ -18,6 +18,11 @@ app.use((req, res, next) => {
     next();
 });
 
+// Serve Static Files (Hanna Live Frontend)
+const path = require('path');
+app.use(express.static(path.join(__dirname, '../public')));
+
+
 // LINE Webhook
 app.post('/webhook', middleware(config.line), (req, res) => {
     console.log('Webhook received events:', JSON.stringify(req.body.events));
@@ -28,6 +33,14 @@ app.post('/webhook', middleware(config.line), (req, res) => {
             res.status(500).end();
         });
 });
+
+// Enable CORS for LIFF
+const cors = require('cors');
+app.use(cors());
+
+// Voice API endpoint for LIFF audio processing
+app.post('/api/chat/voice', express.json({ limit: '10mb' }), require('./routes/voice'));
+
 
 // Health check
 app.get('/health', async (req, res) => {
