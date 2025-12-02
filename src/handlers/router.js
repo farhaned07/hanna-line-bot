@@ -266,6 +266,65 @@ const handleMessage = async (event) => {
             });
         }
 
+        // Admin Command: Setup Rich Menu (temporary - for updating menu without SSH)
+        if (text === 'admin:setup-richmenu') {
+            console.log(`[Admin] Rich Menu setup triggered by user ${userId}`);
+
+            // Import Rich Menu functions
+            const { createRichMenu, setDefaultRichMenu, listRichMenus, deleteRichMenu, uploadRichMenuImage } = require('../services/richMenu');
+            const { generateRichMenuImage } = require('../utils/imageGenerator');
+
+            // Send initial acknowledgement
+            await line.replyMessage(event.replyToken, {
+                type: 'text',
+                text: '🔧 Starting Rich Menu setup...\nThis may take 10-15 seconds.'
+            });
+
+            try {
+                // Generate image
+                console.log('[Admin] Generating Rich Menu image...');
+                const imagePath = generateRichMenuImage();
+
+                // List and delete existing menus
+                console.log('[Admin] Checking existing rich menus...');
+                const existing = await listRichMenus();
+
+                if (existing.length > 0) {
+                    console.log(`[Admin] Deleting ${existing.length} old rich menus...`);
+                    for (const menu of existing) {
+                        await deleteRichMenu(menu.richMenuId);
+                    }
+                }
+
+                // Create new rich menu
+                console.log('[Admin] Creating new rich menu...');
+                const richMenuId = await createRichMenu();
+
+                // Upload image
+                console.log('[Admin] Uploading Rich Menu image...');
+                await uploadRichMenuImage(richMenuId, imagePath);
+
+                // Set as default
+                console.log('[Admin] Setting as default rich menu...');
+                await setDefaultRichMenu(richMenuId);
+
+                console.log('[Admin] Rich Menu setup complete!');
+
+                // Send success message
+                return line.pushMessage(userId, {
+                    type: 'text',
+                    text: '✅ Rich Menu updated successfully!\n\nPlease close and reopen the chat to see the new menu.'
+                });
+
+            } catch (error) {
+                console.error('[Admin] Rich Menu setup failed:', error);
+                return line.pushMessage(userId, {
+                    type: 'text',
+                    text: `❌ Rich Menu setup failed:\n${error.message}`
+                });
+            }
+        }
+
         // Default response
         // --- Conversation Memory & Smart Routing ---
         // Store last 5 messages in memory (for MVP - move to Redis/DB for production)
