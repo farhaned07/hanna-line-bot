@@ -8,8 +8,8 @@ const handlePlanSelection = async (event, plan) => {
 
     if (plan === 'trial') {
         // Start 14-day trial
-        const trialEndDate = new Date();
-        trialEndDate.setDate(trialEndDate.getDate() + 14);
+        const moment = require('moment-timezone');
+        const trialEndDate = moment().tz('Asia/Bangkok').add(14, 'days').endOf('day').toDate();
 
         await db.query(
             `UPDATE chronic_patients 

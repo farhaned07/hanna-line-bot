@@ -40,6 +40,25 @@ app.post('/webhook', middleware(config.line), (req, res) => {
 // Voice API endpoint for LIFF audio processing
 app.post('/api/chat/voice', express.json({ limit: '10mb' }), require('./routes/voice'));
 
+app.use(express.json());
+app.use(express.static('public')); // Serve static files (Privacy Policy)
+
+// Report Generation Endpoint
+const reportService = require('./services/report');
+app.get('/api/report/:userId', async (req, res) => {
+    try {
+        const pdfBuffer = await reportService.generateReport(req.params.userId);
+        res.set({
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': `attachment; filename=health_report_${req.params.userId}.pdf`,
+        });
+        res.send(pdfBuffer);
+    } catch (error) {
+        console.error('Report generation error:', error);
+        res.status(500).send('Error generating report');
+    }
+});
+
 // Health check
 app.get('/health', async (req, res) => {
     try {

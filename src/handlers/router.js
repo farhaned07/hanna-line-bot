@@ -230,9 +230,52 @@ const handleMessage = async (event) => {
         }
 
         // Default response
+        // --- Conversation Memory & Smart Routing ---
+        // Store last 5 messages in memory (for MVP - move to Redis/DB for production)
+        if (!global.conversationHistory) global.conversationHistory = {};
+        if (!global.conversationHistory[userId]) global.conversationHistory[userId] = [];
+
+        global.conversationHistory[userId].push({ role: 'user', text: text });
+        if (global.conversationHistory[userId].length > 5) global.conversationHistory[userId].shift();
+
+        // Smart Routing: Detect complex medical questions
+        const complexKeywords = ['ทำไม', 'อย่างไร', 'อาการ', 'สาเหตุ', 'รักษา', 'why', 'how', 'symptom', 'cause'];
+        const isComplex = complexKeywords.some(kw => text.includes(kw)) && text.length > 20;
+
+        if (isComplex) {
+            return line.replyMessage(event.replyToken, {
+                type: 'flex',
+                altText: '💡 คำถามนี้น่าสนใจค่ะ',
+                contents: {
+                    type: 'bubble',
+                    body: {
+                        type: 'box',
+                        layout: 'vertical',
+                        contents: [
+                            { type: 'text', text: '💡 คำถามนี้น่าสนใจค่ะ', weight: 'bold', color: '#06C755' },
+                            { type: 'text', text: 'เพื่อให้ฮันนาตอบได้ละเอียดและชัดเจนกว่านี้ ลองคุยด้วยเสียงไหมคะ? ฮันนาจะอธิบายให้ฟังยาวๆ เลยค่ะ 😊', margin: 'md', wrap: true, size: 'sm' }
+                        ]
+                    },
+                    footer: {
+                        type: 'box',
+                        layout: 'vertical',
+                        contents: [
+                            {
+                                type: 'button',
+                                style: 'primary',
+                                color: '#06C755',
+                                action: { type: 'uri', label: '📞 คุยกับฮันนา (Gemini Live)', uri: `https://liff.line.me/${process.env.LIFF_ID}` }
+                            }
+                        ]
+                    }
+                }
+            });
+        }
+
+        // Default: Simple acknowledgement (or pass to Gemini Text API if enabled)
         return line.replyMessage(event.replyToken, {
             type: 'text',
-            text: 'ขอบคุณค่ะ ฮันนาได้รับข้อความแล้ว 😊'
+            text: 'ขอบคุณค่ะ ฮันนาได้รับข้อความแล้ว 😊\n(ฮันนากำลังเรียนรู้ที่จะตอบแชทเก่งขึ้น เร็วๆ นี้จะคุยได้ยาวๆ นะคะ)'
         });
     }
 

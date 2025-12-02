@@ -125,8 +125,8 @@ function App() {
           onTouchEnd={stopListening}
           disabled={status === 'connecting' || status === 'error'}
           className={`w-20 h-20 rounded-full shadow-2xl transition-all transform active:scale-95 disabled:opacity-50 ${status === 'listening'
-              ? 'bg-red-500 text-white'
-              : 'bg-green-500 text-white'
+            ? 'bg-red-500 text-white'
+            : 'bg-green-500 text-white'
             }`}
         >
           <Mic size={40} className="mx-auto" />
@@ -137,6 +137,15 @@ function App() {
           กดค้างไมค์เพื่อพูด<br />
           ปล่อยเพื่อส่งข้อความ
         </div>
+
+        {/* Report Button */}
+        <a
+          href={`${import.meta.env.VITE_BACKEND_URL}/api/report/${userId}`}
+          target="_blank"
+          className="mt-4 px-4 py-2 bg-blue-50 text-blue-600 rounded-full text-sm font-medium hover:bg-blue-100 transition-colors flex items-center gap-2"
+        >
+          📄 สรุปผลสุขภาพ (PDF)
+        </a>
 
         {/* End Call Button */}
         <button

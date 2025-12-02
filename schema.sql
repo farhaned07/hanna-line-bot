@@ -8,7 +8,12 @@ CREATE TABLE IF NOT EXISTS chronic_patients (
     display_name VARCHAR(255),
     name VARCHAR(255),
     age INTEGER,
-    condition VARCHAR(50), -- 'Type 1', 'Type 2', etc.
+    condition VARCHAR(50), -- 'Type 1', 'Type 2'
+    
+    -- PDPA Consent
+    consent_pdpa BOOLEAN DEFAULT FALSE,
+    consent_medical_share BOOLEAN DEFAULT FALSE,
+    consent_date TIMESTAMP,
     phone_number VARCHAR(20),
     
     -- Status
@@ -55,3 +60,6 @@ CREATE TABLE IF NOT EXISTS payments (
     
     created_at TIMESTAMP DEFAULT NOW()
 );
+
+-- Performance Index for Health Summary Queries
+CREATE INDEX IF NOT EXISTS idx_checkins_patient_time ON check_ins(patient_id, created_at DESC);

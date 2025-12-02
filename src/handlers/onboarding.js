@@ -3,32 +3,66 @@ const line = require('../services/line');
 
 const start = async (event) => {
     const userId = event.source.userId;
-    await line.replyMessage(event.replyToken, [
-        {
-            type: 'text',
-            text: '✨ สวัสดีค่ะ! ฮันนาเองนะคะ พยาบาลส่วนตัวของคุณ 💚\nฮันนาพร้อมดูแลสุขภาพคุณให้ดีขึ้นทุกวันค่ะ'
-        },
-        {
-            type: 'text',
-            text: 'ก่อนอื่น... ฮันนาขอทราบ **ชื่อเล่น** ของคุณหน่อยนะคะ 😊'
+
+    // Step 0: PDPA Consent
+    const flexMessage = {
+        type: 'flex',
+        altText: '🔒 ขอความยินยอมข้อมูลส่วนบุคคล',
+        contents: {
+            type: 'bubble',
+            body: {
+                type: 'box',
+                layout: 'vertical',
+                contents: [
+                    { type: 'text', text: '🔒 ความเป็นส่วนตัวของคุณสำคัญ', weight: 'bold', size: 'lg', color: '#06C755' },
+                    { type: 'text', text: 'เพื่อให้ฮันนาดูแลคุณได้อย่างเต็มที่ ฮันนาขออนุญาตเก็บรวบรวมข้อมูลสุขภาพของคุณตามนโยบายความเป็นส่วนตัวนะคะ', margin: 'md', wrap: true, size: 'sm' },
+                    { type: 'separator', margin: 'md' },
+                    { type: 'text', text: 'อ่านนโยบายความเป็นส่วนตัว', size: 'xs', color: '#007AFF', action: { type: 'uri', label: 'อ่านนโยบาย', uri: `${process.env.BASE_URL}/privacy.html` }, margin: 'sm', align: 'center' }
+                ]
+            },
+            footer: {
+                type: 'box',
+                layout: 'vertical',
+                contents: [
+                    { type: 'button', style: 'primary', color: '#06C755', action: { type: 'postback', label: 'ยอมรับและเริ่มใช้งาน ✅', data: 'action=consent_pdpa&value=yes' } },
+                    { type: 'button', action: { type: 'postback', label: 'ไม่ยอมรับ', data: 'action=consent_pdpa&value=no' }, margin: 'sm', height: 'sm', style: 'link', color: '#666666' }
+                ]
+            }
         }
-    ]);
-    await db.query('UPDATE chronic_patients SET onboarding_step = 1 WHERE line_user_id = $1', [userId]);
+    };
+
+    await line.replyMessage(event.replyToken, flexMessage);
+    // Set step to 0 (Consent)
+    await db.query('UPDATE chronic_patients SET onboarding_step = 0 WHERE line_user_id = $1', [userId]);
 };
 
 const handleInput = async (event, user) => {
     const userId = user.line_user_id;
     const step = user.onboarding_step;
     let input = '';
+    let action = '';
 
     if (event.type === 'message' && event.message.type === 'text') {
         input = event.message.text;
     } else if (event.type === 'postback') {
         const data = new URLSearchParams(event.postback.data);
         input = data.get('value');
+        action = data.get('action');
     }
 
-    if (step === 1) {
+    if (step === 0) {
+        // Consent received
+        if (action === 'consent_pdpa' && input === 'yes') {
+            await db.query('UPDATE chronic_patients SET consent_pdpa = TRUE, consent_date = NOW(), onboarding_step = 1 WHERE line_user_id = $1', [userId]);
+            await line.replyMessage(event.replyToken, [
+                { type: 'text', text: 'ขอบคุณที่ไว้ใจฮันนานะคะ 💚' },
+                { type: 'text', text: '✨ สวัสดีค่ะ! ฮันนาเองนะคะ พยาบาลส่วนตัวของคุณ \nฮันนาพร้อมดูแลสุขภาพคุณให้ดีขึ้นทุกวันค่ะ' },
+                { type: 'text', text: 'ก่อนอื่น... ฮันนาขอทราบ **ชื่อเล่น** ของคุณหน่อยนะคะ 😊' }
+            ]);
+        } else {
+            await line.replyMessage(event.replyToken, { type: 'text', text: 'ขออภัยค่ะ ฮันนาไม่สามารถให้บริการได้หากไม่ได้รับความยินยอม 😢\nหากเปลี่ยนใจ สามารถพิมพ์ "เริ่มใหม่" ได้เสมอนะคะ' });
+        }
+    } else if (step === 1) {
         // Name received
         await db.query('UPDATE chronic_patients SET name = $1, onboarding_step = 2 WHERE line_user_id = $2', [input, userId]);
         await line.replyMessage(event.replyToken, {
