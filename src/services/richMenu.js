@@ -27,7 +27,7 @@ const createRichMenu = async () => {
                 action: {
                     type: 'uri',
                     label: 'Call Hanna',
-                    uri: 'line://app/2008593893-Bj5k3djg'
+                    uri: `https://liff.line.me/${process.env.LIFF_ID}`
                 }
             },
             {
@@ -62,8 +62,8 @@ const createRichMenu = async () => {
                     height: 843
                 },
                 action: {
-                    type: 'uri',
-                    uri: 'https://lin.ee/519fiets'
+                    type: 'message',
+                    text: 'ช่วยเหลือ'
                 }
             }
         ]

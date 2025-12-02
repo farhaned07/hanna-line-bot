@@ -229,6 +229,43 @@ const handleMessage = async (event) => {
             });
         }
 
+        // Help
+        if (text === 'ช่วยเหลือ' || text === 'help') {
+            return line.replyMessage(event.replyToken, {
+                type: 'flex',
+                altText: '❓ ศูนย์ช่วยเหลือ',
+                contents: {
+                    type: 'bubble',
+                    body: {
+                        type: 'box',
+                        layout: 'vertical',
+                        contents: [
+                            { type: 'text', text: '❓ ศูนย์ช่วยเหลือ', weight: 'bold', size: 'xl', color: '#06C755' },
+                            { type: 'text', text: 'มีอะไรให้ฮันนาช่วยไหมคะ?', margin: 'md', weight: 'bold' },
+                            { type: 'separator', margin: 'md' },
+                            { type: 'text', text: 'คำสั่งที่ใช้ได้:', margin: 'md', weight: 'bold', size: 'sm' },
+                            { type: 'text', text: '• "เช็คสุขภาพ" - บันทึกอาการประจำวัน', size: 'sm', margin: 'sm', color: '#666666' },
+                            { type: 'text', text: '• "บันทึกกินยา" - บันทึกการกินยา', size: 'sm', margin: 'sm', color: '#666666' },
+                            { type: 'text', text: '• "โปรไฟล์ของฉัน" - ดูสรุปสุขภาพ', size: 'sm', margin: 'sm', color: '#666666' },
+                            { type: 'text', text: '• "เริ่มใหม่" - เริ่มต้นการใช้งานใหม่', size: 'sm', margin: 'sm', color: '#666666' }
+                        ]
+                    },
+                    footer: {
+                        type: 'box',
+                        layout: 'vertical',
+                        contents: [
+                            {
+                                type: 'button',
+                                style: 'primary',
+                                color: '#06C755',
+                                action: { type: 'uri', label: '📞 ติดต่อเจ้าหน้าที่', uri: 'https://lin.ee/519fiets' }
+                            }
+                        ]
+                    }
+                }
+            });
+        }
+
         // Default response
         // --- Conversation Memory & Smart Routing ---
         // Store last 5 messages in memory (for MVP - move to Redis/DB for production)
