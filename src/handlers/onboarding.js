@@ -50,9 +50,12 @@ const handleInput = async (event, user) => {
         action = data.get('action');
     }
 
+    console.log(`[Onboarding] User ${userId} at Step ${step}. Input: ${input}, Action: ${action}`);
+
     if (step === 0) {
         // Consent received
         if (action === 'consent_pdpa' && input === 'yes') {
+            console.log(`[Onboarding] User ${userId} accepted consent. Moving to Step 1.`);
             await db.query('UPDATE chronic_patients SET consent_pdpa = TRUE, consent_date = NOW(), onboarding_step = 1 WHERE line_user_id = $1', [userId]);
             await line.replyMessage(event.replyToken, [
                 { type: 'text', text: 'ขอบคุณที่ไว้ใจฮันนานะคะ 💚' },
@@ -60,7 +63,37 @@ const handleInput = async (event, user) => {
                 { type: 'text', text: 'ก่อนอื่น... ฮันนาขอทราบ **ชื่อเล่น** ของคุณหน่อยนะคะ 😊' }
             ]);
         } else {
-            await line.replyMessage(event.replyToken, { type: 'text', text: 'ขออภัยค่ะ ฮันนาไม่สามารถให้บริการได้หากไม่ได้รับความยินยอม 😢\nหากเปลี่ยนใจ สามารถพิมพ์ "เริ่มใหม่" ได้เสมอนะคะ' });
+            // If user types text or declines, re-send consent card
+            console.log(`[Onboarding] User ${userId} sent invalid input at Step 0. Re-sending consent.`);
+
+            const flexMessage = {
+                type: 'flex',
+                altText: '🔒 ขอความยินยอมข้อมูลส่วนบุคคล',
+                contents: {
+                    type: 'bubble',
+                    body: {
+                        type: 'box',
+                        layout: 'vertical',
+                        contents: [
+                            { type: 'text', text: '⚠️ กรุณากดยอมรับเพื่อดำเนินการต่อ', weight: 'bold', color: '#FF3333', size: 'sm', margin: 'md' },
+                            { type: 'text', text: '🔒 ความเป็นส่วนตัวของคุณสำคัญ', weight: 'bold', size: 'lg', color: '#06C755', margin: 'sm' },
+                            { type: 'text', text: 'เพื่อให้ฮันนาดูแลคุณได้อย่างเต็มที่ ฮันนาขออนุญาตเก็บรวบรวมข้อมูลสุขภาพของคุณตามนโยบายความเป็นส่วนตัวนะคะ', margin: 'md', wrap: true, size: 'sm' },
+                            { type: 'separator', margin: 'md' },
+                            { type: 'text', text: 'อ่านนโยบายความเป็นส่วนตัว', size: 'xs', color: '#007AFF', action: { type: 'uri', label: 'อ่านนโยบาย', uri: `${process.env.BASE_URL}/privacy.html` }, margin: 'sm', align: 'center' }
+                        ]
+                    },
+                    footer: {
+                        type: 'box',
+                        layout: 'vertical',
+                        contents: [
+                            { type: 'button', style: 'primary', color: '#06C755', action: { type: 'postback', label: 'ยอมรับและเริ่มใช้งาน ✅', data: 'action=consent_pdpa&value=yes' } },
+                            { type: 'button', action: { type: 'postback', label: 'ไม่ยอมรับ', data: 'action=consent_pdpa&value=no' }, margin: 'sm', height: 'sm', style: 'link', color: '#666666' }
+                        ]
+                    }
+                }
+            };
+
+            await line.replyMessage(event.replyToken, flexMessage);
         }
     } else if (step === 1) {
         // Name received
