@@ -77,21 +77,34 @@ ngrok http 3000
 
 ## Features
 
-### LINE Bot (Asynchronous)
-- ✅ **Onboarding**: 5-step flow to collect user info
+### LINE Bot (Asynchronous Care)
+- ✅ **PDPA Compliance**: Privacy consent flow with policy page
+- ✅ **Onboarding**: 6-step flow (consent → profile → trial activation)
+- ✅ **Trial Management**: 14-day trial with proactive reminders (Day 10, 12, 14)
 - ✅ **Payment**: PromptPay QR generation for subscription
-- ✅ **Daily Messages**: 
-  - 8:00 AM: Morning check-in
+- ✅ **Scheduled Messages**: 
+  - 8:00 AM: Morning health check-in
   - 7:00 PM: Medication reminder
-- ✅ **Health Logging**: Track glucose, medication adherence
-- ✅ **Voice Messages**: Upload audio → Gemini processes → TTS response
+- ✅ **Health Logging**: Track glucose, blood pressure, medication adherence
+- ✅ **Red Flag Detection**: 13 emergency keywords → LINE Notify alerts
+- ✅ **Smart Routing**: Detects complex questions → suggests Gemini Live
+- ✅ **Conversation Memory**: Last 5 messages context retention
+- ✅ **Doctor Report**: PDF generation with 30-day health summary
 
-### Gemini Live (Real-time)
-- ✅ **Real-time Voice**: Bidirectional audio streaming
+### Gemini Live (Real-time Voice Consultation)
+- ✅ **Real-time Voice**: Bidirectional audio streaming (WebSocket)
 - ✅ **Low Latency**: < 1 second response time
 - ✅ **Natural Conversation**: Context preservation, interruption handling
-- ✅ **LIFF Interface**: Push-to-talk web app
-- ✅ **Thai Voice**: Native Thai speech (Puck voice)
+- ✅ **Premium LIFF Interface**: 
+  - Glassmorphism design (frosted glass cards)
+  - Animated background orbs (ambient lighting)
+  - Breathing avatar animation
+  - Voice waveform visualization (5 bars)
+  - Thai-optimized fonts (Prompt, Sarabun)
+  - Medical-grade color palette (emerald + blue)
+  - Smooth Framer Motion animations
+- ✅ **Push-to-Talk**: Mobile-optimized touch controls
+- ✅ **Thai Voice**: Native Thai speech support
 
 ---
 

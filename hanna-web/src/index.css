@@ -1,25 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
+  /* Premium Medical Color Palette */
+  --hanna-primary: #10b981;
+  /* Emerald green */
+  --hanna-primary-light: #34d399;
+  --hanna-primary-dark: #059669;
+  --hanna-secondary: #3b82f6;
+  /* Medical blue */
+  --hanna-accent: #8b5cf6;
+  /* Purple accent */
+  --hanna-bg-start: #f0fdf4;
+  /* Light green */
+  --hanna-bg-end: #eff6ff;
+  /* Light blue */
+  --hanna-surface: rgba(255, 255, 255, 0.7);
+  --hanna-shadow: rgba(0, 0, 0, 0.08);
+
+  /* Typography */
+  font-family: 'Sarabun', 'Prompt', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.6;
   font-weight: 400;
-  background-color: #f0f2f5;
+
+  /* Smooth rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--hanna-bg-start) 0%, var(--hanna-bg-end) 100%);
 }
 
 #root {
   width: 100%;
   height: 100vh;
   margin: 0 auto;
-  text-align: center;
+  overflow: hidden;
+}
+
+/* Glassmorphism utility */
+.glass {
+  background: var(--hanna-surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Smooth transitions */
+.transition-smooth {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--hanna-primary);
+  border-radius: 4px;
 }
