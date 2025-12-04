@@ -240,7 +240,7 @@ const handleInput = async (event, user) => {
             {
                 // Flex Message for Trial Offer
                 type: 'flex',
-                altText: '🎁 ทดลองใช้ฟรี 14 วัน',
+                altText: '🎁 ทดลองใช้ฟรี 7 วัน',
                 contents: {
                     type: 'bubble',
                     hero: {
@@ -254,13 +254,13 @@ const handleInput = async (event, user) => {
                         type: 'box',
                         layout: 'vertical',
                         contents: [
-                            { type: 'text', text: '🎁 ทดลองใช้ฟรี 14 วัน', weight: 'bold', size: 'xl', color: '#1DB446' },
+                            { type: 'text', text: '🎁 ทดลองใช้ฟรี 7 วัน', weight: 'bold', size: 'xl', color: '#1DB446' },
                             { type: 'text', text: 'ไม่ต้องใส่บัตร ไม่มีค่าใช้จ่าย', margin: 'sm', size: 'sm', color: '#999999' },
                             { type: 'separator', margin: 'md' },
                             { type: 'text', text: 'คุณจะได้รับ:', weight: 'bold', margin: 'md' },
                             { type: 'text', text: '✅ ฮันนาเช็คสุขภาพทุกเช้า', size: 'sm', color: '#666666', margin: 'sm' },
                             { type: 'text', text: '✅ เตือนกินยาตรงเวลา', size: 'sm', color: '#666666', margin: 'sm' },
-                            { type: 'text', text: '✅ คุยด้วยเสียงได้ตลอด (Gemini Live)', size: 'sm', color: '#666666', margin: 'sm' },
+                            { type: 'text', text: '✅ พยาบาลวิชาชีพคอยดูแล', size: 'sm', color: '#666666', margin: 'sm' },
                             { type: 'text', text: '✅ สรุปสุขภาพให้ลูกหลาน', size: 'sm', color: '#666666', margin: 'sm' }
                         ]
                     },
