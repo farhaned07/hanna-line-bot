@@ -136,13 +136,66 @@ const handleInput = async (event, user) => {
             },
             {
                 type: 'text',
-                text: 'คุณหมอวินิจฉัยว่าเป็น **เบาหวานชนิดไหน** คะ? 🏥',
-                quickReply: {
-                    items: [
-                        { type: 'action', action: { type: 'postback', label: 'Type 1 (ฉีดอินซูลิน)', data: 'value=Type 1' } },
-                        { type: 'action', action: { type: 'postback', label: 'Type 2 (ทั่วไป)', data: 'value=Type 2' } },
-                        { type: 'action', action: { type: 'postback', label: 'ยังไม่แน่ใจ', data: 'value=Unknown' } }
-                    ]
+                text: `คุณ${user.name}มีภาวะสุขภาพอะไรบ้างคะ? 🏥`
+            },
+            {
+                type: 'flex',
+                altText: 'เลือกประเภทเบาหวาน',
+                contents: {
+                    type: 'bubble',
+                    body: {
+                        type: 'box',
+                        layout: 'vertical',
+                        contents: [
+                            { type: 'text', text: 'คุณหมอวินิจฉัยว่าเป็น', size: 'sm', color: '#999999' },
+                            { type: 'text', text: 'เบาหวานชนิดไหน? 🏥', weight: 'bold', size: 'lg', margin: 'xs' },
+                            { type: 'separator', margin: 'md' },
+                            {
+                                type: 'box',
+                                layout: 'vertical',
+                                margin: 'md',
+                                spacing: 'sm',
+                                contents: [
+                                    {
+                                        type: 'box',
+                                        layout: 'vertical',
+                                        contents: [
+                                            { type: 'text', text: 'Type 1 (ฉีดอินซูลิน)', weight: 'bold', size: 'sm', color: '#1E90FF' },
+                                            { type: 'text', text: 'ร่างกายไม่ผลิตอินซูลิน', size: 'xs', color: '#999999', wrap: true }
+                                        ],
+                                        action: { type: 'postback', data: 'value=Type 1', displayText: 'Type 1 (ฉีดอินซูลิน)' },
+                                        paddingAll: 'sm',
+                                        backgroundColor: '#F0F8FF',
+                                        cornerRadius: 'md'
+                                    },
+                                    {
+                                        type: 'box',
+                                        layout: 'vertical',
+                                        contents: [
+                                            { type: 'text', text: 'Type 2 (ทั่วไป)', weight: 'bold', size: 'sm', color: '#32CD32' },
+                                            { type: 'text', text: 'ควบคุมด้วยยาและอาหาร', size: 'xs', color: '#999999', wrap: true }
+                                        ],
+                                        action: { type: 'postback', data: 'value=Type 2', displayText: 'Type 2 (ทั่วไป)' },
+                                        paddingAll: 'sm',
+                                        backgroundColor: '#F0FFF0',
+                                        cornerRadius: 'md'
+                                    },
+                                    {
+                                        type: 'box',
+                                        layout: 'vertical',
+                                        contents: [
+                                            { type: 'text', text: 'ยังไม่แน่ใจ', weight: 'bold', size: 'sm', color: '#999999' },
+                                            { type: 'text', text: 'ไม่ทราบประเภทที่ชัดเจน', size: 'xs', color: '#999999', wrap: true }
+                                        ],
+                                        action: { type: 'postback', data: 'value=Unknown', displayText: 'ยังไม่แน่ใจ' },
+                                        paddingAll: 'sm',
+                                        backgroundColor: '#F5F5F5',
+                                        cornerRadius: 'md'
+                                    }
+                                ]
+                            }
+                        ]
+                    }
                 }
             }
         ]);
