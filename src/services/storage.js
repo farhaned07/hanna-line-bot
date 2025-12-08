@@ -56,4 +56,46 @@ const uploadAudio = async (buffer, filename) => {
     }
 };
 
-module.exports = { uploadAudio };
+/**
+ * Upload QR code image to Supabase Storage
+ * @param {Buffer} buffer - PNG image buffer
+ * @param {string} filename - Desired filename (e.g., 'qr-payment-123.png')
+ * @returns {Promise<string>} - Public URL of the uploaded file
+ */
+const uploadQR = async (buffer, filename) => {
+    if (!supabase) {
+        console.warn('⚠️ Skipping QR upload: Supabase not configured.');
+        return null;
+    }
+
+    try {
+        console.log(`☁️ Uploading QR ${filename} to Supabase...`);
+
+        const { data, error } = await supabase
+            .storage
+            .from(BUCKET_NAME)
+            .upload(filename, buffer, {
+                contentType: 'image/png',
+                upsert: true
+            });
+
+        if (error) {
+            throw error;
+        }
+
+        // Get Public URL
+        const { data: publicUrlData } = supabase
+            .storage
+            .from(BUCKET_NAME)
+            .getPublicUrl(filename);
+
+        console.log('☁️ QR Upload successful:', publicUrlData.publicUrl);
+        return publicUrlData.publicUrl;
+
+    } catch (error) {
+        console.error('❌ Error uploading QR to Supabase:', error);
+        return null;
+    }
+};
+
+module.exports = { uploadAudio, uploadQR };

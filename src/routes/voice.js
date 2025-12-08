@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { GoogleGenerativeAI } = require("@google/generative-ai");
-const fs = require('fs');
-const path = require('path');
+const tts = require('../services/tts');
+const storage = require('../services/storage');
 
 // Initialize Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -13,8 +13,6 @@ router.post('/', async (req, res) => {
         console.log('Received voice request');
 
         // 1. Get Audio Data (Expect base64 or binary in body)
-        // For MVP, we assume client sends JSON with { audio: "base64..." }
-        // In production, use multer for multipart/form-data
         const { audio } = req.body;
 
         if (!audio) {
@@ -22,12 +20,11 @@ router.post('/', async (req, res) => {
         }
 
         // 2. Process with Gemini (Multimodal)
-        // We send the audio directly to Gemini 2.0 Flash
         const result = await model.generateContent([
             "Listen to this audio and respond as Hanna, a caring AI nurse. Keep it short (1-2 sentences). Respond in Thai.",
             {
                 inlineData: {
-                    mimeType: "audio/wav", // Adjust based on client recording format
+                    mimeType: "audio/wav",
                     data: audio
                 }
             }
@@ -36,12 +33,21 @@ router.post('/', async (req, res) => {
         const responseText = result.response.text();
         console.log('Gemini Response:', responseText);
 
-        // 3. Generate TTS (Text-to-Speech)
-        // TODO: Integrate Google Cloud TTS or similar here.
-        // For now, we return the text and a mock audio URL.
+        // 3. C6 FIX: Generate real TTS audio instead of mock URL
+        let audioUrl = null;
 
-        // Mock Audio for testing frontend playback
-        const mockAudioUrl = "https://actions.google.com/sounds/v1/alarms/beep_short.ogg";
+        try {
+            const speechBuffer = await tts.generateSpeech(responseText);
+
+            if (speechBuffer) {
+                // Upload to Supabase for public URL
+                const filename = `voice-response-${Date.now()}.mp3`;
+                audioUrl = await storage.uploadAudio(speechBuffer, filename);
+            }
+        } catch (ttsError) {
+            console.error('TTS generation failed:', ttsError);
+            // Continue without audio - text response is still valid
+        }
 
         // 4. Determine Emotion (Simple keyword matching for MVP)
         let emotion = 'neutral';
@@ -51,7 +57,7 @@ router.post('/', async (req, res) => {
 
         res.json({
             text: responseText,
-            audioUrl: mockAudioUrl, // Replace with real TTS url later
+            audioUrl: audioUrl, // Real TTS URL (or null if failed)
             emotion: emotion
         });
 

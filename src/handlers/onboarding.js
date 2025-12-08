@@ -17,7 +17,7 @@ const start = async (event) => {
                     { type: 'text', text: '🔒 ความเป็นส่วนตัวของคุณสำคัญ', weight: 'bold', size: 'lg', color: '#06C755' },
                     { type: 'text', text: 'เพื่อให้ฮันนาดูแลคุณได้อย่างเต็มที่ ฮันนาขออนุญาตเก็บรวบรวมข้อมูลสุขภาพของคุณตามนโยบายความเป็นส่วนตัวนะคะ', margin: 'md', wrap: true, size: 'sm' },
                     { type: 'separator', margin: 'md' },
-                    { type: 'text', text: 'อ่านนโยบายความเป็นส่วนตัว', size: 'xs', color: '#007AFF', action: { type: 'uri', label: 'อ่านนโยบาย', uri: `https://${process.env.BASE_URL.replace(/^https?:\/\//, '')}/privacy.html` }, margin: 'sm', align: 'center' }
+                    { type: 'text', text: 'อ่านนโยบายความเป็นส่วนตัว', size: 'xs', color: '#007AFF', action: { type: 'uri', label: 'อ่านนโยบาย', uri: `https://${(process.env.BASE_URL || 'hanna-line-bot-production.up.railway.app').replace(/^https?:\/\//, '')}/privacy.html` }, margin: 'sm', align: 'center' }
                 ]
             },
             footer: {
@@ -80,7 +80,7 @@ const handleInput = async (event, user) => {
                             { type: 'text', text: '🔒 ความเป็นส่วนตัวของคุณสำคัญ', weight: 'bold', size: 'lg', color: '#06C755', margin: 'sm' },
                             { type: 'text', text: 'เพื่อให้ฮันนาดูแลคุณได้อย่างเต็มที่ ฮันนาขออนุญาตเก็บรวบรวมข้อมูลสุขภาพของคุณตามนโยบายความเป็นส่วนตัวนะคะ', margin: 'md', wrap: true, size: 'sm' },
                             { type: 'separator', margin: 'md' },
-                            { type: 'text', text: 'อ่านนโยบายความเป็นส่วนตัว', size: 'xs', color: '#007AFF', action: { type: 'uri', label: 'อ่านนโยบาย', uri: `https://${process.env.BASE_URL.replace(/^https?:\/\//, '')}/privacy.html` }, margin: 'sm', align: 'center' }
+                            { type: 'text', text: 'อ่านนโยบายความเป็นส่วนตัว', size: 'xs', color: '#007AFF', action: { type: 'uri', label: 'อ่านนโยบาย', uri: `https://${(process.env.BASE_URL || 'hanna-line-bot-production.up.railway.app').replace(/^https?:\/\//, '')}/privacy.html` }, margin: 'sm', align: 'center' }
                         ]
                     },
                     footer: {

@@ -383,18 +383,26 @@ const handlePostback = async (event) => {
     const data = new URLSearchParams(event.postback.data);
     const action = data.get('action');
 
-    const userResult = await db.query('SELECT * FROM chronic_patients WHERE line_user_id = $1', [userId]);
-    const user = userResult.rows[0];
+    try {
+        const userResult = await db.query('SELECT * FROM chronic_patients WHERE line_user_id = $1', [userId]);
+        const user = userResult.rows[0];
 
-    if (action === 'select_plan') {
-        return payment.handlePlanSelection(event, data.get('plan'));
-    } else if (action === 'confirm_payment') {
-        return payment.handlePaymentConfirmation(event);
-    } else if (user && user.enrollment_status === 'onboarding') {
-        return onboarding.handleInput(event, user);
+        if (action === 'select_plan') {
+            return payment.handlePlanSelection(event, data.get('plan'));
+        } else if (action === 'confirm_payment') {
+            return payment.handlePaymentConfirmation(event);
+        } else if (user && user.enrollment_status === 'onboarding') {
+            return onboarding.handleInput(event, user);
+        }
+
+        return Promise.resolve(null);
+    } catch (error) {
+        console.error('❌ Error in handlePostback:', error);
+        return line.replyMessage(event.replyToken, {
+            type: 'text',
+            text: 'ขออภัยค่ะ ระบบขัดข้องชั่วคราว กรุณาลองใหม่ภายหลังนะคะ 😓'
+        });
     }
-
-    return Promise.resolve(null);
 };
 
 module.exports = { handleFollow, handleMessage, handlePostback };

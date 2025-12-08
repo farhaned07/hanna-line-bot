@@ -7,6 +7,10 @@ const WebSocket = require('ws');
 
 const GEMINI_LIVE_API_URL = 'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent';
 
+// H8 & H9 FIX: Session limits
+const MAX_CONCURRENT_SESSIONS = 50;
+const SESSION_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
+
 // Hanna's system instruction for nursing intelligence
 const HANNA_SYSTEM_INSTRUCTION = `You are Hanna (ฮันนา), a caring AI nurse for diabetes patients in Thailand.
 
@@ -47,7 +51,18 @@ class GeminiLiveService {
      * @param {WebSocket} clientWs - Client WebSocket connection
      */
     createSession(userId, clientWs) {
-        console.log(`Creating Gemini Live session for user: ${userId}`);
+        // H9 FIX: Check concurrent session limit
+        if (this.sessions.size >= MAX_CONCURRENT_SESSIONS) {
+            console.warn(`⚠️ Max sessions (${MAX_CONCURRENT_SESSIONS}) reached. Rejecting new session.`);
+            clientWs.send(JSON.stringify({
+                type: 'error',
+                message: 'ขออภัยค่ะ ระบบมีผู้ใช้งานเต็มแล้ว กรุณาลองใหม่ภายหลังนะคะ'
+            }));
+            clientWs.close();
+            return null;
+        }
+
+        console.log(`Creating Gemini Live session for user: ${userId} (${this.sessions.size + 1}/${MAX_CONCURRENT_SESSIONS})`);
 
         // Connect to Gemini Live API
         const geminiWs = new WebSocket(`${GEMINI_LIVE_API_URL}?key=${this.apiKey}`);
@@ -56,8 +71,20 @@ class GeminiLiveService {
             userId,
             clientWs,
             geminiWs,
-            connected: false
+            connected: false,
+            createdAt: Date.now(),
+            timeoutId: null
         };
+
+        // H8 FIX: Set session timeout
+        session.timeoutId = setTimeout(() => {
+            console.log(`⏰ Session timeout for user: ${userId}`);
+            clientWs.send(JSON.stringify({
+                type: 'timeout',
+                message: 'เซสชันหมดเวลาแล้วค่ะ กรุณาเชื่อมต่อใหม่ได้เลยนะคะ'
+            }));
+            this.closeSession(userId);
+        }, SESSION_TIMEOUT_MS);
 
         // Handle Gemini connection open
         geminiWs.on('open', () => {
@@ -144,6 +171,7 @@ class GeminiLiveService {
         geminiWs.on('close', (code, reason) => {
             console.log(`Gemini connection closed. Code: ${code}, Reason: ${reason.toString()}`);
             session.connected = false;
+            if (session.timeoutId) clearTimeout(session.timeoutId);
             this.sessions.delete(userId);
         });
 
@@ -179,6 +207,7 @@ class GeminiLiveService {
         // Handle client disconnect
         clientWs.on('close', () => {
             console.log(`Client disconnected: ${userId}`);
+            if (session.timeoutId) clearTimeout(session.timeoutId);
             if (geminiWs.readyState === WebSocket.OPEN) {
                 geminiWs.close();
             }
@@ -216,13 +245,24 @@ class GeminiLiveService {
     }
 
     /**
+     * Get current session count
+     */
+    getSessionCount() {
+        return this.sessions.size;
+    }
+
+    /**
      * Close session for user
      */
     closeSession(userId) {
         const session = this.sessions.get(userId);
         if (session) {
+            if (session.timeoutId) clearTimeout(session.timeoutId);
             if (session.geminiWs.readyState === WebSocket.OPEN) {
                 session.geminiWs.close();
+            }
+            if (session.clientWs.readyState === WebSocket.OPEN) {
+                session.clientWs.close();
             }
             this.sessions.delete(userId);
         }

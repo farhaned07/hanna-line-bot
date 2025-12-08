@@ -1,7 +1,5 @@
 const PDFDocument = require('pdfkit');
 const db = require('./db');
-const fs = require('fs');
-const path = require('path');
 
 /**
  * Generate a patient health report PDF
@@ -57,7 +55,14 @@ const generateReport = async (userId) => {
 
             doc.font('Helvetica').fontSize(12);
             doc.text(`Average Glucose: ${Math.round(stats.avg_glucose) || '-'} mg/dL`);
-            doc.text(`Medication Adherence: ${Math.round((parseInt(stats.meds_taken) / (parseInt(stats.meds_taken) + parseInt(stats.meds_missed)) * 100)) || 0}%`);
+
+            // H7 FIX: Prevent division by zero
+            const medsTaken = parseInt(stats.meds_taken) || 0;
+            const medsMissed = parseInt(stats.meds_missed) || 0;
+            const totalMeds = medsTaken + medsMissed;
+            const adherence = totalMeds > 0 ? Math.round((medsTaken / totalMeds) * 100) : 0;
+            doc.text(`Medication Adherence: ${adherence}%`);
+
             doc.text(`Red Flag Incidents: ${stats.red_flags || 0}`);
             doc.text(`Total Check-ins: ${stats.total_checkins || 0}`);
 

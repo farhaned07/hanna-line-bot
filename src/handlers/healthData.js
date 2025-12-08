@@ -112,13 +112,12 @@ const logCheckIn = async (userId, mood, symptoms = null, glucoseLevel = null) =>
  */
 const logMedication = async (userId, taken, notes = null) => {
     try {
-        // First, get or create today's check-in record
-        const today = new Date().toISOString().split('T')[0];
+        // Get today's check-in record if exists
 
         const existing = await db.query(
             `SELECT id FROM check_ins 
-             WHERE line_user_id = ? 
-             AND date(check_in_time) = date('now')
+             WHERE line_user_id = $1 
+             AND DATE(check_in_time) = CURRENT_DATE
              LIMIT 1`,
             [userId]
         );
@@ -165,8 +164,8 @@ const getHealthSummary = async (userId, days = 7) => {
                 SUM(CASE WHEN mood = 'bad' OR mood = 'ไม่สบาย' THEN 1 ELSE 0 END) as bad_mood_days
              FROM check_ins
              WHERE line_user_id = $1
-             AND check_in_time >= CURRENT_TIMESTAMP - INTERVAL '${days} days'`,
-            [userId]
+             AND check_in_time >= CURRENT_TIMESTAMP - ($2 || ' days')::INTERVAL`,
+            [userId, days]
         );
 
         if (result.rows.length === 0) {
