@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Call Hanna</title>
+    <!-- LiveKit SDK via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/livekit-client/dist/livekit-client.umd.min.js"></script>
+    <!-- LIFF SDK -->
+    <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <style>
+        body {
+            background-color: #111;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .avatar-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .avatar-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00B900, #008000);
+            /* LINE Green */
+            position: absolute;
+            z-index: 2;
+            box-shadow: 0 0 20px rgba(0, 185, 0, 0.4);
+        }
+
+        /* Pulse Animation */
+        .pulse-ring {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: rgba(0, 185, 0, 0.2);
+            z-index: 1;
+            transform: scale(1);
+        }
+
+        .pulsing .pulse-ring {
+            animation: pulse-animation 2s infinite;
+        }
+
+        @keyframes pulse-animation {
+            0% {
+                transform: scale(1);
+                opacity: 0.6;
+            }
+
+            100% {
+                transform: scale(1.8);
+                opacity: 0;
+            }
+        }
+
+        .status-text {
+            margin-top: 40px;
+            font-size: 24px;
+            font-weight: 600;
+            color: #eee;
+            text-align: center;
+        }
+
+        .subtitles {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #aaa;
+            text-align: center;
+            padding: 0 20px;
+            min-height: 40px;
+        }
+
+        .controls {
+            margin-top: 60px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .btn-end {
+            background-color: #ff3b30;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(255, 59, 48, 0.3);
+        }
+
+        .btn-start {
+            background-color: #00B900;
+            color: white;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 18px;
+            border: none;
+            display: none;
+        }
+
+        /* Hidden initially */
+        #call-ui {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Start Screen -->
+    <div id="start-screen">
+        <button id="btn-connect" class="btn-start" style="display:block">คุยกับฮันนา</button>
+        <p style="margin-top:20px; color:#aaa">แตะเพื่อโทร</p>
+    </div>
+
+    <!-- Call UI -->
+    <div id="call-ui">
+        <div class="avatar-container">
+            <div class="pulse-ring"></div>
+            <div class="pulse-ring" style="animation-delay: 1s;"></div>
+            <div class="avatar-circle"></div>
+        </div>
+
+        <div class="status-text" id="status">กำลังเชื่อมต่อ...</div>
+        <div class="subtitles" id="transcript"></div>
+
+        <div class="controls">
+            <button class="btn-end" onclick="endCall()">วางสาย</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = ''; // Relative path
+        let room;
+
+        async function init() {
+            // Check LIFF (Optional but good for User ID)
+            try {
+                await liff.init({ liffId: "LIFF_ID_PLACEHOLDER" }); // Will fall back if not set
+            } catch (e) {
+                console.log('LIFF init failed (running in browser?)', e);
+            }
+
+            document.getElementById('btn-connect').addEventListener('click', startCall);
+        }
+
+        async function startCall() {
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('call-ui').style.display = 'flex';
+            document.getElementById('status').innerText = "กำลังเชื่อมต่อ...";
+
+            try {
+                // 1. Get Token
+                // In production, get userId from LIFF. For pilot, use random or mocked.
+                const userId = liff.isInClient() ? await liff.getProfile().then(p => p.userId) : 'test-user-' + Math.floor(Math.random() * 1000);
+
+                const response = await fetch(`/api/voice/token?userId=${userId}`);
+                const data = await response.json();
+
+                if (!data.token) throw new Error("No token received");
+
+                // 2. Connect to LiveKit
+                room = new LiveKitClient.Room({
+                    adaptiveStream: true,
+                    dynacast: true,
+                });
+
+                // UI Updates
+                room.on(LiveKitClient.RoomEvent.Connected, () => {
+                    document.getElementById('status').innerText = "พูดได้เลยค่ะ";
+                    // Enable Microphone
+                    room.localParticipant.setMicrophoneEnabled(true);
+                });
+
+                room.on(LiveKitClient.RoomEvent.Disconnected, () => {
+                    document.getElementById('status').innerText = "การสนทนาจบลงแล้ว";
+                    setTimeout(() => {
+                        if (liff.isInClient()) liff.closeWindow();
+                        else window.location.reload();
+                    }, 2000);
+                });
+
+                // Active Speaker Handling (Pulse)
+                room.on(LiveKitClient.RoomEvent.ActiveSpeakersChanged, (speakers) => {
+                    const isAgentSpeaking = speakers.some(s => s.identity === 'Hanna'); // Agent name logic
+                    const ring = document.querySelector('.pulse-ring');
+                    if (isAgentSpeaking) {
+                        document.body.classList.add('pulsing');
+                        document.getElementById('status').innerText = "กำลังพูด...";
+                    } else {
+                        document.body.classList.remove('pulsing');
+                        document.getElementById('status').innerText = "พูดได้เลยค่ะ";
+                    }
+                });
+
+                // Connect
+                await room.connect(data.wsUrl, data.token);
+                console.log('Connected to room', room.name);
+
+                // Start Voice Interface
+                setupVoice();
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('status').innerText = "เกิดข้อผิดพลาด: " + err.message;
+            }
+        }
+
+        function endCall() {
+            if (room) room.disconnect();
+            if (recognition) recognition.stop();
+            window.close();
+        }
+
+        // --- Voice Logic (Native Web Speech -> Backend LLM -> TTS) ---
+        let recognition;
+        let isSpeaking = false;
+
+        function setupVoice() {
+            if (!('webkitSpeechRecognition' in window)) {
+                alert("Browser does not support Web Speech API");
+                return;
+            }
+
+            recognition = new webkitSpeechRecognition();
+            recognition.lang = 'th-TH';
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            recognition.onstart = () => {
+                if (!isSpeaking) document.getElementById('status').innerText = "กำลังฟัง...";
+            };
+
+            recognition.onend = () => {
+                // Auto-restart if not speaking
+                if (!isSpeaking) recognition.start();
+            };
+
+            recognition.onresult = async (event) => {
+                const text = event.results[0][0].transcript;
+                document.getElementById('transcript').innerText = `คุณ: ${text}`;
+
+                // Send to Brain
+                await processUserAudio(text);
+            };
+
+            recognition.start();
+        }
+
+        async function processUserAudio(text) {
+            isSpeaking = true;
+            recognition.stop(); // Stop listening while AI thinks/speaks
+
+            document.getElementById('status').innerText = "กำลังคิด...";
+            document.body.classList.add('pulsing'); // Mock agent thinking
+
+            try {
+                // Determine User ID
+                const userId = 'user_pilot_' + Math.floor(Math.random() * 1000); // Demo ID
+
+                const res = await fetch('/api/voice/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, userId })
+                });
+
+                const data = await res.json();
+
+                document.getElementById('transcript').innerText = `ฮันนา: ${data.text}`;
+                document.getElementById('status').innerText = "กำลังพูด...";
+
+                // Play Audio
+                if (data.audio) {
+                    const audio = new Audio("data:audio/mp3;base64," + data.audio);
+
+                    // Publish to LiveKit (So Nurse hears it) - Advanced: Loopback
+                    // For now, Nurse only hears User via Mic. Hearing Agent requires refined AudioContext.
+                    // We play on device for User.
+
+                    audio.onended = () => {
+                        isSpeaking = false;
+                        document.body.classList.remove('pulsing');
+                        document.getElementById('status').innerText = "พูดได้เลยค่ะ";
+                        recognition.start(); // Listening again
+                    };
+
+                    await audio.play();
+                } else {
+                    isSpeaking = false;
+                    recognition.start();
+                }
+
+            } catch (e) {
+                console.error("AI Error", e);
+                isSpeaking = false;
+                document.body.classList.remove('pulsing');
+                recognition.start();
+            }
+        }
+
+        // Initialize
+        init();
+    </script>
+</body>
+
+</html>

@@ -16,6 +16,8 @@ Hanna is a **hybrid conversational AI nurse** for chronic disease management in 
 
 ## System Architecture
 
+## System Architecture
+
 ```mermaid
 graph TB
     subgraph "Patient Touchpoints"
@@ -26,40 +28,43 @@ graph TB
     subgraph "Backend - Railway"
         WEBHOOK[Webhook Handler<br/>POST /webhook]
         ROUTER[Message Router<br/>router.js]
-        GEMINI_LIVE_SVC[Gemini Live Service<br/>WebSocket /api/voice/live]
+        VOICE_ROUTER[Voice Router<br/>/api/voice/token]
+        AGENT[Hanna Brain<br/>agent.js]
         SCHEDULER[Cron Scheduler<br/>Daily reminders]
     end
     
-    subgraph "AI Services"
-        GEMINI_LIVE_API[Gemini 2.0 Live API<br/>Real-time streaming]
-        GEMINI_API[Gemini 2.0 Flash<br/>Audio processing]
-        TTS[Google Cloud TTS<br/>Thai voice]
+    subgraph "Cloud Services (Open Stack)"
+        LIVEKIT[LiveKit Cloud<br/>WebRTC Transport]
+        GROQ[Groq Cloud<br/>Llama 3.3 (Reasoning)]
+        EDGETTS[Microsoft Edge TTS<br/>Premwadee (Voice)]
     end
     
     subgraph "Data Layer"
-        SUPABASE[(Supabase PostgreSQL<br/>chronic_patients<br/>check_ins<br/>payments)]
-        STORAGE[Supabase Storage<br/>Audio files]
+        SUPABASE[(Supabase PostgreSQL<br/>chronic_patients<br/>check_ins<br/>nurse_logs)]
     end
     
     LINE -->|Text/Audio Messages| WEBHOOK
-    LIFF -->|WebSocket| GEMINI_LIVE_SVC
+    LIFF -->|Start Call| VOICE_ROUTER
+    LIFF <-->|WebRTC Audio| LIVEKIT
     
     WEBHOOK --> ROUTER
-    ROUTER -->|Audio| GEMINI_API
-    ROUTER -->|Text| GEMINI_API
-    GEMINI_API --> TTS
-    TTS --> STORAGE
+    ROUTER --> AGENT
+    VOICE_ROUTER --> LIVEKIT
     
-    GEMINI_LIVE_SVC <-->|Bidirectional Stream| GEMINI_LIVE_API
+    LIVEKIT -->|Audio Stream| LIFF
+    AGENT -->|Text Prompt| GROQ
+    GROQ -->|AI Text| AGENT
+    AGENT -->|Text| EDGETTS
+    EDGETTS -->|Audio Base64| AGENT
+    AGENT -->|Response| LIFF
     
     ROUTER <--> SUPABASE
-    GEMINI_LIVE_SVC <--> SUPABASE
     SCHEDULER --> SUPABASE
     SCHEDULER --> LINE
     
-    style GEMINI_LIVE_API fill:#90EE90
-    style GEMINI_LIVE_SVC fill:#90EE90
-    style ROUTER fill:#FFE4B5
+    style LIVEKIT fill:#90EE90
+    style GROQ fill:#FFB6C1
+    style EDGETTS fill:#87CEEB
 ```
 
 ---
@@ -93,101 +98,63 @@ User Message → Webhook → Router → Gemini API → TTS → LINE Reply
 - `src/index.js` - Main server
 - `src/handlers/router.js` - Message routing logic
 - `src/handlers/onboarding.js` - User registration
-- `src/handlers/payment.js` - PromptPay integration
-- `src/services/gemini.js` - Audio processing with Gemini
-- `src/services/tts.js` - Google Cloud TTS
 - `src/services/line.js` - LINE SDK wrapper
 
 ---
 
-### 2. Gemini Live (Real-time Channel)
+### 2. Hanna Voice (LiveKit + Groq)
 
-**Purpose**: Enable natural, low-latency voice conversations
+**Purpose**: Enable natural, low-latency, and cost-effective voice conversations.
 
 **Technology Stack**:
-- WebSocket (ws library)
-- Gemini 2.0 Flash Multimodal Live API
-- React + Vite (LIFF frontend)
-- Framer Motion (animations)
+- **Transport**: LiveKit (WebRTC) - Low Latency Audio.
+- **Intelligence**: Groq (Llama 3.3 70B) - fast inference.
+- **Voice**: EdgeTTS (Neural Thai "Premwadee") - Natural sounding.
+- **Frontend**: Web Speech API (STT) + LiveKit Client.
 
 **Key Features**:
-- Real-time bidirectional audio streaming
-- Push-to-talk interface
-- < 1 second latency
-- Context preservation across turns
-- Natural interruption handling
+- **Nurse Supervision**: Nurses can "Silent Join" the LiveKit room to monitor conversations.
+- **Cost Efficiency**: No per-minute Gemini costs (~$0.01/min vs $0.10).
+- **Latency**: < 2 seconds (Pipeline: STT -> Groq -> TTS).
+- **Interruptible**: Full duplex audio support.
 
 **Conversation Flow**:
 ```
-User Speech → WebSocket → Backend → Gemini Live API → Audio Stream → User
+1. User Speaks → Wireless/Web Speech STT → Text
+2. Text → Backend (/api/voice/chat) → Groq (Llama 3)
+3. AI Text → EdgeTTS → Audio Base64
+4. Audio → Played on Client
+(Nurse listens via LiveKit subscription)
 ```
 
-**Latency**: < 1 second (streaming)
-
 **Files**:
-- `src/services/geminiLive.js` - Backend WebSocket service
-- `hanna-web/src/hooks/useGeminiLive.js` - Frontend WebSocket hook
-- `hanna-web/src/App.jsx` - LIFF interface
+- `public/call.html` - The "Pulse UI" Client.
+- `src/services/livekitService.js` - Token Generator.
+- `src/routes/voice.js` - API Router.
+- `src/worker/agent.js` - The "Brain" (LLM + TTS logic).
 
 **Technical Implementation**:
 
-#### Backend (`geminiLive.js`)
+#### Voice Router (`voice.js`)
 ```javascript
-// Establish WebSocket connection to Gemini Live API
-const geminiWs = new WebSocket(
-    'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent'
-);
-
-// Send system instruction
-geminiWs.send(JSON.stringify({
-    setup: {
-        model: 'models/gemini-2.0-flash-exp',
-        systemInstruction: { parts: [{ text: HANNA_SYSTEM_INSTRUCTION }] },
-        generationConfig: {
-            responseModalities: ['AUDIO'],
-            speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Puck' } } }
-        }
-    }
-}));
-
-// Forward audio from client to Gemini
-clientWs.on('message', (data) => {
-    geminiWs.send(JSON.stringify({
-        clientContent: {
-            turns: [{ role: 'user', parts: [{ inlineData: { mimeType: 'audio/pcm', data: audioData } }] }],
-            turnComplete: true
-        }
-    }));
-});
-
-// Stream audio back to client
-geminiWs.on('message', (data) => {
-    const message = JSON.parse(data);
-    if (message.serverContent?.modelTurn?.parts) {
-        clientWs.send(JSON.stringify({ type: 'audio', data: audioChunk }));
-    }
+router.get('/token', async (req, res) => {
+    // Generate JWT for LiveKit Room
+    const token = await livekitService.generateToken(userId, 'consultation-room');
+    res.json({ token });
 });
 ```
 
-#### Frontend (`useGeminiLive.js`)
+#### The Brain (`agent.js`)
 ```javascript
-// Connect to backend WebSocket
-const wsUrl = `wss://hanna-line-bot-production.up.railway.app/api/voice/live?userId=${userId}`;
-const ws = new WebSocket(wsUrl);
+// 1. Get Reasoning
+const completion = await groq.chat.completions.create({
+    model: "llama-3.3-70b-versatile",
+    messages: [{ role: "system", content: "You are Hanna..." }, { role: "user", content: text }]
+});
 
-// Record audio
-const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
-mediaRecorder.start();
-
-// Send audio to backend
-ws.send(JSON.stringify({ type: 'audio', data: base64Audio }));
-
-// Play audio response
-const audioBuffer = await audioContext.decodeAudioData(bytes.buffer);
-const source = audioContext.createBufferSource();
-source.buffer = audioBuffer;
-source.connect(audioContext.destination);
-source.start();
+// 2. Generate Voice
+const tts = new EdgeTTS(aiText, 'th-TH-PremwadeeNeural');
+const result = await tts.synthesize();
 ```
 
 ---

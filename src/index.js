@@ -96,8 +96,9 @@ app.post('/webhook', middleware(config.line), (req, res) => {
         });
 });
 
-// Voice API endpoint for LIFF audio processing
-app.post('/api/chat/voice', express.json({ limit: '10mb' }), require('./routes/voice'));
+// Voice API (Project VoiceLess)
+const voiceRoutes = require('./routes/voice');
+app.use('/api/voice', express.json(), voiceRoutes);
 
 // Report Generation Endpoint
 const reportService = require('./services/report');

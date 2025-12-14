@@ -29,16 +29,16 @@
 │                                                          │
 │  ┌──────────────┐              ┌──────────────┐         │
 │  │  LINE Chat   │◄────────────►│  Hanna Web   │         │
-│  │     Bot      │   LIFF Link  │  (Gemini Live)│        │
+│  │     Bot      │   LIFF Link  │ (Hanna Voice)│         │
 │  └──────────────┘              └──────────────┘         │
 │       │                              │                   │
-│       │ Webhook                      │ WebSocket         │
+│       │ Webhook                      │ WebSocket (LiveKit)│
 │       ▼                              ▼                   │
 │  ┌──────────────────────────────────────────┐           │
 │  │         Hanna Backend Server             │           │
 │  │  • Message Router                        │           │
 │  │  • Claims Prevention Logic (ROI Engine)  │           │
-│  │  • Gemini Live Service (Gated)           │           │
+│  │  • Hanna Voice Service (LiveKit + Groq)  │           │
 │  │  • Database (Supabase PostgreSQL)        │           │
 │  └──────────────────────────────────────────┘           │
 │       │                              │                   │
@@ -46,6 +46,7 @@
 │  ┌──────────────────────────────────────────┐           │
 │  │      Clinical Oversight Console          │           │
 │  │    (Risk Alerts & Exception Mgmt)        │           │
+│  │    (Silent Nurse Monitoring)             │           │
 │  └──────────────────────────────────────────┘           │
 └─────────────────────────────────────────────────────────┘
 ```
@@ -134,19 +135,20 @@ Always-on service. No upsells. Focus on adherence and early warning.
 
 ---
 
-## 🎙️ Gated Gemini Live Usage
+## 🎙️ Hanna Voice Service (LiveKit + Groq)
 
-Voice conversations are clinically justified resources, not unlimited entertainment.
+**New Outcome**: 90% Cost Reduction (via Open Stack) & Enhanced Supervision.
 
 | Situation | Allowed Channel |
 |-----------|-----------------|
 | Daily Routine Check-in | LINE Chat (Async) |
 | Stable Vitals Reporting | LINE Chat (Async) |
-| **New Symptom Reported** | **Gemini Live (Suggested)** |
-| **Emotional Distress** | **Gemini Live (Capped 10m)** |
-| **Complex Med Review** | **Gemini Live (Suggested)** |
+| **New Symptom Reported** | **Hanna Voice (Suggested)** |
+| **Emotional Distress** | **Hanna Voice (Capped 10m)** |
+| **Complex Med Review** | **Hanna Voice (Suggested)** |
 
 **Gating UX & Limits**:
+- **Technology**: LiveKit (WebRTC) + Llama 3 (Groq) + EdgeTTS.
 - **Cap**: 2 calls / week per patient.
 - **Duration**: Max 10 minutes per call.
 - **Over-limit Msg**: _"ฮันนาอยากคุยด้วยนะคะ แต่โควต้าการโทรสัปดาห์นี้เต็มแล้ว พิมพ์คุยกันก่อนนะคะ"_

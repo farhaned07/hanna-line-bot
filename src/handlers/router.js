@@ -4,8 +4,11 @@ const db = require('../services/db');
 const line = require('../services/line');
 const { logCheckIn, logMedication, getHealthSummary } = require('./healthData');
 const gemini = require('../services/gemini');
-const tts = require('../services/tts');
+const tts = require('../services/edgeTtsAdapter');
 const storage = require('../services/storage');
+const livekitService = require('../services/livekitService');
+const voiceAgent = require('../worker/agent');
+const healthData = require('./healthData');
 
 // Helper to convert stream to buffer
 const streamToBuffer = (stream) => {
@@ -38,7 +41,7 @@ const handleAudio = async (event) => {
 
         // 4. Upload & Attach Audio (if TTS successful)
         if (speechBuffer) {
-            const filename = `reply-${userId}-${Date.now()}.mp3`;
+            const filename = `reply - ${userId} -${Date.now()}.mp3`;
             const publicUrl = await storage.uploadAudio(speechBuffer, filename);
 
             if (publicUrl) {
@@ -81,9 +84,9 @@ const handleFollow = async (event) => {
     try {
         // Create user if not exists
         await db.query(
-            `INSERT INTO chronic_patients (line_user_id, enrollment_status, onboarding_step) 
-         VALUES ($1, 'onboarding', 0) 
-         ON CONFLICT (line_user_id) DO UPDATE SET enrollment_status = 'onboarding', onboarding_step = 0`,
+            `INSERT INTO chronic_patients(line_user_id, enrollment_status, onboarding_step)
+VALUES($1, 'onboarding', 0) 
+         ON CONFLICT(line_user_id) DO UPDATE SET enrollment_status = 'onboarding', onboarding_step = 0`,
             [userId]
         );
         return onboarding.start(event);
@@ -127,7 +130,7 @@ const handleMessage = async (event) => {
     if (user.enrollment_status === 'expired') {
         return line.replyMessage(event.replyToken, {
             type: 'text',
-            text: `สวัสดีค่ะคุณ${user.name}! 💚\n\nสถานะบัญชีของคุณต้องได้รับการตรวจสอบ กรุณาติดต่อเจ้าหน้าที่ดูแลของคุณนะคะ`
+            text: `สวัสดีค่ะคุณ${user.name} ! 💚\n\nสถานะบัญชีของคุณต้องได้รับการตรวจสอบ กรุณาติดต่อเจ้าหน้าที่ดูแลของคุณนะคะ`
         });
     }
 
@@ -139,7 +142,7 @@ const handleMessage = async (event) => {
         if (text === 'เช็คสุขภาพ') {
             return line.replyMessage(event.replyToken, {
                 type: 'text',
-                text: `สวัสดีค่ะคุณ${user.name}! 💚\n\nวันนี้รู้สึกอย่างไรบ้างคะ?`,
+                text: `สวัสดีค่ะคุณ${user.name} ! 💚\n\nวันนี้รู้สึกอย่างไรบ้างคะ ? `,
                 quickReply: {
                     items: [
                         { type: 'action', action: { type: 'message', label: 'สบายดี 😊', text: 'สบายดี' } },
@@ -170,7 +173,7 @@ const handleMessage = async (event) => {
         if (text === 'บันทึกกินยา') {
             return line.replyMessage(event.replyToken, {
                 type: 'text',
-                text: `💊 บันทึกการกินยา\n\nวันนี้กินยาครบแล้วหรือยังคะ?`,
+                text: `💊 บันทึกการกินยา\n\nวันนี้กินยาครบแล้วหรือยังคะ ? `,
                 quickReply: {
                     items: [
                         { type: 'action', action: { type: 'message', label: 'กินแล้ว ✅', text: 'กินยาแล้ว' } },
@@ -207,7 +210,7 @@ const handleMessage = async (event) => {
 
             let summaryText = '';
             if (summary && summary.totalCheckIns > 0) {
-                summaryText = `\n\n📊 สรุป 7 วันที่ผ่านมา:\n` +
+                summaryText = `\n\n📊 สรุป 7 วันที่ผ่านมา: \n` +
                     `✅ เช็คอิน: ${summary.totalCheckIns} ครั้ง\n` +
                     `💊 กินยา: ${summary.medicationsTaken}/${summary.medicationsTaken + summary.medicationsMissed} ครั้ง (${summary.adherencePercent}%)\n` +
                     `😊 รู้สึกดี: ${summary.goodMoodDays} วัน`;
@@ -362,7 +365,7 @@ const handleMessage = async (event) => {
                                 type: 'button',
                                 style: 'primary',
                                 color: '#06C755',
-                                action: { type: 'uri', label: '📞 คุยกับฮันนา (Gemini Live)', uri: `https://liff.line.me/${process.env.LIFF_ID}` }
+                                action: { type: 'uri', label: '📞 คุยกับฮันนา (Hanna Voice)', uri: `https://liff.line.me/${process.env.LIFF_ID}` }
                             }
                         ]
                     }
