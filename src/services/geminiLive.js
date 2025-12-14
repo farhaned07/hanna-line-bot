@@ -43,6 +43,8 @@ class GeminiLiveService {
     constructor(apiKey) {
         this.apiKey = apiKey;
         this.sessions = new Map();
+        // B2B Gating: Simple in-memory usage tracking for Pilot (resets on server restart)
+        this.usageCache = new Map();
     }
 
     /**
@@ -62,7 +64,23 @@ class GeminiLiveService {
             return null;
         }
 
-        console.log(`Creating Gemini Live session for user: ${userId} (${this.sessions.size + 1}/${MAX_CONCURRENT_SESSIONS})`);
+        // B2B Gating: Strict Policy (2 calls/week)
+        // Pilot Implementation: In-Memory Map (Real DB recommended for Prod)
+        const usage = this.usageCache.get(userId) || 0;
+
+        if (usage >= 2) {
+            console.warn(`⚠️ User ${userId} exceeded weekly voice cap (Count: ${usage}).`);
+            clientWs.send(JSON.stringify({
+                type: 'error',
+                message: 'ฮันนาอยากคุยด้วยนะคะ แต่โควต้าการโทรสัปดาห์นี้เต็มแล้ว (2 ครั้ง/สัปดาห์) พิมพ์คุยกันก่อนนะคะ 💚'
+            }));
+            clientWs.close();
+            return null;
+        }
+
+        // Increment usage (Pilot: simple increment, no weekly reset logic yet)
+        this.usageCache.set(userId, usage + 1);
+        console.log(`Creating Gemini Live session for user: ${userId} (${this.sessions.size + 1}/${MAX_CONCURRENT_SESSIONS}). Usage: ${usage + 1}/2`);
 
         // Connect to Gemini Live API
         const geminiWs = new WebSocket(`${GEMINI_LIVE_API_URL}?key=${this.apiKey}`);
@@ -73,18 +91,32 @@ class GeminiLiveService {
             geminiWs,
             connected: false,
             createdAt: Date.now(),
-            timeoutId: null
+            timeoutId: null,
+            durationLimitId: null // New: Hard duration limit
         };
 
-        // H8 FIX: Set session timeout
+        // H8 FIX: Set session timeout (Idle timeout)
         session.timeoutId = setTimeout(() => {
-            console.log(`⏰ Session timeout for user: ${userId}`);
+            console.log(`⏰ Session idle timeout for user: ${userId}`);
             clientWs.send(JSON.stringify({
                 type: 'timeout',
                 message: 'เซสชันหมดเวลาแล้วค่ะ กรุณาเชื่อมต่อใหม่ได้เลยนะคะ'
             }));
             this.closeSession(userId);
         }, SESSION_TIMEOUT_MS);
+
+        // B2B Gating: 10 Minute Hard Cap
+        const MAX_DURATION_MS = 10 * 60 * 1000;
+        session.durationLimitId = setTimeout(() => {
+            console.log(`⏱️ Session DURATION limit processed for user: ${userId}`);
+            if (session.clientWs.readyState === WebSocket.OPEN) {
+                session.clientWs.send(JSON.stringify({
+                    type: 'timeout',
+                    message: 'ครบกำหนดเวลา 10 นาทีแล้วค่ะ ฮันนาขอตัวก่อนนะคะ พิมพ์คุยต่อได้เลยค่ะ 💚'
+                }));
+            }
+            this.closeSession(userId);
+        }, MAX_DURATION_MS);
 
         // Handle Gemini connection open
         geminiWs.on('open', () => {
@@ -208,6 +240,7 @@ class GeminiLiveService {
         clientWs.on('close', () => {
             console.log(`Client disconnected: ${userId}`);
             if (session.timeoutId) clearTimeout(session.timeoutId);
+            if (session.durationLimitId) clearTimeout(session.durationLimitId); // Clear limit
             if (geminiWs.readyState === WebSocket.OPEN) {
                 geminiWs.close();
             }
@@ -258,6 +291,7 @@ class GeminiLiveService {
         const session = this.sessions.get(userId);
         if (session) {
             if (session.timeoutId) clearTimeout(session.timeoutId);
+            if (session.durationLimitId) clearTimeout(session.durationLimitId); // Clear limit
             if (session.geminiWs.readyState === WebSocket.OPEN) {
                 session.geminiWs.close();
             }

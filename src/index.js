@@ -43,6 +43,20 @@ const rateLimitMiddleware = (req, res, next) => {
 // Apply rate limiting to API routes
 app.use('/api', rateLimitMiddleware);
 
+// Admin API Routes
+app.use('/api/admin', require('./routes/admin'));
+
+// Serve React Dashboard (Admin Panel)
+const clientBuildPath = path.join(__dirname, '../client/dist');
+app.use('/dashboard', express.static(clientBuildPath));
+app.use('/login', express.static(clientBuildPath)); // Handle direct login access
+// Fallback for React Router (SPA) - simplified for specific routes
+app.get(['/dashboard/*', '/login'], (req, res) => {
+    res.sendFile(path.join(clientBuildPath, 'index.html'));
+});
+
+// Logging Middleware
+
 // N1 FIX: Cleanup stale rate limit entries every minute to prevent memory leak
 setInterval(() => {
     const now = Date.now();

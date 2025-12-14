@@ -1,16 +1,23 @@
-# Hanna AI Nurse - Complete User Journey Wireframe (Updated)
+# Hanna AI Nurse - Insurer-Led Care Model Wireframe
 
-**Last Updated**: December 2, 2024  
-**Version**: 2.1 - Production Ready with PDPA Compliance
+**Last Updated**: December 14, 2024
+**Version**: 3.0 - B2B Insurer Model
 
 ---
 
-## 🎯 User Personas
+## 🎯 User Personas (Hierarchical)
 
-### Primary Users
-1. **Patient** (Elderly with chronic diabetes)
-2. **Family Member** (Adult child monitoring parent)
-3. **Nurse/Admin** (Healthcare provider oversight)
+### 1. Insurer / Employer (Economic Buyer)
+- **Goal**: Reduce PMPM costs, prevent high-cost claims (ER visits, hospitalizations), manage population risk.
+- **Role**: Provider of the service entitlement.
+
+### 2. Clinical Oversight Team (Risk Owner)
+- **Goal**: Monitor top 5-10% risk cases, approve care escalations, audit AI decisions.
+- **Role**: "Human in the loop" for safety and compliance.
+
+### 3. Patient (Care Recipient)
+- **Goal**: Stay healthy at home, manage chronic condition, feel supported.
+- **Role**: End user of the service (free to them).
 
 ---
 
@@ -30,592 +37,156 @@
 │  ┌──────────────────────────────────────────┐           │
 │  │         Hanna Backend Server             │           │
 │  │  • Message Router                        │           │
-│  │  • Gemini Live Service                   │           │
+│  │  • Claims Prevention Logic (ROI Engine)  │           │
+│  │  • Gemini Live Service (Gated)           │           │
 │  │  • Database (Supabase PostgreSQL)        │           │
-│  │  • PDPA Compliance Layer                 │           │
+│  └──────────────────────────────────────────┘           │
+│       │                              │                   │
+│       ▼                              ▼                   │
+│  ┌──────────────────────────────────────────┐           │
+│  │      Clinical Oversight Console          │           │
+│  │    (Risk Alerts & Exception Mgmt)        │           │
 │  └──────────────────────────────────────────┘           │
 └─────────────────────────────────────────────────────────┘
 ```
-
-### Conversation Modes
-
-| Mode | Channel | Use Case | Conversational Quality |
-|------|---------|----------|----------------------|
-| **Async Care** | LINE Bot | Daily check-ins, reminders, logging | ⭐⭐⭐ (Menu-driven) |
-| **Live Conversation** | Gemini Live (LIFF) | Real-time consultation, urgent care | ⭐⭐⭐⭐⭐ (True conversation) |
 
 ---
 
 ## 📱 Patient Journey
 
-### Phase 1: Discovery & Onboarding (Day 0)
+### Phase 1: Insurer Enrollment (1-Click Activation)
+
+**Concept**: Insurer pre-registers patient data. User only needs to confirm identity.
 
 ```
 ┌─────────────────────────────────────────┐
-│  User scans QR code / searches @519fiets│
-│  ↓                                       │
-│  [Follow Event Triggered]                │
-│  ↓                                       │
-│  🔒 PDPA Consent (Step 0) - MANDATORY    │
-│  "ความเป็นส่วนตัวของคุณสำคัญ"            │
-│  [ยอมรับและเริ่มใช้งาน ✅] [ไม่ยอมรับ]   │
-│  ↓                                       │
-│  ✨ Welcome Message                      │
-│  "ขอบคุณที่ไว้ใจฮันนานะคะ 💚"            │
-│  "สวัสดีค่ะ! ฮันนาเองนะคะ..."           │
-│  ↓                                       │
-│  📝 Onboarding Flow (6 Steps)            │
-│  Step 1: Name (ชื่อเล่น)                 │
-│  Step 2: Age (อายุ)                      │
-│  Step 3: Diabetes Type (Type 1/2)        │
-│  Step 4: Monitoring Frequency            │
-│  Step 5: Trial Offer                     │
-│  ↓                                       │
-│  🎁 Trial Offer (Flex Message)           │
-│  [เริ่มทดลองใช้ฟรี! 🎉] [ดูแพ็คเกจรายเดือน]│
+│  User clicks link from Insurer SMS      │
+│  "คุณ[ชื่อจริง] มีสิทธิ์ดูแลสุขภาพ..."    │
+│  ↓                                      │
+│  [Follow Event Triggered]               │
+│  ↓                                      │
+│  🔒 Identity Confirmation               │
+│  "คุณคือ [ชื่อ-นามสกุล]                 │
+│   เกิดวันที่ [วว/ดด/ปปปป] ใช่ไหมคะ?"    │
+│  [ใช่ ถูกต้อง ✅]  [ไม่ใช่]              │
+│  ↓                                      │
+│  If [ใช่]:                              │
+│  🔒 PDPA Consent                        │
+│  "ประกันของคุณ [ชื่อ] มอบสิทธิ์ให้ฮันนา... │
+│   [ยินยอมรับบริการ ✅] [ไม่ยอมรับ]       │
+│  ↓                                      │
+│  ✨ Activation Complete                 │
+│  "ยืนยันสิทธิ์เรียบร้อย ฮันนาพร้อมดูแลค่ะ"  │
+│  (Database: Status = 'active')          │
 └─────────────────────────────────────────┘
 ```
 
-**Decision Point:**
-- **Option A**: User clicks "เริ่มทดลองใช้ฟรี" → Go to Phase 2 (14-day trial)
-- **Option B**: User clicks "ดูแพ็คเกจรายเดือน" → Go to Payment Flow
+**Fallback**: If user clicks "ไม่ใช่" -> "กรุณาติดต่อประกัน [เบอร์โทร] เพื่อแก้ไขข้อมูล"
+
+### Phase 2: Daily Check-in Decision Tree (08:00 AM)
+
+**Objective**: Maximize logging, minimize unnecessary nurse alerts.
+
+```mermaid
+graph TD
+    Start[8:00 AM Auto-Message] --> Q_Feel{สบายดีไหมคะ?}
+    
+    Q_Feel -->|สบายดี| Check_Vitals[Vitals Due Case]
+    Q_Feel -->|ไม่สบาย| Ask_Sym[ถามอาการ]
+    Q_Feel -->|No Response| Wait{Wait 2 hrs}
+    
+    %% Path 1: Good Health
+    Check_Vitals -->|Vitals Due| Ask_BP[วัดความดัน/น้ำตาลหรือยัง?]
+    Check_Vitals -->|No Vitals Due| Log_Good[✅ Log: Good, No Nurse]
+    Ask_BP -->|Normal| Log_Good
+    Ask_BP -->|High| Alert_Yellow[⚠️ Yellow Flag]
+    
+    %% Path 2: Symptoms
+    Ask_Sym -->|Sym: Headache/Dizzy| Ask_Sev[ระดับความรุนแรง 1-10?]
+    Ask_Sym -->|Sym: Chest Pain/SOS| Alert_Red[🚨 RED ALERT]
+    
+    Ask_Sev -->|1-3 Mild| Advice_AI[AI Advice + Log]
+    Ask_Sev -->|4-6 Moderate| Alert_Yellow
+    Ask_Sev -->|7-10 Severe| Alert_Red
+    
+    %% Path 3: Silence
+    Wait -->|No Resp| Reminder[Reminder Msg]
+    Reminder -->|Still Silent (6PM)| Alert_Silent[📞 Silent Alert (Next Day)]
+```
+
+**Nurse Alert Logic**:
+- **Log (No Alert)**: "Comfortable", Mild symptoms (1-3), Normal Vitals.
+- **Yellow Flag**: Moderate symptoms (4-6), Vitals slightly off, Missed meds 1 day.
+- **Red Alert**: Severe symptoms (7+), Chest pain, Vitals critical, Silent 48h.
+
+### Phase 3: Continuous Care (No Expiry)
+
+Always-on service. No upsells. Focus on adherence and early warning.
+
+#### ROI & Claims Prevention Logic (Embedded)
+
+| Trigger Event | Hanna Action | Clinical Goal |
+|---------------|--------------|---------------|
+| Missed Meds (2 days) | ⚠️ Alert Clinical Console | Prevent condition degradation |
+| BG > 180 mg/dL (2x) | 💬 Deep Dive + Diet Advice | Prevent Hyperglycemia/ER visit |
+| "Chest pain" / SOS | 🚨 IMMEDIATE NURSE ALERT | Urgent Triage (Stroke/Heart Attack) |
+| Silent (48 hours) | 📞 Nurse Call Task Created | Welfare Check |
 
 ---
 
-### Rich Menu (Persistent Bottom Bar)
+## 🎙️ Gated Gemini Live Usage
 
-After onboarding, users see a persistent Rich Menu with 4 buttons:
+Voice conversations are clinically justified resources, not unlimited entertainment.
 
-```
-┌─────────────────────────────────────────┐
-│           RICH MENU (2x2 Grid)           │
-├────────────────────┬────────────────────┤
-│                    │                    │
-│   📞 Call Hanna    │   💊 บันทึกกินยา   │
-│                    │                    │
-│ (Opens LIFF app)   │ (Logs medication)  │
-│                    │                    │
-├────────────────────┼────────────────────┤
-│                    │                    │
-│ 👤 โปรไฟล์ของฉัน   │   ❓ ช่วยเหลือ     │
-│                    │                    │
-│ (Health summary)   │ (Command list)     │
-│                    │                    │
-└────────────────────┴────────────────────┘
-```
+| Situation | Allowed Channel |
+|-----------|-----------------|
+| Daily Routine Check-in | LINE Chat (Async) |
+| Stable Vitals Reporting | LINE Chat (Async) |
+| **New Symptom Reported** | **Gemini Live (Suggested)** |
+| **Emotional Distress** | **Gemini Live (Capped 10m)** |
+| **Complex Med Review** | **Gemini Live (Suggested)** |
 
-**Button Actions:**
-1. **📞 Call Hanna** → Opens `https://liff.line.me/{LIFF_ID}` (Gemini Live voice chat)
-2. **💊 บันทึกกินยา** → Sends message "บันทึกกินยา" → Quick medication logging flow
-3. **👤 โปรไฟล์ของฉัน** → Sends message "โปรไฟล์ของฉัน" → Shows 7-day health summary
-4. **❓ ช่วยเหลือ** → Sends message "ช่วยเหลือ" → Displays available commands + support contact
+**Gating UX & Limits**:
+- **Cap**: 2 calls / week per patient.
+- **Duration**: Max 10 minutes per call.
+- **Over-limit Msg**: _"ฮันนาอยากคุยด้วยนะคะ แต่โควต้าการโทรสัปดาห์นี้เต็มแล้ว พิมพ์คุยกันก่อนนะคะ"_
+- **Soft Deflection**: If request is non-urgent, suggest checking in text first.
 
 ---
 
-### Phase 2: Active Trial (Day 1-14)
+## 👩‍⚕️ Clinical Oversight Console & Time Tracking
 
-#### Daily Routine - LINE Bot (Async)
+**Philosophy**: "Exception-Driven Care". Nurses do NOT monitor every user.
 
-```
-┌─────────────────────────────────────────┐
-│  🌅 8:00 AM - Morning Check-in           │
-│  \"สวัสดีตอนเช้าค่ะ คุณ{name}!\"          │
-│  \"วันนี้รู้สึกอย่างไรบ้างคะ?\"            │
-│  ↓                                       │
-│  User responds (text/voice)              │
-│  ↓                                       │
-│  Hanna logs response to database         │
-│                                          │
-│  🌙 7:00 PM - Medication Reminder        │
-│  \"ถึงเวลากินยาแล้วนะคะ 💊\"              │
-│  [กินแล้ว ✅] [ยังไม่กิน]               │
-└─────────────────────────────────────────┘
-```
+**UI Specifications (Time Tracking):**
+Every alert card must have:
+1.  **Start Action Button**: Starts a timer for that specific alert.
+2.  **Action Type Dropdown**:
+    - `[Quick Message]` (Est. 1-2 min)
+    - `[Phone Call]` (Est. 10-15 min)
+    - `[Escalate to Dr]` (Est. 5 min)
+    - `[False Positive]` (Est. <1 min)
+3.  **Completion Button**: Stops timer, saves `duration_seconds` to DB.
 
-#### Live Conversation - Gemini Live (Real-time)
+**Nurse Action Protocols:**
 
-```
-┌─────────────────────────────────────────┐
-│  User needs to talk to Hanna             │
-│  ↓                                       │
-│  Option 1: Click Rich Menu "Call Hanna"  │
-│  Option 2: Bot suggests for complex Q's  │
-│  "ลองคุยด้วยเสียงไหมคะ?"                 │
-│  [📞 คุยกับฮันนา (Gemini Live)]          │
-│  ↓                                       │
-│  Opens LIFF (Hanna Web) - Premium UI     │
-│  ↓                                       │
-│  ┌─────────────────────────────┐         │
-│  │   Hanna Live Interface      │         │
-│  │   (Glassmorphism Design)    │         │
-│  │                             │         │
-│  │  🌊 Animated gradient orbs  │         │
-│  │  (emerald + blue background)│         │
-│  │                             │         │
-│  │   ╔═══════════════════╗     │         │
-│  │   ║  Hanna Live  🎯   ║     │         │
-│  │   ║  ● เชื่อมต่อแล้ว  ║     │         │
-│  │   ╚═══════════════════╝     │         │
-│  │                             │         │
-│  │      ┌─────────────┐        │         │
-│  │      │             │        │         │
-│  │      │     🩺      │        │         │
-│  │      │  (breathing │        │         │
-│  │      │  animation) │        │         │
-│  │      └─────────────┘        │         │
-│  │                             │         │
-│  │      กำลังฟัง...            │         │
-│  │      ▁ ▃ ▅ ▃ ▁             │         │
-│  │   (voice waveform bars)     │         │
-│  │                             │         │
-│  │   ╔═══════════════════╗     │         │
-│  │   ║                   ║     │         │
-│  │   ║   ◉ 🎤 ◉          ║     │         │
-│  │   ║ กดค้างเพื่อพูด    ║     │         │
-│  │   ║                   ║     │         │
-│  │   ║ [📄 รายงาน] [📞 วางสาย]║     │         │
-│  │   ╚═══════════════════╝     │         │
-│  └─────────────────────────────┘         │
-│  ↓                                       │
-│  User: "ฮันนาค่ะ วันนี้น้ำตาล 180"      │
-│  ↓ (Real-time WebSocket)                 │
-│  Hanna: "น้ำตาลสูงนิดนึงนะคะ..."        │
-│  ↓                                       │
-│  Conversation continues naturally        │
-│  ↓                                       │
-│  [วางสาย] → Back to LINE                │
-│  ↓                                       │
-│  Conversation summary saved to DB        │
-└─────────────────────────────────────────┘
-```
+| Alert Type | Protocol Steps | Target Time |
+|------------|----------------|-------------|
+| **Missed Meds (2 days)** | 1. Check history<br>2. Send "Did you forget?" msg<br>3. If no reply 2h -> Call | 2m (Msg)<br>10m (Call) |
+| **High BG (>180 2x)** | 1. Review diet/meds logs<br>2. Send Templated Diet Check<br>3. If critical -> Call | 5m (Review+Msg)<br>15m (Call) |
+| **Silent (48h)** | 1. Check LINE activity<br>2. Call patient/family immediately | 10m (Call) |
+| **Symptom (Severity 4-6)** | 1. Review symptom history<br>2. Send advice/monitor msg | 3m (Msg) |
 
-**LIFF UI Features:**
-- ✨ Glassmorphism cards (frosted glass effect)
-- 🌊 Animated gradient background orbs
-- 💓 Breathing avatar animation (scales 1 → 1.08 → 1)
-- 📊 Voice waveform visualization (5 animated bars)
-- 🎨 Thai-optimized fonts (Prompt, Sarabun)
-- 🎯 Medical-grade color palette (emerald + blue)
-- ⚡ Smooth Framer Motion transitions
-
-**Trial Reminders:**
-```
-Day 10 (4 days left):
-┌─────────────────────────────────────────┐
-│  💚 Gentle Reminder                      │
-│  \"ช่วงทดลองใช้เหลืออีก 4 วันค่ะ\"        │
-│  [สมัครแพ็คเกจ] [ยังไม่ตัดสินใจ]        │
-└─────────────────────────────────────────┘
-
-Day 12 (2 days left):
-┌─────────────────────────────────────────┐
-│  ⏰ Urgent Reminder                      │
-│  \"เหลือเวลาอีก 2 วัน\"                   │
-│  [สมัครเลย! ฿2,999/เดือน]               │
-└─────────────────────────────────────────┘
-
-Day 14 (Last day):
-┌─────────────────────────────────────────┐
-│  🚨 Final Warning                        │
-│  \"วันสุดท้าย!\"                          │
-│  [สมัครทันที! ฿2,999/เดือน]             │
-└─────────────────────────────────────────┘
-```
+**Audit Trail**:
+Every AI decision (advice given, triage level assigned) and Nurse Action Time is logged for PMPM analysis.
 
 ---
 
-### Phase 3A: Subscription (Paid User)
-
-```
-┌─────────────────────────────────────────┐
-│  User clicks \"Subscribe\"                 │
-│  ↓                                       │
-│  📦 Plan Selection                       │
-│  \"แพ็คเกจ Basic รายเดือน\"                │
-│  \"ยอดชำระ: ฿2,999\"                       │
-│  ↓                                       │
-│  💳 PromptPay QR Code                    │
-│  [QR Image displayed]                    │
-│  ↓                                       │
-│  User scans & pays via banking app       │
-│  ↓                                       │
-│  [โอนแล้ว ✅] (Quick Reply)              │
-│  ↓                                       │
-│  ✅ Confirmation                         │
-│  \"ขอบคุณค่ะ! ตรวจสอบยอดเงินเรียบร้อย\"   │
-│  ↓                                       │
-│  Status: 'active'                        │
-│  → Continue to Phase 4                   │
-└─────────────────────────────────────────┘
-```
+## ⛔ Removed / Deprecated Features
+- ❌ 14-Day Free Trial
+- ❌ Subscription Payments (PromptPay)
+- ❌ Consumer Pricing Pages
+- ❌ "Premium vs Basic" Tiers
+- ❌ Marketing Upsells
 
 ---
-
-### Phase 3B: Trial Expiration (Unpaid User)
-
-```
-┌─────────────────────────────────────────┐
-│  Day 15: Trial Expires                   │
-│  ↓                                       │
-│  😢 Expiration Message                   │
-│  \"ช่วงทดลองใช้หมดอายุแล้วค่ะ\"           │
-│  [สมัครใช้บริการ ฿2,999/เดือน]          │
-│  ↓                                       │
-│  Status: 'expired'                       │
-│  ↓                                       │
-│  🔇 Service Paused:                      │
-│  - No morning check-ins                  │
-│  - No medication reminders               │
-│  - No Gemini Live access                 │
-│  - Bot still responds to messages        │
-│  ↓                                       │
-│  If user messages:                       │
-│  \"สวัสดีค่ะ! ช่วงทดลองใช้หมดอายุแล้ว\"   │
-│  [สมัครแพ็คเกจ 💳]                       │
-└─────────────────────────────────────────┘
-```
-
-**Reactivation Path:**
-User can click "Subscribe" anytime → Go to Phase 3A
-
----
-
-### Phase 4: Active Subscription (Ongoing)
-
-```
-┌─────────────────────────────────────────┐
-│  Daily Routine:                          │
-│                                          │
-│  LINE Bot (Async):                       │
-│  - 8:00 AM: Morning check-in             │
-│  - 7:00 PM: Medication reminder          │
-│  - Health data logging                   │
-│  - Quick questions                       │
-│                                          │
-│  Gemini Live (Real-time):                │
-│  - Urgent consultations                  │
-│  - Complex symptom discussions           │
-│  - Emotional support                     │
-│  - Detailed health reviews               │
-│                                          │
-│  Smart Routing:                          │
-│  - Bot detects when live chat needed     │
-│  - Auto-suggests LIFF link               │
-│  - Seamless handoff                      │
-└─────────────────────────────────────────┘
-```
-
-**Monthly Renewal:**
-```
-Day 28 of subscription:
-┌─────────────────────────────────────────┐
-│  💳 Renewal Reminder                     │
-│  \"บริการจะต่ออายุในอีก 2 วันค่ะ\"        │
-│  [ต่ออายุ ฿2,999] [ยกเลิก]              │
-└─────────────────────────────────────────┘
-```
-
----
-
-## 🎙️ Gemini Live Conversation Flow (Detailed)
-
-### User Experience
-
-```
-┌─────────────────────────────────────────┐
-│  Step 1: User opens LIFF                 │
-│  ↓                                       │
-│  WebSocket connects to backend           │
-│  Backend connects to Gemini Live API     │
-│  ↓                                       │
-│  Status: \"กำลังเชื่อมต่อ...\"             │
-│  ↓                                       │
-│  Status: \"พร้อมรับฟัง\"                   │
-│  ↓                                       │
-│  Hanna greets: \"สวัสดีค่ะ ฮันนา...\"     │
-│  (Auto-plays voice)                      │
-│  ↓                                       │
-│  Step 2: User presses mic button         │
-│  ↓                                       │
-│  Status: \"กำลังฟัง...\"                   │
-│  Mic icon turns red                      │
-│  Ripple animation                        │
-│  ↓                                       │
-│  User speaks: \"วันนี้น้ำตาล 180\"        │
-│  ↓                                       │
-│  Step 3: User releases button            │
-│  ↓                                       │
-│  Status: \"กำลังคิด...\"                   │
-│  Audio sent to Gemini Live               │
-│  ↓                                       │
-│  Step 4: Hanna responds                  │
-│  ↓                                       │
-│  Status: \"กำลังพูด...\"                   │
-│  Audio streams back in real-time         │
-│  Avatar pulses with speech               │
-│  ↓                                       │
-│  Hanna: \"น้ำตาลสูงนิดนึงนะคะ...\"        │
-│  ↓                                       │
-│  Status: \"พร้อมรับฟัง\"                   │
-│  ↓                                       │
-│  Conversation continues...               │
-│  ↓                                       │
-│  User clicks \"วางสาย\"                    │
-│  ↓                                       │
-│  WebSocket closes                        │
-│  Returns to LINE chat                    │
-└─────────────────────────────────────────┘
-```
-
-### Technical Flow
-
-```
-Client (LIFF)          Backend              Gemini Live API
-     │                    │                        │
-     │──WebSocket────────►│                        │
-     │   connect          │                        │
-     │                    │──WebSocket────────────►│
-     │                    │   connect              │
-     │                    │                        │
-     │                    │◄──setup complete───────│
-     │◄──ready────────────│                        │
-     │                    │                        │
-     │                    │──send greeting────────►│
-     │                    │                        │
-     │                    │◄──audio chunks─────────│
-     │◄──audio chunks─────│                        │
-     │   (plays voice)    │                        │
-     │                    │                        │
-     │──audio data───────►│                        │
-     │   (user speech)    │──audio data───────────►│
-     │                    │                        │
-     │                    │◄──audio response───────│
-     │◄──audio response───│                        │
-     │   (Hanna voice)    │                        │
-     │                    │                        │
-     │──close────────────►│                        │
-     │                    │──close────────────────►│
-```
-
----
-
-## 👨‍👩‍👧 Family Member Journey (Future)
-
-```
-┌─────────────────────────────────────────┐
-│  Family adds Hanna to group chat         │
-│  ↓                                       │
-│  Hanna sends daily summary:              │
-│  \"📊 สรุปสุขภาพคุณแม่วันนี้\"             │
-│  - Blood sugar: 120 mg/dL                │
-│  - Medication: ✅ Taken                  │
-│  - Mood: Good                            │
-│  - Hanna Live sessions: 1                │
-│  ↓                                       │
-│  If alert triggered:                     │
-│  \"⚠️ คุณแม่ไม่สบาย ควรพาพบแพทย์\"        │
-└─────────────────────────────────────────┘
-```
-
----
-
-## 👩‍⚕️ Nurse Dashboard Journey (Future)
-
-```
-┌─────────────────────────────────────────┐
-│  Web Dashboard (hannah-dashboard)        │
-│  ↓                                       │
-│  📋 Patient Queue                        │
-│  - High Risk (Red)                       │
-│  - Medium Risk (Yellow)                  │
-│  - Stable (Green)                        │
-│  ↓                                       │
-│  Click patient → View Timeline           │
-│  - Daily check-ins (LINE)                │
-│  - Live conversations (Gemini Live)      │
-│  - Medication adherence                  │
-│  - Vitals history                        │
-│  ↓                                       │
-│  Nurse Actions:                          │
-│  [Send Message] [Schedule Call] [Alert]  │
-│  [View Conversation Transcript]          │
-└─────────────────────────────────────────┘
-```
-
----
-
-## 🔄 State Diagram
-
-```
-                    [New User]
-                        ↓
-                  [Onboarding]
-                        ↓
-              ┌─────────┴─────────┐
-              ↓                   ↓
-          [Trial]            [Paid Monthly]
-              ↓                   ↓
-    ┌─────────┴─────────┐        │
-    ↓                   ↓        │
-[Expired]          [Subscribe]───┘
-    ↓                   
-[Reactivate]────────────┘
-
-Channel Access by Status:
-- Trial: LINE Bot ✅, Gemini Live ✅
-- Active: LINE Bot ✅, Gemini Live ✅
-- Expired: LINE Bot ⚠️ (limited), Gemini Live ❌
-```
-
----
-
-## 📊 Database States
-
-| Status       | Description                    | LINE Bot | Gemini Live | Services Active?          |
-|--------------|--------------------------------|----------|-------------|---------------------------|
-| `onboarding` | Collecting user info           | ✅       | ❌          | ❌ No                     |
-| `trial`      | 14-day free trial              | ✅       | ✅          | ✅ Yes (Full)             |
-| `active`     | Paid subscription              | ✅       | ✅          | ✅ Yes (Full + Premium)   |
-| `expired`    | Trial ended, no payment        | ⚠️       | ❌          | ⚠️ Partial (responds only)|
-| `cancelled`  | User cancelled subscription    | ❌       | ❌          | ❌ No                     |
-
----
-
-## 🎨 Key Screens
-
-### Screen 1: Welcome (LINE)
-```
-┌─────────────────────────────────┐
-│ ✨ สวัสดีค่ะ! ฮันนาเองนะคะ      │
-│ พยาบาลส่วนตัวของคุณ 💚          │
-│                                 │
-│ ฮันนาพร้อมดูแลสุขภาพคุณให้ดีขึ้น│
-│ ทุกวันค่ะ                        │
-└─────────────────────────────────┘
-```
-
-### Screen 2: Trial Offer (Flex Message)
-```
-┌─────────────────────────────────┐
-│ [Hero Image: Medical care]      │
-│                                 │
-│ ทดลองใช้ฟรี 14 วัน              │
-│ ให้ฮันนาช่วยดูแลคุณตั้งแต่วันนี้ │
-│                                 │
-│ ✅ โทรเช็คสุขภาพทุกเช้า          │
-│ ✅ เตือนกินยาไม่ให้พลาด          │
-│ ✅ คุยกับฮันนาแบบเสียง (Live)    │
-│ ✅ สรุปสุขภาพให้ลูกหลาน          │
-│                                 │
-│ [เริ่มทดลองใช้ฟรี! 🎉]          │
-│ [ดูแพ็คเกจรายเดือน]             │
-└─────────────────────────────────┘
-```
-
-### Screen 3: Morning Check-in (LINE)
-```
-┌─────────────────────────────────┐
-│ 🌅 สวัสดีตอนเช้าค่ะ คุณสมชาย!   │
-│                                 │
-│ วันนี้รู้สึกอย่างไรบ้างคะ?       │
-│                                 │
-│ [สบายดี 😊] [ไม่ค่อยสบาย 😔]   │
-│ [วัดน้ำตาลแล้ว 🩸]              │
-│ [🎙️ คุยกับฮันนา]                │
-└─────────────────────────────────┘
-```
-
-### Screen 4: Gemini Live Interface (LIFF)
-```
-┌─────────────────────────────────┐
-│         Hanna Live              │
-│         เชื่อมต่อแล้ว            │
-├─────────────────────────────────┤
-│                                 │
-│                                 │
-│         ┌─────────┐             │
-│         │         │             │
-│         │  [👩‍⚕️]  │             │
-│         │         │             │
-│         └─────────┘             │
-│                                 │
-│       กำลังฟัง...                │
-│                                 │
-│         ┌─────┐                 │
-│         │ 🎤  │                 │
-│         └─────┘                 │
-│     กดค้างไมค์เพื่อพูด           │
-│     ปล่อยเพื่อส่งข้อความ         │
-│                                 │
-│                                 │
-│     [📞 วางสาย]                 │
-└─────────────────────────────────┘
-```
-
----
-
-## 🚀 Implementation Status
-
-### ✅ Completed
-1. **LINE Bot** - Basic conversation flow
-2. **Gemini Live Service** - Real-time voice streaming
-3. **Hanna Web (LIFF)** - Voice interface
-4. **Database Schema** - Patient and check-in tracking
-5. **Onboarding Flow** - 5-step user registration
-6. **Payment Integration** - PromptPay QR generation
-
-### 🚧 In Progress
-1. **Conversation Context** - Memory across turns
-2. **Smart Channel Routing** - Auto-suggest Gemini Live
-3. **Unified Conversation Log** - Sync LINE + Live
-
-### 📋 Planned
-1. **Rich Menu** - Permanent buttons for quick access
-2. **Family Notifications** - Group chat integration
-3. **Nurse Dashboard** - Web interface for monitoring
-4. **Emotion Detection** - Voice tone analysis
-5. **Video Support** - Visual consultation
-
----
-
-## 🎯 Conversational Strategy
-
-### Hybrid Model (Recommended)
-
-**LINE Bot** → **Asynchronous Care**
-- ✅ Daily scheduled check-ins
-- ✅ Medication reminders
-- ✅ Health data logging
-- ✅ Quick questions
-- ✅ Appointment scheduling
-
-**Gemini Live** → **Synchronous Conversations**
-- ✅ Real-time consultations
-- ✅ Urgent triage
-- ✅ Complex symptom discussions
-- ✅ Emotional support
-- ✅ Detailed health reviews
-
-**Integration Points**:
-1. LINE bot detects urgency keywords → Suggests Gemini Live
-2. Gemini Live session ends → Summary sent to LINE
-3. All conversations logged to database
-4. Nurse dashboard shows both channels
-
----
-
-## 📈 Next Steps
-
-Based on this wireframe, we should prioritize:
-
-1. **Conversation Context** - Add memory to LINE bot (Quick Win)
-2. **Smart Routing** - Auto-detect when to use Gemini Live
-3. **Unified Logging** - Sync all conversations to database
-4. **Rich Menu** - Permanent buttons for quick access
-5. **Family Notifications** - Group chat integration
-6. **Nurse Dashboard** - Web interface for monitoring
-
-**Key Question**: Should we enhance LINE bot conversational quality or lean into the hybrid model?
-
-**Recommendation**: Embrace hybrid model - each channel optimized for its strengths.
-

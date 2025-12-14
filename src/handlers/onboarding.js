@@ -52,21 +52,52 @@ const handleInput = async (event, user) => {
 
     console.log(`[Onboarding] User ${userId} at Step ${step}. Input: ${input}, Action: ${action}`);
 
+    // --- Step 0: PDPA Consent ---
     if (step === 0) {
-        // Consent received
         if (action === 'consent_pdpa' && input === 'yes') {
-            console.log(`[Onboarding] User ${userId} accepted consent. Moving to Step 1.`);
+            console.log(`[Onboarding] User ${userId} accepted consent. Moving to Step 1 (Identity Confirmation).`);
+            // Update DB to Step 1
             await db.query('UPDATE chronic_patients SET consent_pdpa = TRUE, consent_date = NOW(), onboarding_step = 1 WHERE line_user_id = $1', [userId]);
+
+            // Mock "Pre-filled" Data for Confirmation
+            // In production, this would query an Insurer API using the LINE User ID (via phone match)
+            // For Pilot, we simulate finding: Name="คุณสมดุล", DOB="01/01/1955", Condition="เบาหวาน Type 2"
+            const mockName = "คุณสมดุล";
+
             await line.replyMessage(event.replyToken, [
                 { type: 'text', text: 'ขอบคุณที่ไว้ใจฮันนานะคะ! 💚' },
-                { type: 'text', text: '━━━━━━━━━━━━━━━━━━━\nขั้นตอนที่ 1/5\n●○○○○\n━━━━━━━━━━━━━━━━━━━' },
-                { type: 'text', text: 'มาเริ่มทำความรู้จักกันค่อยนะคะ\nจะใช้เวลาแค่ 2-3 นาทีเท่านั้น 😊' },
-                { type: 'text', text: 'ฮันนาจะเรียกคุณว่าอะไรดีคะ?\n\nบอกชื่อเล่น หรือ ชื่อที่อยากให้ฮันนาเรียกมาได้เลยนะคะ' }
+                {
+                    type: 'flex',
+                    altText: '🔒 ยืนยันตัวตน',
+                    contents: {
+                        type: 'bubble',
+                        body: {
+                            type: 'box',
+                            layout: 'vertical',
+                            contents: [
+                                { type: 'text', text: '🔒 ยืนยันตัวตน', weight: 'bold', size: 'xl', color: '#06C755' },
+                                { type: 'separator', margin: 'md' },
+                                { type: 'text', text: 'ฮันนาพบข้อมูลสิทธิ์ของคุณจากประกัน:', margin: 'md', size: 'sm', color: '#666666' },
+                                { type: 'text', text: mockName, weight: 'bold', size: 'lg', margin: 'sm' },
+                                { type: 'text', text: 'เกิดวันที่: 01 ม.ค. 2498', size: 'sm', margin: 'xs' },
+                                { type: 'text', text: 'สิทธิ์การดูแล: เบาหวาน (Diabetes)', size: 'sm', margin: 'xs', color: '#007AFF' },
+                                { type: 'separator', margin: 'md' },
+                                { type: 'text', text: 'ข้อมูลนี้ถูกต้องใช่ไหมคะ?', margin: 'md', weight: 'bold', align: 'center' }
+                            ]
+                        },
+                        footer: {
+                            type: 'box',
+                            layout: 'vertical',
+                            contents: [
+                                { type: 'button', style: 'primary', color: '#06C755', action: { type: 'postback', label: 'ใช่ ถูกต้อง ✅', data: 'action=confirm_identity&value=yes' } },
+                                { type: 'button', action: { type: 'postback', label: 'ไม่ใช่ ไม่ใช่ฉัน', data: 'action=confirm_identity&value=no' }, margin: 'sm', height: 'sm', style: 'link', color: '#FF3333' }
+                            ]
+                        }
+                    }
+                }
             ]);
         } else {
-            // If user types text or declines, re-send consent card
-            console.log(`[Onboarding] User ${userId} sent invalid input at Step 0. Re-sending consent.`);
-
+            // Re-send Consent (Simulated same as before)
             const flexMessage = {
                 type: 'flex',
                 altText: '🔒 ขอความยินยอมข้อมูลส่วนบุคคล',
@@ -93,199 +124,68 @@ const handleInput = async (event, user) => {
                     }
                 }
             };
-
             await line.replyMessage(event.replyToken, flexMessage);
         }
-    } else if (step === 1) {
-        // Name received
-        await db.query('UPDATE chronic_patients SET name = $1, onboarding_step = 2 WHERE line_user_id = $2', [input, userId]);
-        await line.replyMessage(event.replyToken, [
-            {
-                type: 'text',
-                text: `ยินดีที่ได้รู้จักนะคะ คุณ${input}! 😊\nชื่อน่ารักมากเลยค่ะ`
-            },
-            {
-                type: 'text',
-                text: '━━━━━━━━━━━━━━━━━━━\nขั้นตอนที่ 2/5\n●●○○○\n━━━━━━━━━━━━━━━━━━━'
-            },
-            {
-                type: 'text',
-                text: 'คุณ' + input + 'อายุเท่าไหร่คะ?\n(เพื่อให้ฮันนาดูแลได้เหมาะสมกับวัย)',
-                quickReply: {
-                    items: [
-                        { type: 'action', action: { type: 'postback', label: 'ต่ำกว่า 50', data: 'value=<50' } },
-                        { type: 'action', action: { type: 'postback', label: '50-60', data: 'value=50-60' } },
-                        { type: 'action', action: { type: 'postback', label: '61-70', data: 'value=61-70' } },
-                        { type: 'action', action: { type: 'postback', label: '71-80', data: 'value=71-80' } },
-                        { type: 'action', action: { type: 'postback', label: '81 ขึ้นไป', data: 'value=81+' } }
-                    ]
-                }
-            }
-        ]);
-    } else if (step === 2) {
-        // Age range received (now accepts range strings like "61-70")
-        await db.query('UPDATE chronic_patients SET age = $1, onboarding_step = 3 WHERE line_user_id = $2', [input, userId]);
-        await line.replyMessage(event.replyToken, [
-            {
-                type: 'text',
-                text: `ขอบคุณค่ะ คุณ${user.name} 😊`
-            },
-            {
-                type: 'text',
-                text: '━━━━━━━━━━━━━━━━━━━\nขั้นตอนที่ 3/5\n●●●○○\n━━━━━━━━━━━━━━━━━━━'
-            },
-            {
-                type: 'text',
-                text: `คุณ${user.name}มีภาวะสุขภาพอะไรบ้างคะ? 🏥`
-            },
-            {
-                type: 'flex',
-                altText: 'เลือกประเภทเบาหวาน',
-                contents: {
-                    type: 'bubble',
-                    body: {
-                        type: 'box',
-                        layout: 'vertical',
-                        contents: [
-                            { type: 'text', text: 'คุณหมอวินิจฉัยว่าเป็น', size: 'sm', color: '#999999' },
-                            { type: 'text', text: 'เบาหวานชนิดไหน? 🏥', weight: 'bold', size: 'lg', margin: 'xs' },
-                            { type: 'separator', margin: 'md' },
-                            {
-                                type: 'box',
-                                layout: 'vertical',
-                                margin: 'md',
-                                spacing: 'sm',
-                                contents: [
-                                    {
-                                        type: 'box',
-                                        layout: 'vertical',
-                                        contents: [
-                                            { type: 'text', text: 'Type 1 (ฉีดอินซูลิน)', weight: 'bold', size: 'sm', color: '#1E90FF' },
-                                            { type: 'text', text: 'ร่างกายไม่ผลิตอินซูลิน', size: 'xs', color: '#999999', wrap: true }
-                                        ],
-                                        action: { type: 'postback', data: 'value=Type 1', displayText: 'Type 1 (ฉีดอินซูลิน)' },
-                                        paddingAll: 'sm',
-                                        backgroundColor: '#F0F8FF',
-                                        cornerRadius: 'md'
-                                    },
-                                    {
-                                        type: 'box',
-                                        layout: 'vertical',
-                                        contents: [
-                                            { type: 'text', text: 'Type 2 (ทั่วไป)', weight: 'bold', size: 'sm', color: '#32CD32' },
-                                            { type: 'text', text: 'ควบคุมด้วยยาและอาหาร', size: 'xs', color: '#999999', wrap: true }
-                                        ],
-                                        action: { type: 'postback', data: 'value=Type 2', displayText: 'Type 2 (ทั่วไป)' },
-                                        paddingAll: 'sm',
-                                        backgroundColor: '#F0FFF0',
-                                        cornerRadius: 'md'
-                                    },
-                                    {
-                                        type: 'box',
-                                        layout: 'vertical',
-                                        contents: [
-                                            { type: 'text', text: 'ยังไม่แน่ใจ', weight: 'bold', size: 'sm', color: '#999999' },
-                                            { type: 'text', text: 'ไม่ทราบประเภทที่ชัดเจน', size: 'xs', color: '#999999', wrap: true }
-                                        ],
-                                        action: { type: 'postback', data: 'value=Unknown', displayText: 'ยังไม่แน่ใจ' },
-                                        paddingAll: 'sm',
-                                        backgroundColor: '#F5F5F5',
-                                        cornerRadius: 'md'
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            }
-        ]);
-    } else if (step === 3) {
-        // Condition received
-        await db.query('UPDATE chronic_patients SET condition = $1, onboarding_step = 4 WHERE line_user_id = $2', [input, userId]);
-        await line.replyMessage(event.replyToken, [
-            {
-                type: 'text',
-                text: `เข้าใจแล้วค่ะ คุณ${user.name}\nฮันนาจะดูแลเรื่อง ${input} ให้ดีที่สุดนะคะ 💚`
-            },
-            {
-                type: 'text',
-                text: '━━━━━━━━━━━━━━━━━━━\nขั้นตอนที่ 4/5\n●●●●○\n━━━━━━━━━━━━━━━━━━━'
-            },
-            {
-                type: 'text',
-                text: `ปกติคุณ${user.name} **วัดระดับน้ำตาล** บ่อยแค่ไหนคะ? 🩸`,
-                quickReply: {
-                    items: [
-                        { type: 'action', action: { type: 'postback', label: 'ทุกวัน', data: 'value=Daily' } },
-                        { type: 'action', action: { type: 'postback', label: 'อาทิตย์ละครั้ง', data: 'value=Weekly' } },
-                        { type: 'action', action: { type: 'postback', label: 'นานๆ ครั้ง', data: 'value=Rarely' } }
-                    ]
-                }
-            }
-        ]);
-    } else if (step === 4) {
-        // Habit received
-        // Offer Trial
-        await db.query('UPDATE chronic_patients SET onboarding_step = 5 WHERE line_user_id = $1', [userId]);
 
-        await line.replyMessage(event.replyToken, [
-            {
-                type: 'text',
-                text: '━━━━━━━━━━━━━━━━━━━\nขั้นตอนที่ 5/5 - ขั้นตอนสุดท้าย!\n●●●●●\n━━━━━━━━━━━━━━━━━━━'
-            },
-            {
-                type: 'text',
-                text: `เรียบร้อยแล้วค่ะ คุณ${user.name}! 🎉\n\nฮันนาพร้อมดูแลสุขภาพคุณแล้วค่ะ`
-            },
-            {
-                // Flex Message for Trial Offer
-                type: 'flex',
-                altText: '🎁 ทดลองใช้ฟรี 7 วัน',
-                contents: {
-                    type: 'bubble',
-                    hero: {
-                        type: 'image',
-                        url: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
-                        size: 'full',
-                        aspectRatio: '20:13',
-                        aspectMode: 'cover'
-                    },
-                    body: {
-                        type: 'box',
-                        layout: 'vertical',
-                        contents: [
-                            { type: 'text', text: '🎁 ทดลองใช้ฟรี 7 วัน', weight: 'bold', size: 'xl', color: '#1DB446' },
-                            { type: 'text', text: 'ไม่ต้องใส่บัตร ไม่มีค่าใช้จ่าย', margin: 'sm', size: 'sm', color: '#999999' },
-                            { type: 'separator', margin: 'md' },
-                            { type: 'text', text: 'คุณจะได้รับ:', weight: 'bold', margin: 'md' },
-                            { type: 'text', text: '✅ ฮันนาเช็คสุขภาพทุกเช้า', size: 'sm', color: '#666666', margin: 'sm' },
-                            { type: 'text', text: '✅ เตือนกินยาตรงเวลา', size: 'sm', color: '#666666', margin: 'sm' },
-                            { type: 'text', text: '✅ พยาบาลวิชาชีพคอยดูแล', size: 'sm', color: '#666666', margin: 'sm' },
-                            { type: 'text', text: '✅ สรุปสุขภาพให้ลูกหลาน', size: 'sm', color: '#666666', margin: 'sm' }
-                        ]
-                    },
-                    footer: {
-                        type: 'box',
-                        layout: 'vertical',
-                        contents: [
-                            {
-                                type: 'button',
-                                style: 'primary',
-                                color: '#06C755',
-                                action: { type: 'postback', label: 'เริ่มทดลองใช้ฟรี! 🎉', data: 'action=select_plan&plan=trial' }
-                            },
-                            {
-                                type: 'button',
-                                action: { type: 'postback', label: 'ดูแพ็คเกจรายเดือน', data: 'action=select_plan&plan=monthly' },
-                                margin: 'sm',
-                                height: 'sm',
-                                style: 'link'
-                            }
-                        ]
+        // --- Step 1: Identity Confirmation (Pre-filled) ---
+    } else if (step === 1) {
+        if (action === 'confirm_identity' && input === 'yes') {
+            // Finish Onboarding - Move to Active
+            console.log(`[Onboarding] User ${userId} confirmed identity.`);
+
+            // In a real app, we would copy the pre-filled data to the user record here.
+            // For simplicity, we just set name/age hardcoded to match the mock above or generic.
+            await db.query(`
+                UPDATE chronic_patients 
+                SET enrollment_status = 'active', onboarding_step = 2, 
+                    name = 'คุณสมดุล', age = '70', condition = 'Diabetes Type 2'
+                WHERE line_user_id = $1`, [userId]);
+
+            await line.replyMessage(event.replyToken, [
+                {
+                    type: 'text',
+                    text: '━━━━━━━━━━━━━━━━━━━\nยืนยันสิทธิ์เรียบร้อย ✅\n━━━━━━━━━━━━━━━━━━━'
+                },
+                {
+                    type: 'flex',
+                    altText: '✅ เริ่มใช้งาน',
+                    contents: {
+                        type: 'bubble',
+                        body: {
+                            type: 'box',
+                            layout: 'vertical',
+                            contents: [
+                                { type: 'text', text: '🎉 เปิดใช้งานสำเร็จ!', weight: 'bold', size: 'xl', color: '#06C755' },
+                                { type: 'text', text: 'ฮันนาพร้อมดูแลสุขภาพคุณแล้วค่ะ', margin: 'md', size: 'sm', color: '#666666' },
+                                { type: 'separator', margin: 'md' },
+                                { type: 'text', text: 'สิ่งที่จะเกิดขึ้นต่อไป:', weight: 'bold', margin: 'md' },
+                                { type: 'text', text: '1. ฮันนาจะทักหาทุกเช้า 08:00 น.', size: 'sm', margin: 'sm' },
+                                { type: 'text', text: '2. ถ้ามีอาการผิดปกติ บอกฮันนาได้เลย', size: 'sm', margin: 'sm' },
+                                { type: 'text', text: '3. พยาบาลวิชาชีพดูแลอยู่เบื้องหลัง', size: 'sm', margin: 'sm' }
+                            ]
+                        },
+                        footer: {
+                            type: 'box',
+                            layout: 'vertical',
+                            contents: [
+                                {
+                                    type: 'button',
+                                    style: 'primary',
+                                    color: '#06C755',
+                                    action: { type: 'message', label: 'เริ่มเช็คสุขภาพครั้งแรก', text: 'เช็คสุขภาพ' }
+                                }
+                            ]
+                        }
                     }
                 }
-            }
-        ]);
+            ]);
+
+        } else if (action === 'confirm_identity' && input === 'no') {
+            await line.replyMessage(event.replyToken, {
+                type: 'text',
+                text: 'ขออภัยในความไม่สะดวกค่ะ 🙏\n\nหากข้อมูลไม่ถูกต้อง กรุณาติดต่อฝ่ายบริการลูกค้าของบริษัทประกันของคุณเพื่อแก้ไขข้อมูลนะคะ\n\n(หรือพิมพ์ "เริ่มใหม่" เพื่อลองอีกครั้ง)'
+            });
+        }
     }
 };
 

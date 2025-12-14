@@ -1,4 +1,27 @@
 const db = require('../services/db');
+
+/**
+ * CLINICAL DATA SCHEMA REFERENCE (B2B Pilot)
+ * 
+ * Table: nurse_alerts
+ * - id: uuid
+ * - patient_id: uuid
+ * - alert_type: string ('missed_meds', 'high_vitals', 'silent', 'voice_risk')
+ * - severity: string ('yellow', 'red')
+ * - status: string ('open', 'investigating', 'resolved', 'false_positive')
+ * - created_at: timestamp
+ * 
+ * Table: nurse_action_logs (Time Tracking)
+ * - id: uuid
+ * - alert_id: uuid (fk)
+ * - nurse_id: uuid
+ * - action_type: string ('message', 'call', 'escalate', 'mark_false')
+ * - started_at: timestamp
+ * - completed_at: timestamp
+ * - duration_seconds: integer (CRITICAL metrics)
+ * - notes: text
+ */
+
 const lineNotify = require('../services/lineNotify');
 
 /**

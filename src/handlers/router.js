@@ -1,5 +1,5 @@
 const onboarding = require('./onboarding');
-const payment = require('./payment');
+// Payment handler removed for B2B model
 const db = require('../services/db');
 const line = require('../services/line');
 const { logCheckIn, logMedication, getHealthSummary } = require('./healthData');
@@ -123,16 +123,11 @@ const handleMessage = async (event) => {
         return onboarding.handleInput(event, user);
     }
 
-    // Handle expired trial users
+    // Handle expired status - Redirect to Admin/Nurse
     if (user.enrollment_status === 'expired') {
         return line.replyMessage(event.replyToken, {
             type: 'text',
-            text: `สวัสดีค่ะคุณ${user.name}! 💚\n\nช่วงทดลองใช้ของคุณหมดอายุแล้วค่ะ หากต้องการใช้บริการต่อ พิมพ์ "สมัคร" เพื่อดูแพ็คเกจนะคะ 😊`,
-            quickReply: {
-                items: [
-                    { type: 'action', action: { type: 'postback', label: 'สมัครแพ็คเกจ 💳', data: 'action=select_plan&plan=monthly' } }
-                ]
-            }
+            text: `สวัสดีค่ะคุณ${user.name}! 💚\n\nสถานะบัญชีของคุณต้องได้รับการตรวจสอบ กรุณาติดต่อเจ้าหน้าที่ดูแลของคุณนะคะ`
         });
     }
 
@@ -266,8 +261,15 @@ const handleMessage = async (event) => {
             });
         }
 
-        // Admin Command: Setup Rich Menu (temporary - for updating menu without SSH)
-        if (text === 'admin:setup-richmenu') {
+        // Admin Command: Setup Rich Menu (Protected)
+        // Usage: admin:setup-richmenu:HANNA_SECRET_2024
+        if (text.startsWith('admin:setup-richmenu')) {
+            const secret = text.split(':')[2];
+            if (secret !== 'HANNA_SECRET_2024') {
+                console.warn(`[Security] Unauthorized admin attempt by ${userId}`);
+                return Promise.resolve(null); // Ignore silently
+            }
+
             console.log(`[Admin] Rich Menu setup triggered by user ${userId}`);
 
             // Import Rich Menu functions
@@ -387,11 +389,7 @@ const handlePostback = async (event) => {
         const userResult = await db.query('SELECT * FROM chronic_patients WHERE line_user_id = $1', [userId]);
         const user = userResult.rows[0];
 
-        if (action === 'select_plan') {
-            return payment.handlePlanSelection(event, data.get('plan'));
-        } else if (action === 'confirm_payment') {
-            return payment.handlePaymentConfirmation(event);
-        } else if (user && user.enrollment_status === 'onboarding') {
+        if (user && user.enrollment_status === 'onboarding') {
             return onboarding.handleInput(event, user);
         }
 
