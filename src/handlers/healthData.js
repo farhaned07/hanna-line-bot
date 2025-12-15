@@ -1,4 +1,5 @@
 const db = require('../services/db');
+const OneBrain = require('../services/OneBrain');
 
 /**
  * CLINICAL DATA SCHEMA REFERENCE (B2B Pilot)
@@ -111,6 +112,17 @@ const logCheckIn = async (userId, mood, symptoms = null, glucoseLevel = null) =>
             [userId, mood, symptoms, glucoseLevel, alertLevel]
         );
         console.log(`✅ Check-in logged for ${userId} (Alert Level: ${alertLevel})`);
+
+        // 5. Trigger Brain Analysis (Async)
+        // We need patient_id. Let's look it up quickly or handle it in OneBrain.
+        // Ideally we pass the UUID if we have it. For now, we query.
+        db.query('SELECT id FROM chronic_patients WHERE line_user_id = $1', [userId])
+            .then(res => {
+                if (res.rows[0]) {
+                    OneBrain.analyzePatient(res.rows[0].id, 'check_in');
+                }
+            })
+            .catch(err => console.error('OneBrain Trigger Error:', err));
 
         return {
             success: true,

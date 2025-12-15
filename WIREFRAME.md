@@ -1,194 +1,153 @@
-# Hanna AI Nurse - Insurer-Led Care Model Wireframe
+# Hanna AI Nurse - Hybrid Intelligence Wireframe
 
-**Last Updated**: December 14, 2024
-**Version**: 3.0 - B2B Insurer Model
-
----
-
-## 🎯 User Personas (Hierarchical)
-
-### 1. Insurer / Employer (Economic Buyer)
-- **Goal**: Reduce PMPM costs, prevent high-cost claims (ER visits, hospitalizations), manage population risk.
-- **Role**: Provider of the service entitlement.
-
-### 2. Clinical Oversight Team (Risk Owner)
-- **Goal**: Monitor top 5-10% risk cases, approve care escalations, audit AI decisions.
-- **Role**: "Human in the loop" for safety and compliance.
-
-### 3. Patient (Care Recipient)
-- **Goal**: Stay healthy at home, manage chronic condition, feel supported.
-- **Role**: End user of the service (free to them).
+**Last Updated**: December 15, 2025
+**Version**: 4.1 - "The Safety Polish" (Critical Gaps Fixed)
+**Status**: Production Specification
 
 ---
 
-## 🏗️ System Architecture Overview
+## 🎯 Core Philosophy: "Uncompromising Safety"
+
+We are solving the **Nurse Scaling Problem** without causing **Alert Fatigue**.
+*   **Old Way**: Nurses drown in data.
+*   **Hanna Way**: Nurses see *Exceptions* with *Context*.
+
+---
+
+## 🏗️ System Overview & Limits
+
+### The 4-Tier Safety Net (Safeguards)
+
+| Tier | Component | Behavior | Limits/Rules |
+| :--- | :--- | :--- | :--- |
+| **0. The Invisible App** | **LINE Bot** | Daily Habit & Vitals Collection. | **De-duplication**: Max 1 task/patient/4h (unless Emergency). |
+| **1. The Active Nudge** | **Scheduler** | If Silent > 24h -> "Push-to-Talk". | **Smart Rule**: No nudge if Hospitalized or "On Vacation". |
+| **2. The Brain** | **OneBrain** | Scores Risk (0-10). | **Fatigue Cap**: Max 15 CRITICAL tasks visible. |
+| **3. The Control** | **Dashboard** | Priority Queue + Resolution Loop. | **Escalation**: Unanswered > 1h = SMS Supervisor. |
+
+---
+
+## 📱 User Flow (Patient)
+
+### 1. The Emergency (Trigger)
+*   **User**: "I have chest pain."
+*   **Hanna**: 🚨 **"Please call 1669 immediately!"** (Instant Reply)
+*   **System**: 
+    1.  Creates **CRITICAL TASK (Score 10)**.
+    2.  Bypasses De-duplication.
+    3.  TRIGGERS SOUND on Nurse Dashboard.
+
+### 2. The Active Nudge (Proactive Rules)
+*   **Condition**: Silent > 24h AND Risk > 3.
+*   **Hanna**: Sends **Flex Card**:
+    > **Hanna is worried.**
+    > "We haven't spoken today. Are you okay?"
+    > [ 📞 Call Hanna (1 min) ]
+
+### 3. The Voice Call (LiveKit)
+*   **Error Handling**:
+    *   **Connecting**: Text "Connecting..." (Max 5s).
+    *   **Fail**: "Call failed. Please type message." + Log Error.
+    *   **Silence**: If user silent > 20s → Auto-disconnect + SMS Check-in.
+
+---
+
+## 🧠 OneBrain Risk Scoring (The Formula)
+
+**Target**: Transparent, Deterministic Risk Assessment.
+
+| Factor | Points | Condition |
+| :--- | :--- | :--- |
+| **Emergency Keyword** | **+3** | "Chest Pain", "Breathing", "Fainting" |
+| **Vital Danger** | **+2** | BP >180/110, Glucose >400 or <70 |
+| **Missed Meds** | **+2** | >3 consecutive days |
+| **Trend** | **+1** | 3+ days worsening vitals |
+| **Silence** | **+1** | >48 hours no contact |
+| **Age Modifier** | **x1.2** | If Age > 70 |
+
+*   **0-4**: Routine (Green)
+*   **5-7**: High (Orange)
+*   **8-10**: Critical (Red)
+
+---
+
+## 👩‍⚕️ Nurse Dashboard (Mission Control)
+
+### 1. The Task Card (Context-Rich)
+
+**Problem**: Nurses need to know *WHY*.
+**Design**:
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    PATIENT TOUCHPOINTS                   │
-│                                                          │
-│  ┌──────────────┐              ┌──────────────┐         │
-│  │  LINE Chat   │◄────────────►│  Hanna Web   │         │
-│  │     Bot      │   LIFF Link  │ (Hanna Voice)│         │
-│  └──────────────┘              └──────────────┘         │
-│       │                              │                   │
-│       │ Webhook                      │ WebSocket (LiveKit)│
-│       ▼                              ▼                   │
-│  ┌──────────────────────────────────────────┐           │
-│  │         Hanna Backend Server             │           │
-│  │  • Message Router                        │           │
-│  │  • Claims Prevention Logic (ROI Engine)  │           │
-│  │  • Hanna Voice Service (LiveKit + Groq)  │           │
-│  │  • Database (Supabase PostgreSQL)        │           │
-│  └──────────────────────────────────────────┘           │
-│       │                              │                   │
-│       ▼                              ▼                   │
-│  ┌──────────────────────────────────────────┐           │
-│  │      Clinical Oversight Console          │           │
-│  │    (Risk Alerts & Exception Mgmt)        │           │
-│  │    (Silent Nurse Monitoring)             │           │
-│  └──────────────────────────────────────────┘           │
-└─────────────────────────────────────────────────────────┘
+[ 🔴 CRITICAL ]  Somchai P., 67M  [Diabetes, HTN]
+-------------------------------------------------------
+⚠️ TRIGGER: Keyword "Chest Pain" detected (10 mins ago)
+
+📊 CONTEXT:
+- Last Vitals: BP 165/95 (Yesterday)
+- Meds: Skipped Metformin (Yesterday)
+- History: ER visit last month
+
+💡 BRAIN SUGGESTION:
+"High risk of cardiac event. Call immediately."
+
+[ 📞 Call Patient ]  [ 🚑 Call Ambulance ]  [ Resolve ]
 ```
 
----
+### 2. The Feedback Loop (Resolution)
 
-## 📱 Patient Journey
+**Problem**: System needs training data.
+**Flow**: When Nurse clicks [Resolve]:
 
-### Phase 1: Insurer Enrollment (1-Click Activation)
+**Modal Output**:
+> **What was the outcome?**
+> *   [ ] Called - Patient Stable
+> *   [ ] Called - Escalated to Doctor
+> *   [ ] Called - Sent to ER
+> *   [ ] False Alarm (System Error)
+>
+> **Next Action?**
+> *   [ ] None
+> *   [ ] Snooze 2 hours
+> *   [ ] Follow-up Tomorrow
+>
+> **Note**: ____________ (Optional)
+>
+> [ Submit & Close ]
 
-**Concept**: Insurer pre-registers patient data. User only needs to confirm identity.
+### 3. Escalation Protocol (Safety Net)
 
-```
-┌─────────────────────────────────────────┐
-│  User clicks link from Insurer SMS      │
-│  "คุณ[ชื่อจริง] มีสิทธิ์ดูแลสุขภาพ..."    │
-│  ↓                                      │
-│  [Follow Event Triggered]               │
-│  ↓                                      │
-│  🔒 Identity Confirmation               │
-│  "คุณคือ [ชื่อ-นามสกุล]                 │
-│   เกิดวันที่ [วว/ดด/ปปปป] ใช่ไหมคะ?"    │
-│  [ใช่ ถูกต้อง ✅]  [ไม่ใช่]              │
-│  ↓                                      │
-│  If [ใช่]:                              │
-│  🔒 PDPA Consent                        │
-│  "ประกันของคุณ [ชื่อ] มอบสิทธิ์ให้ฮันนา... │
-│   [ยินยอมรับบริการ ✅] [ไม่ยอมรับ]       │
-│  ↓                                      │
-│  ✨ Activation Complete                 │
-│  "ยืนยันสิทธิ์เรียบร้อย ฮันนาพร้อมดูแลค่ะ"  │
-│  (Database: Status = 'active')          │
-└─────────────────────────────────────────┘
-```
+If a **CRITICAL** task remains Pending:
+*   **1 Hour**: Dashboard flashes + Sound Alert + Ping Assigned Nurse.
+*   **2 Hours**: SMS sent to **Nursing Supervisor**.
+*   **3 Hours**: Incident Report logged + SMS to **Clinical Director**.
 
-**Fallback**: If user clicks "ไม่ใช่" -> "กรุณาติดต่อประกัน [เบอร์โทร] เพื่อแก้ไขข้อมูล"
-
-### Phase 2: Daily Check-in Decision Tree (08:00 AM)
-
-**Objective**: Maximize logging, minimize unnecessary nurse alerts.
-
-```mermaid
-graph TD
-    Start[8:00 AM Auto-Message] --> Q_Feel{สบายดีไหมคะ?}
-    
-    Q_Feel -->|สบายดี| Check_Vitals[Vitals Due Case]
-    Q_Feel -->|ไม่สบาย| Ask_Sym[ถามอาการ]
-    Q_Feel -->|No Response| Wait{Wait 2 hrs}
-    
-    %% Path 1: Good Health
-    Check_Vitals -->|Vitals Due| Ask_BP[วัดความดัน/น้ำตาลหรือยัง?]
-    Check_Vitals -->|No Vitals Due| Log_Good[✅ Log: Good, No Nurse]
-    Ask_BP -->|Normal| Log_Good
-    Ask_BP -->|High| Alert_Yellow[⚠️ Yellow Flag]
-    
-    %% Path 2: Symptoms
-    Ask_Sym -->|Sym: Headache/Dizzy| Ask_Sev[ระดับความรุนแรง 1-10?]
-    Ask_Sym -->|Sym: Chest Pain/SOS| Alert_Red[🚨 RED ALERT]
-    
-    Ask_Sev -->|1-3 Mild| Advice_AI[AI Advice + Log]
-    Ask_Sev -->|4-6 Moderate| Alert_Yellow
-    Ask_Sev -->|7-10 Severe| Alert_Red
-    
-    %% Path 3: Silence
-    Wait -->|No Resp| Reminder[Reminder Msg]
-    Reminder -->|Still Silent (6PM)| Alert_Silent[📞 Silent Alert (Next Day)]
-```
-
-**Nurse Alert Logic**:
-- **Log (No Alert)**: "Comfortable", Mild symptoms (1-3), Normal Vitals.
-- **Yellow Flag**: Moderate symptoms (4-6), Vitals slightly off, Missed meds 1 day.
-- **Red Alert**: Severe symptoms (7+), Chest pain, Vitals critical, Silent 48h.
-
-### Phase 3: Continuous Care (No Expiry)
-
-Always-on service. No upsells. Focus on adherence and early warning.
-
-#### ROI & Claims Prevention Logic (Embedded)
-
-| Trigger Event | Hanna Action | Clinical Goal |
-|---------------|--------------|---------------|
-| Missed Meds (2 days) | ⚠️ Alert Clinical Console | Prevent condition degradation |
-| BG > 180 mg/dL (2x) | 💬 Deep Dive + Diet Advice | Prevent Hyperglycemia/ER visit |
-| "Chest pain" / SOS | 🚨 IMMEDIATE NURSE ALERT | Urgent Triage (Stroke/Heart Attack) |
-| Silent (48 hours) | 📞 Nurse Call Task Created | Welfare Check |
+### 4. Nurse Performance View (Analytics)
+*   **Load**: Tasks Assigned vs Resolved.
+*   **Speed**: Avg Response Time (Target < 15m for Critical).
+*   **Quality**: False Positive Rate (Target < 10%).
 
 ---
 
-## 🎙️ Hanna Voice Service (LiveKit + Groq)
+## 📉 Data Flow
 
-**New Outcome**: 90% Cost Reduction (via Open Stack) & Enhanced Supervision.
+### 1. Vitals Collection
+*   **Source**: Patient types "Sugar 180" OR Voice "My sugar is 180".
+*   **Brain**: Parses number → `vitals_log`.
+*   **Chart**: Dashboard draws 7-day trend line.
 
-| Situation | Allowed Channel |
-|-----------|-----------------|
-| Daily Routine Check-in | LINE Chat (Async) |
-| Stable Vitals Reporting | LINE Chat (Async) |
-| **New Symptom Reported** | **Hanna Voice (Suggested)** |
-| **Emotional Distress** | **Hanna Voice (Capped 10m)** |
-| **Complex Med Review** | **Hanna Voice (Suggested)** |
-
-**Gating UX & Limits**:
-- **Technology**: LiveKit (WebRTC) + Llama 3 (Groq) + EdgeTTS.
-- **Cap**: 2 calls / week per patient.
-- **Duration**: Max 10 minutes per call.
-- **Over-limit Msg**: _"ฮันนาอยากคุยด้วยนะคะ แต่โควต้าการโทรสัปดาห์นี้เต็มแล้ว พิมพ์คุยกันก่อนนะคะ"_
-- **Soft Deflection**: If request is non-urgent, suggest checking in text first.
+### 2. Medication Tracking
+*   **Source**: Daily 19:00 Reminder ("Did you take meds?").
+*   **Response**: "Yes" / "No" / Silence.
+*   **Brain**: Silence > 2 days = **Risk +2**.
 
 ---
 
-## 👩‍⚕️ Clinical Oversight Console & Time Tracking
+## 🔌 Integration Summary
 
-**Philosophy**: "Exception-Driven Care". Nurses do NOT monitor every user.
-
-**UI Specifications (Time Tracking):**
-Every alert card must have:
-1.  **Start Action Button**: Starts a timer for that specific alert.
-2.  **Action Type Dropdown**:
-    - `[Quick Message]` (Est. 1-2 min)
-    - `[Phone Call]` (Est. 10-15 min)
-    - `[Escalate to Dr]` (Est. 5 min)
-    - `[False Positive]` (Est. <1 min)
-3.  **Completion Button**: Stops timer, saves `duration_seconds` to DB.
-
-**Nurse Action Protocols:**
-
-| Alert Type | Protocol Steps | Target Time |
-|------------|----------------|-------------|
-| **Missed Meds (2 days)** | 1. Check history<br>2. Send "Did you forget?" msg<br>3. If no reply 2h -> Call | 2m (Msg)<br>10m (Call) |
-| **High BG (>180 2x)** | 1. Review diet/meds logs<br>2. Send Templated Diet Check<br>3. If critical -> Call | 5m (Review+Msg)<br>15m (Call) |
-| **Silent (48h)** | 1. Check LINE activity<br>2. Call patient/family immediately | 10m (Call) |
-| **Symptom (Severity 4-6)** | 1. Review symptom history<br>2. Send advice/monitor msg | 3m (Msg) |
-
-**Audit Trail**:
-Every AI decision (advice given, triage level assigned) and Nurse Action Time is logged for PMPM analysis.
-
----
-
-## ⛔ Removed / Deprecated Features
-- ❌ 14-Day Free Trial
-- ❌ Subscription Payments (PromptPay)
-- ❌ Consumer Pricing Pages
-- ❌ "Premium vs Basic" Tiers
-- ❌ Marketing Upsells
-
----
+| Integration | Direction | Data |
+| :--- | :--- | :--- |
+| **LINE → OneBrain** | Inbound | Text, Audio, Quick Reply |
+| **OneBrain → Dash** | Push | New Task, Sound Alert |
+| **Dash → LiveKit** | Outbound | Nurse joins Voice Room |
+| **Dash → OneBrain** | Feedback | "False Alarm" (tunes model) |

@@ -1,14 +1,16 @@
 const onboarding = require('./onboarding');
+const OneBrain = require('../services/OneBrain');
 // Payment handler removed for B2B model
 const db = require('../services/db');
 const line = require('../services/line');
-const { logCheckIn, logMedication, getHealthSummary } = require('./healthData');
-const gemini = require('../services/gemini');
+
+const groq = require('../services/groq');
 const tts = require('../services/edgeTtsAdapter');
 const storage = require('../services/storage');
 const livekitService = require('../services/livekitService');
-const voiceAgent = require('../worker/agent');
+
 const healthData = require('./healthData');
+
 
 // Helper to convert stream to buffer
 const streamToBuffer = (stream) => {
@@ -25,45 +27,43 @@ const handleAudio = async (event) => {
     const messageId = event.message.id;
 
     try {
-        // 1. Get Audio Content
+        // 1. Get Audio Content (Line Stream)
         const stream = await line.getMessageContent(messageId);
         const audioBuffer = await streamToBuffer(stream);
 
-        // 2. Process with Gemini (STT + Brain)
-        const replyText = await gemini.processAudio(audioBuffer);
+        // 2. STT (Groq Whisper)
+        const userText = await groq.transcribeAudio(audioBuffer);
 
-        // 3. Generate Speech (TTS)
+        if (!userText) {
+            return line.replyMessage(event.replyToken, { type: 'text', text: 'ขออภัยค่ะ ไม่ได้ยินเสียง กรุณาพูดใหม่อีกครั้งนะคะ' });
+        }
+
+        // 3. ONE BRAIN: Analyze (Risk + Context)
+        const userResult = await db.query('SELECT * FROM chronic_patients WHERE line_user_id = $1', [userId]);
+        const user = userResult.rows[0]; // Assume user exists if sending audio
+
+        // Pass specialized trigger to Brain
+        const riskAnalysis = await OneBrain.analyzePatient(user.id, `voice_input:${userText}`);
+
+        // 4. CHAT LAYER (Groq Llama 3): Generate Response (Aware of Risk)
+        const replyText = await groq.generateChatResponse(userText, riskAnalysis);
+
+        // 5. TTS: Generate Audio Reply
         const speechBuffer = await tts.generateSpeech(replyText);
 
         let messages = [
-            { type: 'text', text: replyText }
+            { type: 'text', text: `🗣️ ${userText}\n\n💬 ${replyText}` } // Show what was heard + replay text
         ];
 
-        // 4. Upload & Attach Audio (if TTS successful)
+        // 6. Upload & Attach Audio
         if (speechBuffer) {
-            const filename = `reply - ${userId} -${Date.now()}.mp3`;
+            const filename = `reply-${userId}-${Date.now()}.mp3`;
             const publicUrl = await storage.uploadAudio(speechBuffer, filename);
-
             if (publicUrl) {
-                // Add Audio Message (Must be first or second? LINE allows mixed)
-                // Note: LINE Audio messages require duration. 
-                // For MVP, we might skip duration (it might show 0:00) or use ffmpeg to get it.
-                // Let's try sending without explicit duration (optional in some SDKs, but LINE API requires it).
-                // Actually, LINE API requires 'duration' in milliseconds.
-                // Without ffmpeg/music-metadata, we can't easily get duration from buffer.
-                // Workaround: Send just text if we can't get duration, OR send as a file link?
-                // Better: Use a fixed duration or estimate? No, that's bad UX.
-                // Let's try sending as 'audio' with a dummy duration (e.g. 1000ms) just to test, 
-                // OR use 'fluent-ffmpeg' which we installed.
-
-                // For now, let's just send the text and the link to the audio if we can't determine duration easily.
-                // Or better, just send the text. The user asked for "Voice Experience".
-                // Let's assume we can send it.
-
                 messages.unshift({
                     type: 'audio',
                     originalContentUrl: publicUrl,
-                    duration: 5000 // Hardcoded 5s for MVP to avoid complex duration logic
+                    duration: 5000 // Placeholder duration
                 });
             }
         }
@@ -137,6 +137,25 @@ const handleMessage = async (event) => {
     // Handle Rich Menu commands
     if (event.message.type === 'text') {
         const text = event.message.text.trim();
+
+
+
+        // 🚨 SAFETY CHECK: Emergency Keywords
+        const emergencyKeywords = ['chest pain', 'เจ็บหน้าอก', 'breathe', 'หายใจไม่ออก', 'faint', 'จะเป็นลม', 'emergency', 'ฉุกเฉิน'];
+        const isEmergency = emergencyKeywords.some(kw => text.toLowerCase().includes(kw));
+
+        if (isEmergency) {
+            console.log(`🚨 [Router] Emergency Keyword Detected: ${text}`);
+
+            // 1. Trigger Brain Analysis IMMEDIATELY
+            OneBrain.analyzePatient(user.id, `emergency_keyword:${text}`);
+
+            // 2. Immediate Safe Response
+            return line.replyMessage(event.replyToken, {
+                type: 'text',
+                text: '🚨 ฮันนารับทราบอาการแล้วค่ะ! \nแจ้งพยาบาลให้ติดต่อกลับด่วนที่สุดแล้ว \n\n⚠️ หากอาการรุนแรง กรุณาโทร 1669 ทันทีนะคะ'
+            });
+        }
 
         // Health Check
         if (text === 'เช็คสุขภาพ') {
@@ -373,7 +392,7 @@ const handleMessage = async (event) => {
             });
         }
 
-        // Default: Simple acknowledgement (or pass to Gemini Text API if enabled)
+        // Default: Simple acknowledgement
         return line.replyMessage(event.replyToken, {
             type: 'text',
             text: 'ขอบคุณค่ะ ฮันนาได้รับข้อความแล้ว 😊\n(ฮันนากำลังเรียนรู้ที่จะตอบแชทเก่งขึ้น เร็วๆ นี้จะคุยได้ยาวๆ นะคะ)'
