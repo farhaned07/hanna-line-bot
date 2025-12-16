@@ -10,8 +10,12 @@
     <!-- LIFF SDK -->
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            background-color: #111;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             color: #fff;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             display: flex;
@@ -25,31 +29,38 @@
 
         .avatar-container {
             position: relative;
-            width: 200px;
-            height: 200px;
+            width: 220px;
+            height: 220px;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
         .avatar-circle {
-            width: 150px;
-            height: 150px;
+            width: 160px;
+            height: 160px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #00B900, #008000);
-            /* LINE Green */
+            background: linear-gradient(135deg, #06C755 0%, #00a347 100%);
             position: absolute;
             z-index: 2;
-            box-shadow: 0 0 20px rgba(0, 185, 0, 0.4);
+            box-shadow: 0 8px 32px rgba(6, 199, 85, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 80px;
+        }
+
+        .avatar-circle::after {
+            content: '🩺';
         }
 
         /* Pulse Animation */
         .pulse-ring {
             position: absolute;
-            width: 150px;
-            height: 150px;
+            width: 160px;
+            height: 160px;
             border-radius: 50%;
-            background: rgba(0, 185, 0, 0.2);
+            background: rgba(6, 199, 85, 0.25);
             z-index: 1;
             transform: scale(1);
         }
@@ -61,64 +72,107 @@
         @keyframes pulse-animation {
             0% {
                 transform: scale(1);
-                opacity: 0.6;
+                opacity: 0.7;
             }
 
             100% {
-                transform: scale(1.8);
+                transform: scale(2);
                 opacity: 0;
             }
         }
 
+        .brand-name {
+            margin-top: 20px;
+            font-size: 32px;
+            font-weight: 700;
+            color: #06C755;
+            letter-spacing: 2px;
+        }
+
         .status-text {
-            margin-top: 40px;
-            font-size: 24px;
-            font-weight: 600;
+            margin-top: 16px;
+            font-size: 22px;
+            font-weight: 500;
             color: #eee;
             text-align: center;
         }
 
         .subtitles {
-            margin-top: 20px;
+            margin-top: 24px;
             font-size: 16px;
-            color: #aaa;
+            color: rgba(255, 255, 255, 0.75);
             text-align: center;
-            padding: 0 20px;
-            min-height: 40px;
+            padding: 16px 24px;
+            min-height: 60px;
+            max-width: 320px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
         }
 
         .controls {
-            margin-top: 60px;
+            margin-top: 48px;
             width: 100%;
             display: flex;
             justify-content: center;
         }
 
         .btn-end {
-            background-color: #ff3b30;
+            background: linear-gradient(135deg, #ff4757 0%, #ff3b30 100%);
             color: white;
             border: none;
             border-radius: 50px;
-            padding: 15px 40px;
+            padding: 16px 48px;
             font-size: 18px;
-            font-weight: bold;
+            font-weight: 600;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(255, 59, 48, 0.3);
+            box-shadow: 0 8px 24px rgba(255, 59, 48, 0.35);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-end:active {
+            transform: scale(0.95);
         }
 
         .btn-start {
-            background-color: #00B900;
+            background: linear-gradient(135deg, #06C755 0%, #00a347 100%);
             color: white;
-            padding: 15px 40px;
+            padding: 20px 60px;
             border-radius: 50px;
-            font-size: 18px;
+            font-size: 20px;
+            font-weight: 600;
             border: none;
             display: none;
+            box-shadow: 0 8px 32px rgba(6, 199, 85, 0.4);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn-start:active {
+            transform: scale(0.95);
+        }
+
+        #start-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #start-screen p {
+            margin-top: 20px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
         }
 
         /* Hidden initially */
         #call-ui {
             display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .error-text {
+            color: #ff4757;
         }
     </style>
 </head>
