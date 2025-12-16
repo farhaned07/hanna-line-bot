@@ -27,6 +27,16 @@ const voiceRateLimiter = (req, res, next) => {
 // Apply rate limiting to all voice routes
 router.use(voiceRateLimiter);
 
+// Debug endpoint to check LIVEKIT config
+router.get('/debug', (req, res) => {
+    res.json({
+        LIVEKIT_URL: process.env.LIVEKIT_URL ? 'SET (' + process.env.LIVEKIT_URL.substring(0, 20) + '...)' : 'NOT SET',
+        LIVEKIT_API_KEY: process.env.LIVEKIT_API_KEY ? 'SET' : 'NOT SET',
+        LIVEKIT_API_SECRET: process.env.LIVEKIT_API_SECRET ? 'SET' : 'NOT SET',
+        nodeEnv: process.env.NODE_ENV
+    });
+});
+
 // GET /api/voice/token?userId=X&room=Y
 router.get('/token', async (req, res) => {
     try {
@@ -37,7 +47,7 @@ router.get('/token', async (req, res) => {
         res.json({ token, wsUrl });
     } catch (err) {
         console.error("Token Gen Error:", err);
-        res.status(500).json({ error: "Failed to generate token" });
+        res.status(500).json({ error: "Failed to generate token", details: err.message });
     }
 });
 
