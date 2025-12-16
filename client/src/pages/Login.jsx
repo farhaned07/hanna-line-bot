@@ -1,7 +1,12 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useNavigate } from 'react-router-dom'
+import { Shield, Lock, Mail, AlertCircle, Loader2 } from 'lucide-react'
 
+/**
+ * Login Page - Dark Mode Enterprise Design
+ * Clinical Command Center authentication
+ */
 export default function Login() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -31,61 +36,100 @@ export default function Login() {
     }
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gray-50">
-            <div className="w-full max-w-md space-y-8 rounded-lg bg-white p-8 shadow-md">
-                <div className="text-center">
-                    <h2 className="text-3xl font-bold tracking-tight text-gray-900">
-                        Hanna Mission Control
-                    </h2>
-                    <p className="mt-2 text-sm text-gray-600">
-                        Sign in to access admin dashboard
-                    </p>
-                </div>
-                <form className="mt-8 space-y-6" onSubmit={handleLogin}>
-                    {error && (
-                        <div className="rounded-md bg-red-50 p-4 text-sm text-red-700">
-                            {error}
-                        </div>
-                    )}
-                    <div className="-space-y-px rounded-md shadow-sm">
-                        <div>
-                            <input
-                                id="email-address"
-                                name="email"
-                                type="email"
-                                autoComplete="email"
-                                required
-                                className="relative block w-full rounded-t-md border-0 py-2.5 px-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                placeholder="Email address"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                            />
-                        </div>
-                        <div>
-                            <input
-                                id="password"
-                                name="password"
-                                type="password"
-                                autoComplete="current-password"
-                                required
-                                className="relative block w-full rounded-b-md border-0 py-2.5 px-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                placeholder="Password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-                        </div>
-                    </div>
+        <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
+            {/* Background gradient */}
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"></div>
 
-                    <div>
+            {/* Login Card */}
+            <div className="relative w-full max-w-md">
+                {/* Logo Section */}
+                <div className="text-center mb-8">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl mb-4">
+                        <Shield className="w-8 h-8 text-white" />
+                    </div>
+                    <h1 className="text-3xl font-bold text-white">Hanna</h1>
+                    <p className="text-slate-400 mt-2">Clinical Command Center</p>
+                </div>
+
+                {/* Form Card */}
+                <div className="bg-slate-800 rounded-2xl shadow-2xl border border-slate-700 p-8">
+                    <form onSubmit={handleLogin} className="space-y-6">
+                        {/* Error Message */}
+                        {error && (
+                            <div className="flex items-center gap-3 p-4 bg-red-500/10 border border-red-500/50 rounded-lg text-red-400 text-sm">
+                                <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                                <span>{error}</span>
+                            </div>
+                        )}
+
+                        {/* Email Input */}
+                        <div className="space-y-2">
+                            <label htmlFor="email" className="block text-sm font-medium text-slate-300">
+                                Email Address
+                            </label>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <Mail className="h-5 w-5 text-slate-500" />
+                                </div>
+                                <input
+                                    id="email"
+                                    name="email"
+                                    type="email"
+                                    autoComplete="email"
+                                    required
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="block w-full pl-10 pr-4 py-3 bg-slate-900 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                                    placeholder="nurse@hospital.com"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Password Input */}
+                        <div className="space-y-2">
+                            <label htmlFor="password" className="block text-sm font-medium text-slate-300">
+                                Password
+                            </label>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <Lock className="h-5 w-5 text-slate-500" />
+                                </div>
+                                <input
+                                    id="password"
+                                    name="password"
+                                    type="password"
+                                    autoComplete="current-password"
+                                    required
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="block w-full pl-10 pr-4 py-3 bg-slate-900 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                                    placeholder="••••••••"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Submit Button */}
                         <button
                             type="submit"
                             disabled={loading}
-                            className="group relative flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50"
+                            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600/50 text-white font-medium rounded-lg transition-colors"
                         >
-                            {loading ? 'Signing in...' : 'Sign in'}
+                            {loading ? (
+                                <>
+                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                    Signing in...
+                                </>
+                            ) : (
+                                'Sign In'
+                            )}
                         </button>
-                    </div>
-                </form>
+                    </form>
+                </div>
+
+                {/* Footer */}
+                <p className="text-center text-slate-500 text-sm mt-6">
+                    Secure access for authorized personnel only
+                </p>
             </div>
         </div>
     )

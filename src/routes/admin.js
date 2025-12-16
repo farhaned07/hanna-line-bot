@@ -3,9 +3,23 @@ const router = express.Router();
 const line = require('../services/line');
 const db = require('../services/db');
 
-// Secure this endpoint in production! (e.g. check for a shared secret or session)
-// For MVP, we assume the API is only called by the local frontend (same origin)
-// or protected by network policy, but ideally add middleware.
+// AUTH MIDDLEWARE (Shared with Nurse API for simplicity)
+const checkAdminAuth = (req, res, next) => {
+    const token = req.headers['authorization'];
+    if (!token) {
+        return res.status(401).json({ error: 'Missing Authorization Header' });
+    }
+    // Use the same token as Nurse Dashboard, or a separate ADMIN_API_TOKEN
+    const expected = `Bearer ${process.env.NURSE_DASHBOARD_TOKEN || process.env.ADMIN_API_TOKEN}`;
+    if (token !== expected) {
+        return res.status(403).json({ error: 'Invalid Token' });
+    }
+    next();
+};
+
+// Protect all routes
+router.use(checkAdminAuth);
+
 router.post('/notify-activation', async (req, res) => {
     const { userId, name } = req.body;
 

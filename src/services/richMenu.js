@@ -8,22 +8,19 @@ const path = require('path');
  * Rich Menu provides quick access buttons for users
  */
 const createRichMenu = async () => {
+    // Updated to 6-button 3x2 grid layout
     const richMenuObject = {
         size: {
             width: 2500,
             height: 1686
         },
         selected: true,
-        name: 'Hanna Main Menu',
+        name: 'Hanna Main Menu v2',
         chatBarText: 'เมนู',
         areas: [
+            // Top row: Call, Check Health, Log Vitals
             {
-                bounds: {
-                    x: 0,
-                    y: 0,
-                    width: 1250,
-                    height: 843
-                },
+                bounds: { x: 0, y: 0, width: 833, height: 843 },
                 action: {
                     type: 'uri',
                     label: 'Call Hanna',
@@ -31,36 +28,36 @@ const createRichMenu = async () => {
                 }
             },
             {
-                bounds: {
-                    x: 1250,
-                    y: 0,
-                    width: 1250,
-                    height: 843
-                },
+                bounds: { x: 833, y: 0, width: 834, height: 843 },
+                action: {
+                    type: 'message',
+                    text: 'เช็คสุขภาพ'
+                }
+            },
+            {
+                bounds: { x: 1667, y: 0, width: 833, height: 843 },
+                action: {
+                    type: 'message',
+                    text: 'บันทึกค่า'
+                }
+            },
+            // Bottom row: Log Meds, Profile, Help
+            {
+                bounds: { x: 0, y: 843, width: 833, height: 843 },
                 action: {
                     type: 'message',
                     text: 'บันทึกกินยา'
                 }
             },
             {
-                bounds: {
-                    x: 0,
-                    y: 843,
-                    width: 1250,
-                    height: 843
-                },
+                bounds: { x: 833, y: 843, width: 834, height: 843 },
                 action: {
                     type: 'message',
                     text: 'โปรไฟล์ของฉัน'
                 }
             },
             {
-                bounds: {
-                    x: 1250,
-                    y: 843,
-                    width: 1250,
-                    height: 843
-                },
+                bounds: { x: 1667, y: 843, width: 833, height: 843 },
                 action: {
                     type: 'message',
                     text: 'ช่วยเหลือ'

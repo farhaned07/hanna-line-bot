@@ -1,88 +1,157 @@
-import { useEffect, useState } from 'react'
-import { supabase } from '../lib/supabase'
+import { useState } from 'react';
+import { usePatients } from '../hooks/useNurseData';
+import { Link } from 'react-router-dom';
+import { SkeletonTable } from '../components/ui/Skeleton';
+import { EmptyState } from '../components/ui/StatusBanners';
+import { Users, Search, Filter, ArrowUpDown } from 'lucide-react';
 
+/**
+ * Patients List Page - Dark Mode Enterprise Design
+ * Browse and search all registered patients
+ */
 export default function Patients() {
-    const [patients, setPatients] = useState([])
-    const [loading, setLoading] = useState(true)
+    const { patients, loading, error, refresh } = usePatients();
+    const [searchQuery, setSearchQuery] = useState('');
+    const [statusFilter, setStatusFilter] = useState('all');
 
-    useEffect(() => {
-        fetchPatients()
-    }, [])
-
-    const fetchPatients = async () => {
-        try {
-            const { data, error } = await supabase
-                .from('chronic_patients')
-                .select('*')
-                //.eq('enrollment_status', 'active') // Show all for now? Or just active/trial
-                .order('created_at', { ascending: false })
-
-            if (error) throw error
-            setPatients(data || [])
-        } catch (error) {
-            console.error('Error fetching patients:', error)
-        } finally {
-            setLoading(false)
-        }
-    }
+    // Filter patients
+    const filteredPatients = patients?.filter(patient => {
+        const matchesSearch = patient.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            patient.condition?.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesStatus = statusFilter === 'all' || patient.enrollment_status === statusFilter;
+        return matchesSearch && matchesStatus;
+    }) || [];
 
     return (
-        <div>
-            <div className="sm:flex sm:items-center">
-                <div className="sm:flex-auto">
-                    <h1 className="text-2xl font-semibold leading-6 text-gray-900">Patients</h1>
-                    <p className="mt-2 text-sm text-gray-700">
-                        A list of all registered patients including their name, status, and condition.
+        <div className="space-y-6">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-2xl font-bold text-white flex items-center gap-3">
+                        <Users className="w-7 h-7 text-blue-400" />
+                        Patients
+                    </h1>
+                    <p className="text-slate-400 text-sm mt-1">
+                        {filteredPatients.length} registered patients
                     </p>
                 </div>
             </div>
-            <div className="mt-8 flow-root">
-                <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                    <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                        <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-                            <table className="min-w-full divide-y divide-gray-300">
-                                <thead className="bg-gray-50">
-                                    <tr>
-                                        <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Name</th>
-                                        <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
-                                        <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Condition</th>
-                                        <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Age</th>
-                                        <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Joined</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-200 bg-white">
-                                    {loading ? (
-                                        <tr><td colSpan="5" className="py-4 text-center">Loading...</td></tr>
-                                    ) : patients.length === 0 ? (
-                                        <tr><td colSpan="5" className="py-10 text-center text-gray-500">No patients found</td></tr>
-                                    ) : (
-                                        patients.map((patient) => (
-                                            <tr key={patient.id}>
-                                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                                                    {patient.name}
-                                                </td>
-                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                    <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${patient.enrollment_status === 'active' ? 'bg-green-50 text-green-700 ring-green-600/20' :
-                                                            patient.enrollment_status === 'pending_verification' ? 'bg-yellow-50 text-yellow-700 ring-yellow-600/20' :
-                                                                'bg-gray-50 text-gray-600 ring-gray-500/10'
-                                                        }`}>
-                                                        {patient.enrollment_status}
-                                                    </span>
-                                                </td>
-                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{patient.condition}</td>
-                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{patient.age}</td>
-                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                    {new Date(patient.created_at).toLocaleDateString()}
-                                                </td>
-                                            </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+
+            {/* Filters */}
+            <div className="flex flex-wrap gap-4">
+                {/* Search */}
+                <div className="relative flex-1 max-w-md">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                    <input
+                        type="text"
+                        placeholder="Search patients..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2.5 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
                 </div>
+
+                {/* Status Filter */}
+                <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                    <option value="all">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="pending_verification">Pending</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </div>
+
+            {/* Table */}
+            <div className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
+                {loading ? (
+                    <SkeletonTable rows={8} />
+                ) : filteredPatients.length === 0 ? (
+                    <div className="p-8">
+                        <EmptyState
+                            title="No Patients Found"
+                            description={searchQuery ? "Try adjusting your search query" : "No patients registered yet"}
+                        />
+                    </div>
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-slate-700">
+                            <thead className="bg-slate-900">
+                                <tr>
+                                    <th className="px-6 py-4 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                                        Patient
+                                    </th>
+                                    <th className="px-6 py-4 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                                        Status
+                                    </th>
+                                    <th className="px-6 py-4 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                                        Condition
+                                    </th>
+                                    <th className="px-6 py-4 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                                        Age
+                                    </th>
+                                    <th className="px-6 py-4 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                                        Joined
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-700">
+                                {filteredPatients.map((patient) => (
+                                    <tr
+                                        key={patient.id}
+                                        className="hover:bg-slate-700/50 transition-colors"
+                                    >
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <Link
+                                                to={`/dashboard/patients/${patient.id}`}
+                                                className="text-white font-medium hover:text-blue-400 transition-colors"
+                                            >
+                                                {patient.name}
+                                            </Link>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <StatusBadge status={patient.enrollment_status} />
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-slate-400">
+                                            {patient.condition || '-'}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-slate-400">
+                                            {patient.age || '-'}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-slate-500 text-sm">
+                                            {patient.created_at
+                                                ? new Date(patient.created_at).toLocaleDateString()
+                                                : '-'}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
             </div>
         </div>
-    )
+    );
+}
+
+function StatusBadge({ status }) {
+    const styles = {
+        active: 'bg-green-500/20 text-green-400 ring-green-500/30',
+        pending_verification: 'bg-amber-500/20 text-amber-400 ring-amber-500/30',
+        inactive: 'bg-slate-500/20 text-slate-400 ring-slate-500/30'
+    };
+
+    const labels = {
+        active: 'Active',
+        pending_verification: 'Pending',
+        inactive: 'Inactive'
+    };
+
+    return (
+        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ring-1 ring-inset ${styles[status] || styles.inactive}`}>
+            {labels[status] || status}
+        </span>
+    );
 }

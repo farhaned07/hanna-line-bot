@@ -219,6 +219,52 @@ const handleMessage = async (event) => {
             });
         }
 
+        // Vitals Input Handler
+        if (text === 'บันทึกค่า' || text === 'บันทึกค่าสุขภาพ') {
+            return line.replyMessage(event.replyToken, {
+                type: 'flex',
+                altText: '📊 บันทึกค่าสุขภาพ',
+                contents: {
+                    type: 'bubble',
+                    body: {
+                        type: 'box',
+                        layout: 'vertical',
+                        contents: [
+                            { type: 'text', text: '📊 บันทึกค่าสุขภาพ', weight: 'bold', size: 'lg', color: '#06C755' },
+                            { type: 'text', text: 'เลือกค่าที่ต้องการบันทึกค่ะ', margin: 'md', size: 'sm', color: '#666666' },
+                            { type: 'separator', margin: 'lg' }
+                        ]
+                    },
+                    footer: {
+                        type: 'box',
+                        layout: 'vertical',
+                        spacing: 'sm',
+                        contents: [
+                            { type: 'button', style: 'primary', color: '#FF6B6B', action: { type: 'message', label: '🩸 ความดันโลหิต', text: 'บันทึกความดัน' } },
+                            { type: 'button', style: 'primary', color: '#4ECDC4', action: { type: 'message', label: '🍬 น้ำตาลในเลือด', text: 'บันทึกน้ำตาล' } },
+                            { type: 'button', style: 'link', action: { type: 'message', label: 'ยกเลิก', text: 'ยกเลิก' } }
+                        ]
+                    }
+                }
+            });
+        }
+
+        // Blood Pressure Input
+        if (text === 'บันทึกความดัน') {
+            return line.replyMessage(event.replyToken, {
+                type: 'text',
+                text: '🩸 กรุณาพิมพ์ค่าความดันในรูปแบบ:\n\n**ความดัน 120/80**\n\nหรือ **BP 120/80**\n\nตัวอย่าง: ความดัน 135/85'
+            });
+        }
+
+        // Glucose Input
+        if (text === 'บันทึกน้ำตาล') {
+            return line.replyMessage(event.replyToken, {
+                type: 'text',
+                text: '🍬 กรุณาพิมพ์ค่าน้ำตาลในรูปแบบ:\n\n**น้ำตาล 120**\n\nหรือ **Sugar 120**\n\nตัวอย่าง: น้ำตาล 135'
+            });
+        }
+
         // Profile with health summary
         if (text === 'โปรไฟล์ของฉัน') {
             const status = user.enrollment_status === 'trial' ? 'ทดลองใช้ฟรี' :
@@ -284,10 +330,11 @@ const handleMessage = async (event) => {
         }
 
         // Admin Command: Setup Rich Menu (Protected)
-        // Usage: admin:setup-richmenu:HANNA_SECRET_2024
+        // Usage: admin:setup-richmenu:YOUR_ADMIN_SECRET
         if (text.startsWith('admin:setup-richmenu')) {
             const secret = text.split(':')[2];
-            if (secret !== 'HANNA_SECRET_2024') {
+            const expectedSecret = process.env.ADMIN_SECRET || 'CHANGE_ME_IN_PRODUCTION';
+            if (secret !== expectedSecret) {
                 console.warn(`[Security] Unauthorized admin attempt by ${userId}`);
                 return Promise.resolve(null); // Ignore silently
             }
@@ -392,11 +439,38 @@ const handleMessage = async (event) => {
             });
         }
 
-        // Default: Simple acknowledgement
-        return line.replyMessage(event.replyToken, {
-            type: 'text',
-            text: 'ขอบคุณค่ะ ฮันนาได้รับข้อความแล้ว 😊\n(ฮันนากำลังเรียนรู้ที่จะตอบแชทเก่งขึ้น เร็วๆ นี้จะคุยได้ยาวๆ นะคะ)'
-        });
+        // Default: AI-Powered Conversation
+        // Route all non-command messages through Hanna AI
+        try {
+            console.log(`🧠 [Router] Generating AI response for: "${text}"`);
+
+            // Get risk context from OneBrain for safety-aware responses
+            let riskProfile = { level: 'low', reasons: [] };
+            try {
+                riskProfile = await OneBrain.analyzePatient(user.id, `chat:${text}`);
+            } catch (e) {
+                console.warn('⚠️ OneBrain analysis failed, using default risk profile');
+            }
+
+            // Generate AI response
+            const aiReply = await groq.generateChatResponse(text, riskProfile);
+
+            // Store in conversation history
+            global.conversationHistory[userId].push({ role: 'assistant', text: aiReply });
+            if (global.conversationHistory[userId].length > 10) global.conversationHistory[userId].shift();
+
+            return line.replyMessage(event.replyToken, {
+                type: 'text',
+                text: aiReply
+            });
+        } catch (aiError) {
+            console.error('❌ AI response failed:', aiError.message);
+            // Fallback to friendly acknowledgment
+            return line.replyMessage(event.replyToken, {
+                type: 'text',
+                text: 'ขอบคุณที่ส่งข้อความมาค่ะ 💚 ขณะนี้ฮันนากำลังประมวลผล หากต้องการพูดคุยด่วน ลองกดโทรได้เลยนะคะ'
+            });
+        }
     }
 
     return Promise.resolve(null);

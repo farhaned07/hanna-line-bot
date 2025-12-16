@@ -50,6 +50,20 @@ const logCheckIn = async (userId, mood, symptoms = null, glucoseLevel = null) =>
     let alertMessage = '';
     let shouldNotifyStaff = false;
 
+    // 0. Look up patient_id from line_user_id (required for FK constraint)
+    let patientId = null;
+    try {
+        const patientRes = await db.query('SELECT id FROM chronic_patients WHERE line_user_id = $1', [userId]);
+        patientId = patientRes.rows[0]?.id;
+        if (!patientId) {
+            console.warn(`⚠️ No patient found for LINE user ${userId}`);
+            return { success: false, alertLevel: 'error', alertMessage: 'Patient not found' };
+        }
+    } catch (err) {
+        console.error('❌ Error looking up patient:', err);
+        return { success: false, alertLevel: 'error', alertMessage: 'Database error' };
+    }
+
     // 1. Check Glucose Levels (Critical Thresholds)
     if (glucoseLevel) {
         const glucose = parseInt(glucoseLevel);
@@ -104,25 +118,17 @@ const logCheckIn = async (userId, mood, symptoms = null, glucoseLevel = null) =>
         }
     }
 
-    // 4. Save to Database
+    // 4. Save to Database (using patient_id, not line_user_id)
     try {
         await db.query(
-            `INSERT INTO check_ins (line_user_id, mood, symptoms, glucose_level, alert_level, check_in_time)
+            `INSERT INTO check_ins (patient_id, mood, symptoms, glucose_level, alert_level, check_in_time)
              VALUES ($1, $2, $3, $4, $5, NOW())`,
-            [userId, mood, symptoms, glucoseLevel, alertLevel]
+            [patientId, mood, symptoms, glucoseLevel, alertLevel]
         );
-        console.log(`✅ Check-in logged for ${userId} (Alert Level: ${alertLevel})`);
+        console.log(`✅ Check-in logged for patient ${patientId} (Alert Level: ${alertLevel})`);
 
-        // 5. Trigger Brain Analysis (Async)
-        // We need patient_id. Let's look it up quickly or handle it in OneBrain.
-        // Ideally we pass the UUID if we have it. For now, we query.
-        db.query('SELECT id FROM chronic_patients WHERE line_user_id = $1', [userId])
-            .then(res => {
-                if (res.rows[0]) {
-                    OneBrain.analyzePatient(res.rows[0].id, 'check_in');
-                }
-            })
-            .catch(err => console.error('OneBrain Trigger Error:', err));
+        // 5. Trigger Brain Analysis (Async) - we already have patientId
+        OneBrain.analyzePatient(patientId, 'check_in').catch(err => console.error('OneBrain Trigger Error:', err));
 
         return {
             success: true,
@@ -147,14 +153,21 @@ const logCheckIn = async (userId, mood, symptoms = null, glucoseLevel = null) =>
  */
 const logMedication = async (userId, taken, notes = null) => {
     try {
-        // Get today's check-in record if exists
+        // Look up patient_id first
+        const patientRes = await db.query('SELECT id FROM chronic_patients WHERE line_user_id = $1', [userId]);
+        const patientId = patientRes.rows[0]?.id;
+        if (!patientId) {
+            console.warn(`⚠️ No patient found for LINE user ${userId}`);
+            return false;
+        }
 
+        // Get today's check-in record if exists
         const existing = await db.query(
             `SELECT id FROM check_ins 
-             WHERE line_user_id = $1 
+             WHERE patient_id = $1 
              AND DATE(check_in_time) = CURRENT_DATE
              LIMIT 1`,
-            [userId]
+            [patientId]
         );
 
         if (existing.rows.length > 0) {
@@ -168,9 +181,9 @@ const logMedication = async (userId, taken, notes = null) => {
         } else {
             // Create new check-in just for medication
             await db.query(
-                `INSERT INTO check_ins (line_user_id, medication_taken, medication_notes, check_in_time)
+                `INSERT INTO check_ins (patient_id, medication_taken, medication_notes, check_in_time)
                  VALUES ($1, $2, $3, CURRENT_TIMESTAMP)`,
-                [userId, taken, notes]
+                [patientId, taken, notes]
             );
         }
 
@@ -189,6 +202,11 @@ const logMedication = async (userId, taken, notes = null) => {
  */
 const getHealthSummary = async (userId, days = 7) => {
     try {
+        // Look up patient_id first
+        const patientRes = await db.query('SELECT id FROM chronic_patients WHERE line_user_id = $1', [userId]);
+        const patientId = patientRes.rows[0]?.id;
+        if (!patientId) return null;
+
         const result = await db.query(
             `SELECT 
                 COUNT(*) as total_checkins,
@@ -198,9 +216,9 @@ const getHealthSummary = async (userId, days = 7) => {
                 SUM(CASE WHEN mood = 'good' OR mood = 'สบายดี' THEN 1 ELSE 0 END) as good_mood_days,
                 SUM(CASE WHEN mood = 'bad' OR mood = 'ไม่สบาย' THEN 1 ELSE 0 END) as bad_mood_days
              FROM check_ins
-             WHERE line_user_id = $1
+             WHERE patient_id = $1
              AND check_in_time >= CURRENT_TIMESTAMP - ($2 || ' days')::INTERVAL`,
-            [userId, days]
+            [patientId, days]
         );
 
         if (result.rows.length === 0) {
@@ -245,6 +263,11 @@ const getHealthSummary = async (userId, days = 7) => {
  */
 const getRecentCheckIns = async (userId, limit = 7) => {
     try {
+        // Look up patient_id first
+        const patientRes = await db.query('SELECT id FROM chronic_patients WHERE line_user_id = $1', [userId]);
+        const patientId = patientRes.rows[0]?.id;
+        if (!patientId) return [];
+
         const result = await db.query(
             `SELECT 
                 DATE(check_in_time) as date,
@@ -254,10 +277,10 @@ const getRecentCheckIns = async (userId, limit = 7) => {
                 medication_taken,
                 medication_notes
              FROM check_ins
-             WHERE line_user_id = $1
+             WHERE patient_id = $1
              ORDER BY check_in_time DESC
              LIMIT $2`,
-            [userId, limit]
+            [patientId, limit]
         );
 
         return result.rows;

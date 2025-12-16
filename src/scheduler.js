@@ -36,8 +36,8 @@ const initScheduler = () => {
     cron.schedule('0 8 * * *', async () => {
         console.log('Running morning check-in...');
 
-        // First, check trial status and send reminders
-        await checkTrialStatus();
+        // NOTE: checkTrialStatus was removed - trial logic handled differently in B2B model
+        // await checkTrialStatus();
 
         try {
             const result = await db.query(
@@ -122,13 +122,23 @@ const checkSilenceAndNudge = async () => {
     console.log('🕵️‍♀️ [Scheduler] Auditing Patient Silence...');
 
     try {
-        // Find users with no check-in today (Simple MVP Logic)
-        // In prod: SELECT * FROM chronic_patients WHERE last_interaction < NOW() - INTERVAL '24 hours'
-        const users = await db.query(`SELECT * FROM chronic_patients WHERE enrollment_status = 'active'`);
+        // Find active patients who have NOT had a check-in in the last 24 hours
+        const users = await db.query(`
+            SELECT cp.* 
+            FROM chronic_patients cp
+            WHERE cp.enrollment_status = 'active'
+            AND cp.id NOT IN (
+                SELECT DISTINCT patient_id 
+                FROM check_ins 
+                WHERE check_in_time >= NOW() - INTERVAL '24 hours'
+                AND patient_id IS NOT NULL
+            )
+        `);
+
+        console.log(`🔍 Found ${users.rows.length} silent patients`);
 
         for (const user of users.rows) {
-            // MVP Simulation: Nudge everyone for the demo
-            console.log(`📡 Nudging Patient: ${user.name}`);
+            console.log(`📡 Nudging Silent Patient: ${user.name}`);
 
             await sendWithRetry(user.line_user_id, {
                 type: 'flex',

@@ -102,9 +102,16 @@ app.post('/webhook', middleware(config.line), (req, res) => {
 const voiceRoutes = require('./routes/voice');
 app.use('/api/voice', express.json(), voiceRoutes);
 
-// Report Generation Endpoint
+// Report Generation Endpoint (Protected)
 const reportService = require('./services/report');
 app.get('/api/report/:userId', async (req, res) => {
+    // Auth check - require same token as Nurse Dashboard
+    const token = req.headers['authorization'];
+    const expected = `Bearer ${process.env.NURSE_DASHBOARD_TOKEN}`;
+    if (!token || token !== expected) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
     try {
         const pdfBuffer = await reportService.generateReport(req.params.userId);
         res.set({

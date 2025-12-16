@@ -1,0 +1,188 @@
+/**
+ * Hanna Design System Tokens
+ * Enterprise-grade clinical dashboard styling
+ * Dark mode optimized for long shifts
+ */
+
+:root {
+  /* Semantic Colors */
+  --color-critical: #EF4444;
+  --color-critical-light: #FEE2E2;
+  --color-critical-dark: #991B1B;
+  
+  --color-high: #F59E0B;
+  --color-high-light: #FEF3C7;
+  --color-high-dark: #92400E;
+  
+  --color-normal: #60A5FA;
+  --color-normal-light: #DBEAFE;
+  --color-normal-dark: #1E40AF;
+  
+  --color-success: #22C55E;
+  --color-success-light: #DCFCE7;
+  --color-success-dark: #166534;
+  
+  /* Background Tiers (Dark Mode) */
+  --bg-base: #0F172A;
+  --bg-card: #1E293B;
+  --bg-elevated: #334155;
+  --bg-hover: #475569;
+  
+  /* Text Colors */
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --text-disabled: #475569;
+  
+  /* AI Attribution */
+  --ai-tint: rgba(96, 165, 250, 0.1);
+  --ai-border: rgba(96, 165, 250, 0.3);
+  --human-tint: rgba(34, 197, 94, 0.1);
+  --human-border: rgba(34, 197, 94, 0.3);
+  
+  /* Borders */
+  --border-subtle: #334155;
+  --border-default: #475569;
+  --border-strong: #64748B;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+  
+  /* Motion */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 350ms ease;
+  
+  /* Spacing Scale */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+  
+  /* Typography */
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* Base Styles */
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Utility Classes */
+.bg-base { background-color: var(--bg-base); }
+.bg-card { background-color: var(--bg-card); }
+.bg-elevated { background-color: var(--bg-elevated); }
+
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+
+.border-subtle { border-color: var(--border-subtle); }
+.border-default { border-color: var(--border-default); }
+
+/* Priority Badge Styles */
+.priority-critical {
+  background-color: var(--color-critical);
+  color: white;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+}
+
+.priority-high {
+  background-color: var(--color-high);
+  color: white;
+}
+
+.priority-normal {
+  background-color: var(--color-normal);
+  color: white;
+}
+
+/* Status Dot */
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+}
+
+.status-dot.stable { background-color: var(--color-success); }
+.status-dot.drifting { background-color: var(--color-high); }
+.status-dot.critical { 
+  background-color: var(--color-critical);
+  animation: pulse 2s infinite;
+}
+.status-dot.silent { 
+  background-color: transparent;
+  border: 2px solid var(--text-muted);
+}
+
+/* Pulse Animation */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Card Glow Effects */
+.glow-critical {
+  box-shadow: 0 0 0 1px var(--color-critical), 0 0 20px rgba(239, 68, 68, 0.2);
+}
+
+.glow-high {
+  box-shadow: 0 0 0 1px var(--color-high), 0 0 15px rgba(245, 158, 11, 0.15);
+}
+
+/* AI Attribution Styling */
+.ai-generated {
+  background-color: var(--ai-tint);
+  border-left: 3px solid var(--color-normal);
+}
+
+.human-action {
+  background-color: var(--human-tint);
+  border-left: 3px solid var(--color-success);
+}
+
+/* Scrollbar Styling (Dark Mode) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-card);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-strong);
+}
+
+/* Focus Styles for Accessibility */
+:focus-visible {
+  outline: 2px solid var(--color-normal);
+  outline-offset: 2px;
+}
+
+/* Transition Utilities */
+.transition-fast { transition: all var(--transition-fast); }
+.transition-normal { transition: all var(--transition-normal); }
