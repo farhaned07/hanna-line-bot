@@ -84,10 +84,7 @@ app.use((req, res, next) => {
 // M1 FIX: Removed duplicate static middleware (was at line 44)
 app.use(express.static(path.join(__dirname, '../public')));
 
-// JSON parsing for non-webhook routes
-app.use(express.json());
-
-// LINE Webhook (must use raw body for signature verification)
+// LINE Webhook (MUST be before express.json() for raw body signature verification)
 app.post('/webhook', middleware(config.line), (req, res) => {
     console.log('Webhook received events:', JSON.stringify(req.body.events));
     Promise.all(req.body.events.map(handleEvent))
@@ -97,6 +94,9 @@ app.post('/webhook', middleware(config.line), (req, res) => {
             res.status(500).end();
         });
 });
+
+// JSON parsing for non-webhook routes (AFTER webhook route)
+app.use(express.json());
 
 // Voice API (Project VoiceLess)
 const voiceRoutes = require('./routes/voice');
