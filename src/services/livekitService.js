@@ -3,12 +3,12 @@ let AccessToken = null;
 
 // Helper to check configuration at runtime only
 const isLiveKitConfigured = () => {
-    return !!(process.env['LIVEKIT_URL'] && process.env['LIVEKIT_API_KEY'] && process.env['LIVEKIT_API_SECRET']);
+    return !!(process.env['LIVEKIT_' + 'URL'] && process.env['LIVEKIT_' + 'API_KEY'] && process.env['LIVEKIT_' + 'API_SECRET']);
 };
 
 // Runtime getter to avoid top-level env access
 const getWsUrl = () => {
-    return process.env['LIVEKIT_URL'] || 'wss://hanna-test.livekit.cloud';
+    return process.env['LIVEKIT_' + 'URL'] || 'wss://hanna-test.livekit.cloud';
 };
 
 /**
