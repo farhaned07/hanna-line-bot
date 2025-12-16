@@ -1,283 +1,164 @@
-# Hanna AI Nurse - LINE Bot MVP
+# Hanna AI Nurse
 
-**Version**: 2.0 (Hybrid Model)  
-**Status**: Production  
-**Deployment**: Railway
+**Hybrid Intelligence Network for Chronic Disease Management**
+
+[![Railway](https://img.shields.io/badge/Backend-Railway-purple)](https://railway.app)
+[![Vercel](https://img.shields.io/badge/Dashboard-Vercel-black)](https://vercel.com)
+[![LINE](https://img.shields.io/badge/LINE-Official-00C300)](https://line.me)
 
 ---
 
 ## Overview
 
-Hanna is a **hybrid conversational AI nurse** for chronic disease management in Thailand, combining:
-- **LINE Bot** for asynchronous care (reminders, logging, scheduled check-ins)
-- **Gemini Live** for real-time voice conversations (consultations, urgent care)
+Hanna is a **nurse force multiplier** for chronic disease management in Thailand. It performs:
+- **Systematic data collection** via LINE chat and voice
+- **Risk assessment** using AI-powered analysis
+- **Nurse prioritization** through an exception-based dashboard
 
-### System Architecture
+**What Hanna is NOT**: A medical triage system or diagnostic tool.
 
-```
-┌─────────────────────────────────────────┐
-│         PATIENT TOUCHPOINTS              │
-│                                          │
-│  LINE Chat ◄──────────► Hanna Web       │
-│    Bot          LIFF       (Gemini Live)│
-└─────────────────────────────────────────┘
-           │                    │
-           │ Webhook            │ WebSocket
-           ▼                    ▼
-┌─────────────────────────────────────────┐
-│       Hanna Backend (Railway)            │
-│  • Message Router                        │
-│  • Gemini Live Service                   │
-│  • Cron Scheduler                        │
-│  • Database (Supabase)                   │
-└─────────────────────────────────────────┘
-```
+---
+
+## System Components
+
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| **LINE Bot** | LINE Messaging API | Patient interaction, vitals logging |
+| **Voice Interface** | LiveKit + EdgeTTS | Real-time Thai voice conversations |
+| **OneBrain** | Groq Llama 3.3 70B | Risk scoring and response generation |
+| **Dashboard** | React + Tailwind | Nurse Mission Control |
+| **Database** | Supabase PostgreSQL | Patient data and audit logs |
 
 ---
 
 ## Quick Start
 
-### 1. Install Dependencies
+### Prerequisites
+- Node.js 18+
+- LINE Developer Account
+- Supabase Project
+- Groq API Key
+- LiveKit Cloud Account
+
+### Installation
+
 ```bash
+# Clone repository
+git clone https://github.com/farhaned07/hanna-line-bot.git
+cd hanna-line-bot
+
+# Install dependencies
 npm install
-```
 
-### 2. Database Setup
-```bash
-# Ensure PostgreSQL is running (or use Supabase)
-# Create a database (e.g., hanna_db)
-psql -d hanna_db -f schema.sql
-```
-
-### 3. Environment Variables
-```bash
+# Configure environment
 cp .env.example .env
-# Edit .env with your credentials:
-# - LINE_CHANNEL_SECRET
-# - LINE_CHANNEL_ACCESS_TOKEN
-# - GEMINI_API_KEY
-# - DATABASE_URL
-# - SUPABASE_URL
-# - SUPABASE_KEY
-```
+# Edit .env with your credentials
 
-### 4. Run Server
-```bash
+# Run locally
 npm start
 ```
 
-### 5. Expose to Internet (for LINE Webhook)
+### Environment Variables
+
 ```bash
-ngrok http 3000
-# Copy the HTTPS URL and set it as the Webhook URL in LINE Developers Console
-# Example: https://xxxx.ngrok-free.app/webhook
+# LINE
+LINE_CHANNEL_SECRET=your_channel_secret
+LINE_CHANNEL_ACCESS_TOKEN=your_access_token
+LIFF_ID=your_liff_id
+
+# AI
+GROQ_API_KEY=your_groq_key
+
+# Voice
+LIVEKIT_URL=wss://your-app.livekit.cloud
+LIVEKIT_API_KEY=your_api_key
+LIVEKIT_API_SECRET=your_api_secret
+
+# Database
+DATABASE_URL=postgresql://...
+
+# Dashboard Auth
+NURSE_DASHBOARD_TOKEN=your_secure_token
 ```
 
 ---
 
 ## Features
 
-### LINE Bot (Asynchronous Care)
-- ✅ **PDPA Compliance**: Privacy consent flow with policy page
-- ✅ **Onboarding**: 6-step flow (consent → profile → trial activation)
-- ✅ **Trial Management**: 14-day trial with proactive reminders (Day 10, 12, 14)
-- ✅ **Payment**: PromptPay QR generation for subscription
-- ✅ **Scheduled Messages**: 
-  - 8:00 AM: Morning health check-in
-  - 7:00 PM: Medication reminder
-- ✅ **Health Logging**: Track glucose, blood pressure, medication adherence
-- ✅ **Red Flag Detection**: 13 emergency keywords → LINE Notify alerts
-- ✅ **Smart Routing**: Detects complex questions → suggests Gemini Live
-- ✅ **Conversation Memory**: Last 5 messages context retention
-- ✅ **Doctor Report**: PDF generation with 30-day health summary
+### For Patients (LINE)
+- 🎙️ **Voice Calls** - Talk to Hanna in Thai
+- 📊 **Vitals Logging** - Record blood pressure, glucose
+- 💊 **Medication Tracking** - Daily reminders
+- 🚨 **Emergency Detection** - Immediate escalation
 
-### Gemini Live (Real-time Voice Consultation)
-- ✅ **Real-time Voice**: Bidirectional audio streaming (WebSocket)
-- ✅ **Low Latency**: < 1 second response time
-- ✅ **Natural Conversation**: Context preservation, interruption handling
-- ✅ **Premium LIFF Interface**: 
-  - Glassmorphism design (frosted glass cards)
-  - Animated background orbs (ambient lighting)
-  - Breathing avatar animation
-  - Voice waveform visualization (5 bars)
-  - Thai-optimized fonts (Prompt, Sarabun)
-  - Medical-grade color palette (emerald + blue)
-  - Smooth Framer Motion animations
-- ✅ **Push-to-Talk**: Mobile-optimized touch controls
-- ✅ **Thai Voice**: Native Thai speech support
+### For Nurses (Dashboard)
+- 📋 **Mission Control** - Real-time patient overview
+- 🔴 **Risk Alerts** - Prioritized by severity
+- 📞 **One-Click Call** - Connect with patients
+- 📈 **Patient History** - Context for decisions
 
 ---
 
-## Conversational Quality
-
-| Channel | Latency | Context | Natural Flow | Rating |
-|---------|---------|---------|--------------|--------|
-| **LINE Bot** | 5-10s | ❌ Limited | ⚠️ Menu-driven | ⭐⭐⭐ |
-| **Gemini Live** | < 1s | ✅ Full | ✅ Continuous | ⭐⭐⭐⭐⭐ |
-
-**Recommendation**: Use LINE for scheduled tasks, Gemini Live for conversations.
-
-See [CONVERSATIONAL_ANALYSIS.md](./CONVERSATIONAL_ANALYSIS.md) for detailed evaluation.
-
----
-
-## Documentation
-
-- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Complete system architecture
-- **[WIREFRAME.md](./WIREFRAME.md)** - User journey and UI flows
-- **[CONVERSATIONAL_ANALYSIS.md](./CONVERSATIONAL_ANALYSIS.md)** - Conversational quality analysis
-- **[docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md)** - Railway deployment guide
-- **[docs/SUPABASE_SETUP.md](./docs/SUPABASE_SETUP.md)** - Database setup
-- **[docs/RICH_MENU_GUIDE.md](./docs/RICH_MENU_GUIDE.md)** - LINE rich menu
-
----
-
-## Technology Stack
-
-### Backend
-- **Runtime**: Node.js 18+
-- **Framework**: Express.js
-- **WebSocket**: ws library
-- **Scheduler**: node-cron
-- **Database**: PostgreSQL (Supabase)
-
-### AI Services
-- **Gemini 2.0 Flash** - Audio processing, text generation
-- **Gemini 2.0 Live API** - Real-time voice streaming
-- **Google Cloud TTS** - Thai text-to-speech
-
-### Frontend (LIFF)
-- **Framework**: React + Vite
-- **UI**: Tailwind CSS, Framer Motion
-- **LINE**: @line/liff SDK
-
----
-
-## Project Structure
+## Architecture
 
 ```
-hanna-line-bot/
-├── src/
-│   ├── index.js                 # Main server (Express + WebSocket)
-│   ├── handlers/
-│   │   ├── router.js            # Message routing logic
-│   │   ├── onboarding.js        # User registration flow
-│   │   ├── payment.js           # PromptPay integration
-│   │   └── healthData.js        # Health logging
-│   ├── services/
-│   │   ├── geminiLive.js        # Gemini Live WebSocket service
-│   │   ├── gemini.js            # Gemini audio processing
-│   │   ├── tts.js               # Google Cloud TTS
-│   │   ├── line.js              # LINE SDK wrapper
-│   │   └── db.js                # Database connection
-│   └── scheduler/
-│       └── index.js             # Cron jobs (daily reminders)
-├── hanna-web/                   # LIFF app (Gemini Live interface)
-│   ├── src/
-│   │   ├── App.jsx              # Main LIFF component
-│   │   └── hooks/
-│   │       └── useGeminiLive.js # WebSocket hook
-├── schema.sql                   # Database schema
-├── package.json
-└── README.md
-```
-
----
-
-## API Endpoints
-
-### LINE Webhook
-```
-POST /webhook
-```
-Receives events from LINE Platform (messages, follows, postbacks)
-
-### Gemini Live WebSocket
-```
-WS /api/voice/live?userId={userId}
-```
-Real-time bidirectional audio streaming
-
-### Health Check
-```
-GET /health
-```
-Returns `OK` if database is reachable
-
----
-
-## Environment Variables
-
-```bash
-# LINE
-LINE_CHANNEL_SECRET=xxx
-LINE_CHANNEL_ACCESS_TOKEN=xxx
-LIFF_ID=2008593893-Bj5k3djg
-
-# Gemini
-GEMINI_API_KEY=xxx
-
-# Database
-DATABASE_URL=postgresql://user:pass@host:5432/db
-
-# Supabase (for storage)
-SUPABASE_URL=https://xxx.supabase.co
-SUPABASE_KEY=xxx
-
-# Server
-PORT=3000
+LINE App  ─────┐
+               │    ┌────────────────────┐    ┌──────────────┐
+LIFF Voice ────┼───▶│  Railway Backend   │───▶│   Supabase   │
+               │    │  (Express + Node)  │    │  PostgreSQL  │
+               │    └────────────────────┘    └──────────────┘
+               │              │
+               │              ▼
+               │    ┌────────────────────┐
+               └───▶│  Vercel Dashboard  │
+                    │  (React + Tailwind)│
+                    └────────────────────┘
 ```
 
 ---
 
 ## Deployment
 
-**Platform**: Railway  
-**URL**: `https://hanna-line-bot-production.up.railway.app`
+### Backend (Railway)
+```bash
+# Push to GitHub triggers auto-deploy
+git push origin main
+```
 
-See [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) for detailed deployment instructions.
+### Dashboard (Vercel)
+Separate repository: `hanna-nurse-dashboard`
 
----
-
-## Development Roadmap
-
-### ✅ Completed (v2.0)
-- LINE bot with onboarding and payment
-- Gemini Live real-time voice
-- LIFF web interface
-- Database schema and migrations
-- Scheduled reminders
-
-### 🚧 In Progress
-- Conversation context (memory across turns)
-- Smart channel routing (auto-suggest Gemini Live)
-- Unified conversation logging
-
-### 📋 Planned
-- Rich menu (persistent buttons)
-- Family notifications (group chat)
-- Nurse dashboard (web interface)
-- Emotion detection (voice tone)
-- Video support (visual consultation)
+```bash
+# Vercel auto-deploys from GitHub
+```
 
 ---
 
-## Contributing
+## API Endpoints
 
-This is an MVP project for chronic disease management in Thailand. Contributions are welcome!
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/webhook` | POST | LINE webhook receiver |
+| `/api/nurse/stats` | GET | Dashboard statistics |
+| `/api/nurse/tasks` | GET | Task queue |
+| `/api/nurse/patients` | GET | Patient list |
+| `/api/voice/token` | GET | LiveKit token |
+| `/api/voice/chat` | POST | Voice chat processing |
+| `/health` | GET | Health check |
+
+---
+
+## Documentation
+
+- [WIREFRAME.md](./WIREFRAME.md) - UX specification
+- [ARCHITECTURE.md](./ARCHITECTURE.md) - Technical architecture
 
 ---
 
 ## License
 
-ISC
+Proprietary - All rights reserved.
 
 ---
 
-## Support
-
-For issues or questions:
-1. Check [ARCHITECTURE.md](./ARCHITECTURE.md) for system details
-2. Review [CONVERSATIONAL_ANALYSIS.md](./CONVERSATIONAL_ANALYSIS.md) for design rationale
-3. See [docs/](./docs/) for deployment and setup guides
-
+**Built for healthcare. Designed for nurses. Powered by AI.**

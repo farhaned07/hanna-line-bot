@@ -1,64 +1,68 @@
 # Hanna System Architecture
 
-**Version**: 2.1 (The Pivot)
-**Last Updated**: December 15, 2025
-**Status**: Production (Hybrid Intelligence Network)
+**Version**: 3.0 (Production)  
+**Last Updated**: December 17, 2025  
+**Status**: GO-LIVE Ready
 
 ---
 
 ## Overview
 
 Hanna is a **hybrid intelligence network** for chronic disease management in Thailand, combining:
-- **OneBrain Intelligence**: A centralized Risk Engine (Groq Llama 3) that audits patient health.
-- **LINE Bot**: For asynchronous daily check-ins and "Active Nudge" reminders.
-- **Hanna Voice**: Real-time voice conversations via LiveKit + EdgeTTS.
-- **Nurse Dashboard**: A priority-based control center for human supervision.
+- **OneBrain Intelligence**: A centralized Risk Engine (Groq Llama 3.3 70B) that performs systematic data collection and risk assessment.
+- **LINE Bot**: For asynchronous daily check-ins, vitals logging, and "Active Nudge" reminders.
+- **Hanna Voice**: Real-time voice conversations via LiveKit WebRTC + EdgeTTS.
+- **Nurse Dashboard**: A priority-based Mission Control for human supervision.
+
+**Critical Distinction**: Hanna performs **nurse force multiplication** through systematic data collection — NOT medical triage.
 
 ---
 
 ## System Architecture
 
-```mermaid
-graph TB
-    subgraph "Patient Touchpoints"
-        LINE[LINE Messaging App]
-        LIFF[Hanna Web - LIFF App]
-    end
-    
-    subgraph "The Brain (OneBrain Service)"
-        ROUTER[Message Router<br/>router.js]
-        ONEBRAIN[Risk Engine<br/>OneBrain.js]
-        SCHEDULER[Cron Scheduler<br/>Active Nudge]
-    end
-    
-    subgraph "Cloud Services"
-        LIVEKIT[LiveKit Cloud<br/>WebRTC Audio]
-        GROQ[Groq Cloud<br/>Llama 3 (Reasoning)]
-        EDGETTS[Microsoft Edge TTS<br/>Premwadee (Voice)]
-    end
-    
-    subgraph "Data Layer"
-        SUPABASE[(Supabase PostgreSQL<br/>patient_state<br/>nurse_tasks<br/>nurse_logs)]
-    end
-    
-    subgraph "Nurse Control"
-        DASH[Nurse Dashboard<br/>React + Tailwind]
-    end
-    
-    LINE -->|Text| ROUTER
-    LIFF <-->|WebRTC Voice| LIVEKIT
-    
-    ROUTER --> ONEBRAIN
-    SCHEDULER --> ONEBRAIN
-    ONEBRAIN --> SUPABASE
-    
-    ONEBRAIN -->|Risk Score| DASH
-    DASH -->|Resolve Task| SUPABASE
-    
-    LIVEKIT -->|Audio Stream| LIFF
-    ONEBRAIN -->|Context| GROQ
-    GROQ -->|Response| EDGETTS
-    EDGETTS -->|Audio| LIVEKIT
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     PATIENT TOUCHPOINTS                          │
+│  ┌──────────────────┐         ┌─────────────────────────────┐   │
+│  │   LINE App       │         │   LIFF Voice (call.html)    │   │
+│  │   (Rich Menu)    │         │   LiveKit WebRTC            │   │
+│  └────────┬─────────┘         └─────────────┬───────────────┘   │
+└───────────┼─────────────────────────────────┼───────────────────┘
+            │                                 │
+            ▼                                 ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    RAILWAY BACKEND                               │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │  Message Router (router.js)                               │   │
+│  │  - Emergency keyword detection                            │   │
+│  │  - Onboarding flow                                        │   │
+│  │  - Rich Menu actions                                      │   │
+│  └────────────────────────┬─────────────────────────────────┘   │
+│                           │                                      │
+│  ┌────────────────────────▼─────────────────────────────────┐   │
+│  │  OneBrain Service (OneBrain.js)                          │   │
+│  │  - Risk calculation (0-10 score)                         │   │
+│  │  - Task generation with deduplication                    │   │
+│  │  - Alert fatigue safeguards                              │   │
+│  └────────────────────────┬─────────────────────────────────┘   │
+│                           │                                      │
+│  ┌──────────────┐  ┌──────▼───────┐  ┌──────────────────────┐   │
+│  │ Groq API     │  │ EdgeTTS      │  │ LiveKit Service      │   │
+│  │ (Llama 3.3)  │  │ (Premwadee)  │  │ (Token Generation)   │   │
+│  │ - AI Chat    │  │ - Thai TTS   │  │ - WebRTC Audio       │   │
+│  └──────────────┘  └──────────────┘  └──────────────────────┘   │
+└─────────────────────────────────────────────────────────────────┘
+            │                                      │
+            ▼                                      ▼
+┌─────────────────────────────┐  ┌────────────────────────────────┐
+│   SUPABASE DATABASE         │  │   VERCEL DASHBOARD             │
+│   - chronic_patients        │  │   - Mission Control            │
+│   - patient_state           │  │   - Monitoring View            │
+│   - nurse_tasks             │  │   - Patient Detail             │
+│   - vitals_log              │  │   - React + Tailwind           │
+│   - chat_history            │  │                                │
+│   - audit_log               │  │                                │
+└─────────────────────────────┘  └────────────────────────────────┘
 ```
 
 ---
@@ -67,102 +71,139 @@ graph TB
 
 ### 1. The Interface: LINE Bot (Asynchronous)
 
-**Purpose**: "The Invisible App". Handles daily check-ins and safety alerts.
+**Purpose**: "The Invisible App". Handles daily check-ins, vitals logging, and safety alerts.
+
+**Rich Menu (6 Buttons)**:
+| Button | Action |
+|--------|--------|
+| โทรหาฮันนา | LIFF voice call |
+| เช็คสุขภาพ | Health summary |
+| บันทึกค่า | Log vitals |
+| บันทึกกินยา | Log medication |
+| โปรไฟล์ของฉัน | View profile |
+| ช่วยเหลือ | Help commands |
+
 **Key Features**:
-- **Smart Router**: Detects "Chest Pain" → Immediate 1669 Protocol.
-- **Active Nudge**: Proactively calls (Push Message) silent patients.
-- **Payments**: PromptPay integration.
+- **Emergency Detection**: "Chest Pain" → Immediate 1669 Protocol + CRITICAL task
+- **AI Responses**: All messages go through Groq Llama 3.3 for contextual replies
+- **Active Nudge**: Proactive push to silent patients
 
 ### 2. The Engine: OneBrain + Hanna Voice
 
-**Purpose**: To understand context and speak naturally.
-**Technology Stack**:
-- **Intelligence**: Groq (Llama 3.3 70B) - fast, medical reasoning.
-- **Voice**: EdgeTTS (Neural Thai "Premwadee") + LiveKit (WebRTC).
-- **Latency**: < 2 seconds end-to-end.
+**Purpose**: Systematic data collection and risk assessment for nurse force multiplication.
+
+**Voice Technology Stack**:
+| Component | Service | Purpose |
+|-----------|---------|---------|
+| STT | Web Speech API (Browser) | User speech → text |
+| Reasoning | Groq Llama 3.3 70B | Generate response |
+| TTS | Microsoft EdgeTTS | Text → Thai audio (Premwadee) |
+| Transport | LiveKit Cloud | WebRTC real-time audio |
 
 **Voice Flow**:
-1. User Speaks → LiveKit (STT)
-2. Text → Groq (Reasoning)
-3. AI Text → EdgeTTS (Audio)
-4. Audio → LiveKit (Playback)
+1. User opens LIFF → `call.html` loads
+2. User speaks → Web Speech API transcribes
+3. Text → `/api/voice/chat` → Groq generates response
+4. Response → EdgeTTS → Base64 audio
+5. Audio plays in browser
 
 ### 3. The Control: Nurse Dashboard
 
-**Purpose**: "Exception Management".
-**Technology**: React, Tailwind, Supabase Real-time.
+**Purpose**: "Exception Management" — Nurses see only what needs attention.
+
+**Technology**: React 18, Tailwind CSS 3, Vite 5, deployed on Vercel
+
+**Pages**:
+1. **Login** - Bearer token auth (VITE_NURSE_TOKEN)
+2. **Mission Control** - Real-time metrics, critical alerts
+3. **Monitoring View** - Full task queue with filters
+4. **Patient List** - All enrolled patients
+5. **Patient Detail** - Individual patient view
+6. **Payments** - B2B placeholder
+
 **Workflow**:
-1. **OneBrain** creates a Task (Critical/High).
-2. **Dashboard** flashes Red.
-3. **Nurse** clicks 'Call' or 'Resolve'.
-4. **Loop Closed**.
+1. OneBrain creates Task (Critical/High)
+2. Dashboard shows alert
+3. Nurse clicks 'Call' or 'Resolve'
+4. Feedback logged → Loop closed
 
 ---
 
-## Database Schema (Supabase)
+## Database Schema (Supabase PostgreSQL)
 
-### `patient_state` (The Brain's Memory)
-Stores the current risk snapshot.
-```sql
-CREATE TABLE patient_state (
-    patient_id UUID PRIMARY KEY,
-    current_risk_score INTEGER, -- 0-10
-    risk_level VARCHAR(20), -- 'critical', 'high', 'medium', 'low'
-    risk_reasoning JSONB, -- {"triggers": ["bp_high_3days", "keyword_chest_pain"]}
-    last_interaction TIMESTAMP
-);
-```
+### Core Tables
 
-### `vitals_log` (The Data)
 ```sql
-CREATE TABLE vitals_log (
-    id UUID PRIMARY KEY,
-    patient_id UUID REFERENCES chronic_patients(id),
-    type VARCHAR(20), -- 'bp', 'glucose', 'weight', 'o2'
-    value JSONB, -- {"systolic": 120, "diastolic": 80} or {"level": 110}
-    source VARCHAR(20), -- 'manual_text', 'voice_ai', 'device'
-    timestamp TIMESTAMP DEFAULT NOW()
-);
-```
-
-### `medication_log` (The Adherence)
-```sql
-CREATE TABLE medication_log (
-    id UUID PRIMARY KEY,
-    patient_id UUID REFERENCES chronic_patients(id),
-    med_name VARCHAR(100),
-    taken BOOLEAN,
-    reason_skipped TEXT,
-    timestamp TIMESTAMP DEFAULT NOW()
-);
-```
-
-### `audit_log` (The Legal Safety Net)
-**CRITICAL**: Immutable log of all risk calculations and alerts.
-```sql
-CREATE TABLE audit_log (
-    id UUID PRIMARY KEY,
-    timestamp TIMESTAMP DEFAULT NOW(),
-    actor VARCHAR(50), -- 'OneBrain', 'Nurse_A', 'Patient'
-    action VARCHAR(50), -- 'CALCULATE_RISK', 'TRIGGER_ALARM', 'RESOLVE_TASK'
-    patient_id UUID,
-    details JSONB -- Snapshot of input/output for reproducibility
-);
-```
-
-### `nurse_tasks` (The Queue)
-Stores actionable items for the dashboard.
-```sql
-CREATE TABLE nurse_tasks (
-    id UUID PRIMARY KEY,
-    patient_id UUID REFERENCES chronic_patients(id),
-    priority VARCHAR(20), -- 'critical', 'high', 'medium'
-    status VARCHAR(20), -- 'pending', 'completed', 'escalated'
-    reason TEXT, -- Human readable summary
-    context JSONB, -- {"recent_vitals": ..., "history": ...}
-    dismissal_reason VARCHAR(50), -- 'called_stable', 'false_positive'
-    escalation_level INTEGER DEFAULT 0, -- 0=None, 1=Nurse, 2=Supervisor, 3=Director
+-- Patient Registry
+CREATE TABLE chronic_patients (
+    id SERIAL PRIMARY KEY,
+    line_user_id VARCHAR(255) UNIQUE NOT NULL,
+    name VARCHAR(255),
+    age INTEGER,
+    condition VARCHAR(255),
+    enrollment_status VARCHAR(50) DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Risk State (OneBrain Memory)
+CREATE TABLE patient_state (
+    patient_id INTEGER PRIMARY KEY REFERENCES chronic_patients(id),
+    current_risk_score INTEGER DEFAULT 0,
+    risk_level VARCHAR(20),
+    risk_reasoning JSONB,
+    risk_score INTEGER DEFAULT 0,
+    assigned_nurse VARCHAR(255),
+    last_assessment TIMESTAMP DEFAULT NOW(),
+    status VARCHAR(50) DEFAULT 'active',
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Nurse Task Queue
+CREATE TABLE nurse_tasks (
+    id SERIAL PRIMARY KEY,
+    patient_id INTEGER REFERENCES chronic_patients(id),
+    task_type VARCHAR(50),
+    priority VARCHAR(20),
+    status VARCHAR(20) DEFAULT 'pending',
+    reason TEXT,
+    context JSONB,
+    title VARCHAR(255),
+    description TEXT,
+    created_by VARCHAR(100),
+    resolved_by VARCHAR(100),
+    resolved_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Vitals Log
+CREATE TABLE vitals_log (
+    id SERIAL PRIMARY KEY,
+    patient_id INTEGER REFERENCES chronic_patients(id),
+    type VARCHAR(50),
+    value JSONB,
+    source VARCHAR(50),
+    recorded_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Chat History
+CREATE TABLE chat_history (
+    id SERIAL PRIMARY KEY,
+    patient_id INTEGER REFERENCES chronic_patients(id),
+    role VARCHAR(20),
+    content TEXT,
+    message_type VARCHAR(20) DEFAULT 'text',
+    metadata JSONB,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Legal Audit Trail
+CREATE TABLE audit_log (
+    id SERIAL PRIMARY KEY,
+    actor VARCHAR(100),
+    action VARCHAR(100),
+    patient_id INTEGER,
+    details JSONB,
+    timestamp TIMESTAMP DEFAULT NOW()
 );
 ```
 
@@ -172,56 +213,76 @@ CREATE TABLE nurse_tasks (
 
 ### Failure Modes & Fallbacks
 | Component | Failure Scenario | Automated Fallback |
-|-----------|------------------|-------------------|
-| **OneBrain (Groq)** | API Timeout / 500 | **Rule-Based Triage**: Fallback to Keyword Matching (Regex) for Safety. |
-| **LiveKit Voice** | Connection Dropped | **SMS Failover**: "Call failed. Please type your symptoms." + High Priority Task. |
-| **Supabase DB** | Timeout / Down | **Redis Queue**: Cache vital logs and retry sync when DB returns. |
-| **Nurse Dashboard** | Offline / Unreachable | **SMS Broadcast**: Send critical alerts directly to Nurse Supervisor phone. |
+|-----------|------------------|-------------------:|
+| **Groq API** | Timeout / 500 | Fallback response: "กรุณาลองใหม่อีกครั้งค่ะ" |
+| **LiveKit Voice** | Connection Dropped | User sees error message, can type instead |
+| **Supabase DB** | Timeout | Logged error, graceful degradation |
+| **LINE Webhook** | Signature fail | Request rejected (security) |
 
 ### Safeguards (Alert Fatigue)
-*   **Cap**: Max 15 **CRITICAL** tasks visible at any time.
-*   **De-duplication**: Same patient = Max 1 task per 4 hours (unless new **Emergency Keyword**).
-*   **Feedback Loop**: If Nurse marks >40% of tasks as "False Alarm", system auto-notifies Admin to retune OneBrain.
+- **Cap**: Max 15 CRITICAL tasks visible at any time
+- **De-duplication**: Same patient = Max 1 task per 4 hours (unless Emergency)
+- **Feedback Loop**: High false-positive rate triggers admin notification
 
 ### Escalation Protocol
-*   **T+0m**: Task Created on Dashboard (Sound Alert).
-*   **T+60m**: Unresolved? **Ping Nurse** (Dashboard Flash).
-*   **T+120m**: Still Unresolved? **SMS Supervisor**.
-*   **T+180m**: Critical Failure. **SMS Clinical Director** + Incident Log.
+- **T+0m**: Task Created on Dashboard
+- **T+60m**: Unresolved? Ping Nurse
+- **T+120m**: SMS Supervisor
+- **T+180m**: SMS Clinical Director + Incident Log
 
 ---
 
-## 🏗️ Updated Voice Stack (STT/TTS)
+## 🚀 Deployment Configuration
 
-```mermaid
-graph LR
-    User[User Audio] -->|Stream| LiveKit
-    LiveKit -->|Audio| Deepgram[Deepgram STT]
-    Deepgram -->|Text| Groq[Groq Llama 3]
-    Groq -->|Text| EdgeTTS[Edge TTS]
-    EdgeTTS -->|Audio| LiveKit
-    LiveKit -->|Stream| User
+### Production Environment
+
+| Service | Platform | URL |
+|---------|----------|-----|
+| Backend API | Railway | `hanna-line-bot-production.up.railway.app` |
+| Nurse Dashboard | Vercel | (from hanna-nurse-dashboard repo) |
+| Database | Supabase | `hozputqagilvsbilojgr.supabase.co` |
+| Voice | LiveKit Cloud | `fastcare-319g1krm.livekit.cloud` |
+
+### Required Environment Variables
+
+```bash
+# LINE Integration
+LINE_CHANNEL_SECRET=xxx
+LINE_CHANNEL_ACCESS_TOKEN=xxx
+LIFF_ID=2008593893-Bj5k3djg
+
+# AI & Voice
+GROQ_API_KEY=xxx
+LIVEKIT_URL=wss://fastcare-319g1krm.livekit.cloud
+LIVEKIT_API_KEY=xxx
+LIVEKIT_API_SECRET=xxx
+
+# Database
+DATABASE_URL=postgresql://xxx
+
+# Dashboard
+NURSE_DASHBOARD_TOKEN=han_ops_2024_secure_xyz
+
+# Dashboard Frontend (Vercel)
+VITE_SUPABASE_URL=https://xxx.supabase.co
+VITE_SUPABASE_ANON_KEY=xxx
+VITE_NURSE_TOKEN=xxx
+VITE_API_URL=https://hanna-line-bot-production.up.railway.app
 ```
 
 ---
 
-## Deployment Env Variables
+## Repository Structure
 
-```bash
-# LINE
-LINE_CHANNEL_SECRET=xxx
-LINE_CHANNEL_ACCESS_TOKEN=xxx
-LIFF_ID=xxx
-
-# BRAIN
-GROQ_API_KEY=xxx
-DEEPGRAM_API_KEY=xxx # New for STT
-
-# VOICE
-LIVEKIT_API_KEY=xxx
-LIVEKIT_API_SECRET=xxx
-LIVEKIT_URL=wss://hanna.livekit.cloud
-
-# DATA
-DATABASE_URL=postgresql://xxx
+```
+hanna-line-bot/
+├── src/
+│   ├── handlers/       # Message routing, onboarding
+│   ├── services/       # OneBrain, Groq, LiveKit, LINE
+│   ├── routes/         # API endpoints (nurse, voice)
+│   └── config/         # Prompts, configuration
+├── client/             # Nurse Dashboard (React)
+├── public/             # LIFF assets (call.html)
+├── migrations/         # SQL schema files
+└── scripts/            # Utilities
 ```
