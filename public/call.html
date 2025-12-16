@@ -154,9 +154,10 @@
         async function init() {
             // Check LIFF (Optional but good for User ID)
             try {
-                await liff.init({ liffId: "LIFF_ID_PLACEHOLDER" }); // Will fall back if not set
+                await liff.init({ liffId: "2008593893-Bj5k3djg" });
+                console.log('LIFF initialized successfully');
             } catch (e) {
-                console.log('LIFF init failed (running in browser?)', e);
+                console.warn('LIFF init failed (running in browser?):', e.message);
             }
 
             document.getElementById('btn-connect').addEventListener('click', startCall);
@@ -168,10 +169,18 @@
             document.getElementById('status').innerText = "กำลังเชื่อมต่อ...";
 
             try {
-                // 1. Get Token
-                // In production, get userId from LIFF. For pilot, use random or mocked.
-                const userId = liff.isInClient() ? await liff.getProfile().then(p => p.userId) : 'test-user-' + Math.floor(Math.random() * 1000);
+                // 1. Get User ID from LIFF
+                let userId = 'guest-' + Date.now();
+                try {
+                    if (liff.isInClient() && liff.isLoggedIn()) {
+                        const profile = await liff.getProfile();
+                        userId = profile.userId;
+                    }
+                } catch (e) {
+                    console.warn('Could not get LIFF profile:', e.message);
+                }
 
+                // 2. Get Token
                 const response = await fetch(`/api/voice/token?userId=${userId}`);
                 const data = await response.json();
 
@@ -273,13 +282,19 @@
             document.body.classList.add('pulsing'); // Mock agent thinking
 
             try {
-                // Determine User ID
-                const userId = 'user_pilot_' + Math.floor(Math.random() * 1000); // Demo ID
+                // Use same userId from startCall (stored in global)
+                let chatUserId = 'guest';
+                try {
+                    if (liff.isInClient() && liff.isLoggedIn()) {
+                        const profile = await liff.getProfile();
+                        chatUserId = profile.userId;
+                    }
+                } catch (e) { /* ignore */ }
 
                 const res = await fetch('/api/voice/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text, userId })
+                    body: JSON.stringify({ text, userId: chatUserId })
                 });
 
                 const data = await res.json();
