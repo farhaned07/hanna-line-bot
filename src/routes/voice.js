@@ -9,7 +9,7 @@ router.get('/token', async (req, res) => {
         const userId = req.query.userId || 'guest';
         const roomName = req.query.room || 'consultation-room';
         const token = await livekitService.generateToken(userId, roomName);
-        const wsUrl = livekitService.WS_URL;
+        const wsUrl = livekitService.getWsUrl();
         res.json({ token, wsUrl });
     } catch (err) {
         console.error("Token Gen Error:", err);

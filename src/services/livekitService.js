@@ -1,13 +1,14 @@
 // Lazy-load LiveKit only when needed to prevent Railway build failures
 let AccessToken = null;
 
-const API_KEY = process.env.LIVEKIT_API_KEY || 'devkey';
-const API_SECRET = process.env.LIVEKIT_API_SECRET || 'secret';
-const WS_URL = process.env.LIVEKIT_URL || 'wss://hanna-test.livekit.cloud';
-
-// Check if LiveKit is configured
+// Helper to check configuration at runtime only
 const isLiveKitConfigured = () => {
-    return !!(process.env.LIVEKIT_URL && process.env.LIVEKIT_API_KEY && process.env.LIVEKIT_API_SECRET);
+    return !!(process.env['LIVEKIT_URL'] && process.env['LIVEKIT_API_KEY'] && process.env['LIVEKIT_API_SECRET']);
+};
+
+// Runtime getter to avoid top-level env access
+const getWsUrl = () => {
+    return process.env['LIVEKIT_URL'] || 'wss://hanna-test.livekit.cloud';
 };
 
 /**
@@ -24,6 +25,9 @@ async function generateToken(participantName, roomName, isAgent = false) {
         }
         AccessToken = require('livekit-server-sdk').AccessToken;
     }
+
+    const API_KEY = process.env['LIVEKIT_API_KEY'] || 'devkey';
+    const API_SECRET = process.env['LIVEKIT_API_SECRET'] || 'secret';
 
     const at = new AccessToken(API_KEY, API_SECRET, {
         identity: participantName,
@@ -42,5 +46,5 @@ async function generateToken(participantName, roomName, isAgent = false) {
 
 module.exports = {
     generateToken,
-    WS_URL
+    getWsUrl
 };
