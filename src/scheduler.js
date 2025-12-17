@@ -101,17 +101,17 @@ const initScheduler = () => {
         timezone: "Asia/Bangkok"
     });
 
-    // Proactive "Silence Audit" (10:00 AM)
-    cron.schedule('0 10 * * *', checkSilenceAndNudge, {
+    // Proactive "Silence Audit" (14:00 PM - Afternoon nudge)
+    cron.schedule('0 14 * * *', checkSilenceAndNudge, {
         timezone: "Asia/Bangkok"
     });
 
     // Safety Safeguard: Escalation Check (Every 15 mins)
     cron.schedule('*/15 * * * *', checkEscalations);
 
-    console.log('✅ Scheduler Initialized: Morning(08:00), Nudge(10:00), Evening(19:00), Escalation(15m)');
+    console.log('✅ Scheduler Initialized: Morning(08:00), Nudge(14:00), Evening(19:00), Escalation(15m)');
 
-    console.log('✅ Scheduler Initialized: Morning(08:00), Nudge(10:00), Evening(19:00)');
+    console.log('✅ Scheduler Initialized: Morning(08:00), Nudge(14:00), Evening(19:00)');
 };
 
 /**
@@ -149,9 +149,9 @@ const checkSilenceAndNudge = async () => {
                         type: 'box',
                         layout: 'vertical',
                         contents: [
-                            { type: 'text', text: 'ฮันนาเป็นห่วงค่ะ 😟', weight: 'bold', size: 'xl', color: '#FF3333' },
-                            { type: 'text', text: 'วันนี้ยังไม่ได้คุยกันเลย สบายดีไหมคะ?', margin: 'md', size: 'md' },
-                            { type: 'text', text: 'กดปุ่มเพื่อคุยกับพยาบาล 1 นาทีนะคะ', margin: 'sm', size: 'xs', color: '#666666' }
+                            { type: 'text', text: 'สวัสดีค่ะ ฮันนาอยากทักทายหน่อย 😊', weight: 'bold', size: 'xl', color: '#06C755' },
+                            { type: 'text', text: 'วันนี้ยังไม่ได้คุยกัน สบายดีไหมคะ?', margin: 'md', size: 'md' },
+                            { type: 'text', text: 'กดปุ่มเพื่อคุยกับฮันนา 1 นาทีนะคะ', margin: 'sm', size: 'xs', color: '#666666' }
                         ]
                     },
                     footer: {

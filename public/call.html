@@ -198,6 +198,17 @@
         <div class="status-text" id="status">กำลังเชื่อมต่อ...</div>
         <div class="subtitles" id="transcript"></div>
 
+        <!-- Text Input Fallback (shown when speech not available) -->
+        <div id="text-input-container" style="display: none; margin-top: 24px; width: 100%; max-width: 320px;">
+            <input type="text" id="text-input" placeholder="พิมพ์ข้อความ..." style="width: 100%; padding: 16px; border-radius: 25px; border: none; 
+                       font-size: 16px; background: rgba(255,255,255,0.9); color: #333;">
+            <button id="send-btn" onclick="sendTextMessage()" style="margin-top: 12px; width: 100%; padding: 14px; border-radius: 25px; 
+                       border: none; background: linear-gradient(135deg, #06C755 0%, #00a347 100%); 
+                       color: white; font-size: 16px; font-weight: 600; cursor: pointer;">
+                ส่งข้อความ
+            </button>
+        </div>
+
         <div class="controls">
             <button class="btn-end" onclick="endCall()">วางสาย</button>
         </div>
@@ -271,7 +282,9 @@
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
             if (!SpeechRecognition) {
-                document.getElementById('status').innerText = "เบราว์เซอร์ไม่รองรับ Speech API";
+                // Show text input fallback
+                document.getElementById('status').innerText = "พิมพ์ข้อความแทนได้ค่ะ";
+                document.getElementById('text-input-container').style.display = 'block';
                 return;
             }
 
@@ -370,6 +383,27 @@
                 document.getElementById('status').innerText = "กำลังฟัง...";
             }
         }
+
+        // Text input fallback function
+        async function sendTextMessage() {
+            const input = document.getElementById('text-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            input.value = '';
+            document.getElementById('transcript').innerText = `คุณ: ${text}`;
+            await processUserAudio(text);
+        }
+
+        // Handle Enter key for text input
+        document.addEventListener('DOMContentLoaded', () => {
+            const input = document.getElementById('text-input');
+            if (input) {
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') sendTextMessage();
+                });
+            }
+        });
 
         // Initialize on load
         init();
