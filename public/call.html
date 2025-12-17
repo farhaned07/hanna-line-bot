@@ -5,8 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Call Hanna</title>
-    <!-- LiveKit SDK via CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/livekit-client/dist/livekit-client.umd.min.js"></script>
     <!-- LIFF SDK -->
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
@@ -181,8 +179,12 @@
 
     <!-- Start Screen -->
     <div id="start-screen">
-        <button id="btn-connect" class="btn-start" style="display:block">คุยกับฮันนา</button>
-        <p style="margin-top:20px; color:#aaa">แตะเพื่อโทร</p>
+        <div class="avatar-container">
+            <div class="avatar-circle"></div>
+        </div>
+        <div class="brand-name">HANNA</div>
+        <button id="btn-connect" class="btn-start" style="display:block; margin-top: 40px;">คุยกับฮันนา</button>
+        <p style="margin-top:20px; color:#aaa">แตะเพื่อเริ่มสนทนา</p>
     </div>
 
     <!-- Call UI -->
@@ -202,16 +204,28 @@
     </div>
 
     <script>
-        const API_BASE = ''; // Relative path
-        let room;
+        let recognition;
+        let isSpeaking = false;
+        let userId = 'guest-' + Date.now();
 
         async function init() {
-            // Check LIFF (Optional but good for User ID)
+            // Initialize LIFF
             try {
                 await liff.init({ liffId: "2008593893-Bj5k3djg" });
                 console.log('LIFF initialized successfully');
+
+                // Get user profile if logged in
+                if (liff.isInClient() && liff.isLoggedIn()) {
+                    try {
+                        const profile = await liff.getProfile();
+                        userId = profile.userId;
+                        console.log('User ID:', userId);
+                    } catch (e) {
+                        console.warn('Could not get profile:', e.message);
+                    }
+                }
             } catch (e) {
-                console.warn('LIFF init failed (running in browser?):', e.message);
+                console.warn('LIFF init failed:', e.message);
             }
 
             document.getElementById('btn-connect').addEventListener('click', startCall);
@@ -223,63 +237,14 @@
             document.getElementById('status').innerText = "กำลังเชื่อมต่อ...";
 
             try {
-                // 1. Get User ID from LIFF
-                let userId = 'guest-' + Date.now();
-                try {
-                    if (liff.isInClient() && liff.isLoggedIn()) {
-                        const profile = await liff.getProfile();
-                        userId = profile.userId;
-                    }
-                } catch (e) {
-                    console.warn('Could not get LIFF profile:', e.message);
+                // Check for Web Speech API support
+                if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                    throw new Error("เบราว์เซอร์ไม่รองรับ Speech API");
                 }
 
-                // 2. Get Token
-                const response = await fetch(`/api/voice/token?userId=${userId}`);
-                const data = await response.json();
-
-                if (!data.token) throw new Error("No token received");
-
-                // 2. Connect to LiveKit
-                room = new LiveKitClient.Room({
-                    adaptiveStream: true,
-                    dynacast: true,
-                });
-
-                // UI Updates
-                room.on(LiveKitClient.RoomEvent.Connected, () => {
-                    document.getElementById('status').innerText = "พูดได้เลยค่ะ";
-                    // Enable Microphone
-                    room.localParticipant.setMicrophoneEnabled(true);
-                });
-
-                room.on(LiveKitClient.RoomEvent.Disconnected, () => {
-                    document.getElementById('status').innerText = "การสนทนาจบลงแล้ว";
-                    setTimeout(() => {
-                        if (liff.isInClient()) liff.closeWindow();
-                        else window.location.reload();
-                    }, 2000);
-                });
-
-                // Active Speaker Handling (Pulse)
-                room.on(LiveKitClient.RoomEvent.ActiveSpeakersChanged, (speakers) => {
-                    const isAgentSpeaking = speakers.some(s => s.identity === 'Hanna'); // Agent name logic
-                    const ring = document.querySelector('.pulse-ring');
-                    if (isAgentSpeaking) {
-                        document.body.classList.add('pulsing');
-                        document.getElementById('status').innerText = "กำลังพูด...";
-                    } else {
-                        document.body.classList.remove('pulsing');
-                        document.getElementById('status').innerText = "พูดได้เลยค่ะ";
-                    }
-                });
-
-                // Connect
-                await room.connect(data.wsUrl, data.token);
-                console.log('Connected to room', room.name);
-
-                // Start Voice Interface
+                // Start voice interface
                 setupVoice();
+                document.getElementById('status').innerText = "พูดได้เลยค่ะ";
 
             } catch (err) {
                 console.error(err);
@@ -288,33 +253,61 @@
         }
 
         function endCall() {
-            if (room) room.disconnect();
-            if (recognition) recognition.stop();
-            window.close();
+            if (recognition) {
+                try {
+                    recognition.stop();
+                } catch (e) { }
+            }
+
+            // Close LIFF or go back
+            if (typeof liff !== 'undefined' && liff.isInClient()) {
+                liff.closeWindow();
+            } else {
+                window.close();
+            }
         }
 
-        // --- Voice Logic (Native Web Speech -> Backend LLM -> TTS) ---
-        let recognition;
-        let isSpeaking = false;
-
         function setupVoice() {
-            if (!('webkitSpeechRecognition' in window)) {
-                alert("Browser does not support Web Speech API");
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+            if (!SpeechRecognition) {
+                document.getElementById('status').innerText = "เบราว์เซอร์ไม่รองรับ Speech API";
                 return;
             }
 
-            recognition = new webkitSpeechRecognition();
+            recognition = new SpeechRecognition();
             recognition.lang = 'th-TH';
             recognition.continuous = false;
             recognition.interimResults = false;
 
             recognition.onstart = () => {
-                if (!isSpeaking) document.getElementById('status').innerText = "กำลังฟัง...";
+                if (!isSpeaking) {
+                    document.getElementById('status').innerText = "กำลังฟัง...";
+                    document.body.classList.remove('pulsing');
+                }
             };
 
             recognition.onend = () => {
                 // Auto-restart if not speaking
-                if (!isSpeaking) recognition.start();
+                if (!isSpeaking) {
+                    setTimeout(() => {
+                        try {
+                            recognition.start();
+                        } catch (e) {
+                            console.log('Recognition restart failed:', e);
+                        }
+                    }, 100);
+                }
+            };
+
+            recognition.onerror = (event) => {
+                console.log('Speech recognition error:', event.error);
+                if (event.error === 'no-speech') {
+                    // Just restart
+                    try {
+                        recognition.start();
+                    } catch (e) { }
+                }
             };
 
             recognition.onresult = async (event) => {
@@ -325,30 +318,29 @@
                 await processUserAudio(text);
             };
 
-            recognition.start();
+            // Start listening
+            try {
+                recognition.start();
+            } catch (e) {
+                console.error('Failed to start recognition:', e);
+            }
         }
 
         async function processUserAudio(text) {
             isSpeaking = true;
-            recognition.stop(); // Stop listening while AI thinks/speaks
-
-            document.getElementById('status').innerText = "กำลังคิด...";
-            document.body.classList.add('pulsing'); // Mock agent thinking
 
             try {
-                // Use same userId from startCall (stored in global)
-                let chatUserId = 'guest';
-                try {
-                    if (liff.isInClient() && liff.isLoggedIn()) {
-                        const profile = await liff.getProfile();
-                        chatUserId = profile.userId;
-                    }
-                } catch (e) { /* ignore */ }
+                recognition.stop();
+            } catch (e) { }
 
+            document.getElementById('status').innerText = "กำลังคิด...";
+            document.body.classList.add('pulsing');
+
+            try {
                 const res = await fetch('/api/voice/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text, userId: chatUserId })
+                    body: JSON.stringify({ text, userId })
                 });
 
                 const data = await res.json();
@@ -360,32 +352,47 @@
                 if (data.audio) {
                     const audio = new Audio("data:audio/mp3;base64," + data.audio);
 
-                    // Publish to LiveKit (So Nurse hears it) - Advanced: Loopback
-                    // For now, Nurse only hears User via Mic. Hearing Agent requires refined AudioContext.
-                    // We play on device for User.
-
                     audio.onended = () => {
                         isSpeaking = false;
                         document.body.classList.remove('pulsing');
                         document.getElementById('status').innerText = "พูดได้เลยค่ะ";
-                        recognition.start(); // Listening again
+                        try {
+                            recognition.start();
+                        } catch (e) { }
+                    };
+
+                    audio.onerror = () => {
+                        isSpeaking = false;
+                        document.body.classList.remove('pulsing');
+                        document.getElementById('status').innerText = "พูดได้เลยค่ะ";
+                        try {
+                            recognition.start();
+                        } catch (e) { }
                     };
 
                     await audio.play();
                 } else {
+                    // No audio, just restart listening
                     isSpeaking = false;
-                    recognition.start();
+                    document.body.classList.remove('pulsing');
+                    document.getElementById('status').innerText = "พูดได้เลยค่ะ";
+                    try {
+                        recognition.start();
+                    } catch (e) { }
                 }
 
             } catch (e) {
                 console.error("AI Error", e);
                 isSpeaking = false;
                 document.body.classList.remove('pulsing');
-                recognition.start();
+                document.getElementById('status').innerText = "พูดได้เลยค่ะ";
+                try {
+                    recognition.start();
+                } catch (e) { }
             }
         }
 
-        // Initialize
+        // Initialize on load
         init();
     </script>
 </body>
