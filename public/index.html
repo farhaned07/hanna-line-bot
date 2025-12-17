@@ -277,10 +277,11 @@
 
             recognition = new SpeechRecognition();
             recognition.lang = 'th-TH';
-            recognition.continuous = false;
+            recognition.continuous = true;  // Keep listening continuously
             recognition.interimResults = false;
 
             recognition.onstart = () => {
+                console.log('Recognition started');
                 if (!isSpeaking) {
                     document.getElementById('status').innerText = "กำลังฟัง...";
                     document.body.classList.remove('pulsing');
@@ -288,50 +289,41 @@
             };
 
             recognition.onend = () => {
-                // Auto-restart if not speaking
+                console.log('Recognition ended, restarting...');
+                // Auto-restart only if session is still active
                 if (!isSpeaking) {
-                    setTimeout(() => {
-                        try {
-                            recognition.start();
-                        } catch (e) {
-                            console.log('Recognition restart failed:', e);
-                        }
-                    }, 100);
+                    recognition.start();
                 }
             };
 
             recognition.onerror = (event) => {
                 console.log('Speech recognition error:', event.error);
-                if (event.error === 'no-speech') {
-                    // Just restart
-                    try {
-                        recognition.start();
-                    } catch (e) { }
+                // Don't restart on every error - just log it
+                if (event.error === 'aborted' || event.error === 'no-speech') {
+                    // These are expected, recognition will auto-restart via onend
                 }
             };
 
             recognition.onresult = async (event) => {
-                const text = event.results[0][0].transcript;
-                document.getElementById('transcript').innerText = `คุณ: ${text}`;
+                // Get the latest result (continuous mode gives multiple results)
+                const resultIndex = event.resultIndex;
+                const text = event.results[resultIndex][0].transcript;
 
-                // Send to Brain
-                await processUserAudio(text);
+                if (text.trim() && !isSpeaking) {
+                    document.getElementById('transcript').innerText = `คุณ: ${text}`;
+                    // Process the message (don't await - let recognition continue)
+                    processUserAudio(text);
+                }
             };
 
-            // Start listening
-            try {
-                recognition.start();
-            } catch (e) {
-                console.error('Failed to start recognition:', e);
-            }
+            // Start listening once - permission requested here only
+            recognition.start();
         }
 
         async function processUserAudio(text) {
-            isSpeaking = true;
+            if (isSpeaking) return; // Prevent overlapping responses
 
-            try {
-                recognition.stop();
-            } catch (e) { }
+            isSpeaking = true;
 
             document.getElementById('status').innerText = "กำลังคิด...";
             document.body.classList.add('pulsing');
@@ -355,40 +347,27 @@
                     audio.onended = () => {
                         isSpeaking = false;
                         document.body.classList.remove('pulsing');
-                        document.getElementById('status').innerText = "พูดได้เลยค่ะ";
-                        try {
-                            recognition.start();
-                        } catch (e) { }
+                        document.getElementById('status').innerText = "กำลังฟัง...";
                     };
 
                     audio.onerror = () => {
                         isSpeaking = false;
                         document.body.classList.remove('pulsing');
-                        document.getElementById('status').innerText = "พูดได้เลยค่ะ";
-                        try {
-                            recognition.start();
-                        } catch (e) { }
+                        document.getElementById('status').innerText = "กำลังฟัง...";
                     };
 
                     await audio.play();
                 } else {
-                    // No audio, just restart listening
                     isSpeaking = false;
                     document.body.classList.remove('pulsing');
-                    document.getElementById('status').innerText = "พูดได้เลยค่ะ";
-                    try {
-                        recognition.start();
-                    } catch (e) { }
+                    document.getElementById('status').innerText = "กำลังฟัง...";
                 }
 
             } catch (e) {
                 console.error("AI Error", e);
                 isSpeaking = false;
                 document.body.classList.remove('pulsing');
-                document.getElementById('status').innerText = "พูดได้เลยค่ะ";
-                try {
-                    recognition.start();
-                } catch (e) { }
+                document.getElementById('status').innerText = "กำลังฟัง...";
             }
         }
 
