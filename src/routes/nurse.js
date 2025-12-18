@@ -324,13 +324,15 @@ router.get('/patients/:id', async (req, res) => {
             return res.status(404).json({ error: 'Patient not found' });
         }
 
-        // Fetch recent check-ins
+        const patient = patientRes.rows[0];
+
+        // Fetch recent check-ins (Using line_user_id as FK legacy)
         const checkinsRes = await db.query(`
             SELECT * FROM check_ins 
-            WHERE patient_id = $1 
+            WHERE line_user_id = $1 
             ORDER BY check_in_time DESC 
             LIMIT 20
-        `, [id]);
+        `, [patient.line_user_id]);
 
         // Fetch tasks/logs
         const tasksRes = await db.query(`
