@@ -1,3 +1,5 @@
+import colors from 'tailwindcss/colors';
+
 /** @type {import('tailwindcss').Config} */
 export default {
     content: [
@@ -8,6 +10,14 @@ export default {
     theme: {
         extend: {
             colors: {
+                // ALIAS SLATE TO ZINC FOR NEW THEME
+                slate: {
+                    ...colors.zinc,
+                    // Preserve existing custom shades just in case
+                    750: '#293548', // Between 700 and 800 (Original Slate)
+                    850: '#172033', // Between 800 and 900 (Original Slate)
+                    950: '#0a1019'  // Darker than 900 (Original Slate)
+                },
                 // Clinical semantic colors
                 critical: {
                     DEFAULT: '#EF4444',
@@ -29,12 +39,7 @@ export default {
                     light: '#DCFCE7',
                     dark: '#166534'
                 },
-                // Background tiers
-                slate: {
-                    750: '#293548', // Between 700 and 800
-                    850: '#172033', // Between 800 and 900
-                    950: '#0a1019'  // Darker than 900
-                }
+                // Background tiers (removed explicit slate definition as it's now aliased above)
             },
             fontFamily: {
                 sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
