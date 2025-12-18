@@ -64,6 +64,18 @@ export default function PatientDetail() {
         diastolic: h.diastolic
     })).filter(d => d.glucose || d.systolic);
 
+    // Insight Logic: Calculate Trend
+    let trendInsight = { label: 'Stable', color: 'green', icon: CheckCircle };
+    if (chartData.length >= 2) {
+        const last = chartData[chartData.length - 1];
+        const prev = chartData[chartData.length - 2];
+        if (last.glucose && prev.glucose) {
+            const diff = last.glucose - prev.glucose;
+            if (diff > 20) trendInsight = { label: `Glucose Rising (+${diff})`, color: 'amber', icon: TrendingUp };
+            else if (diff < -20) trendInsight = { label: `Glucose Improving (-${Math.abs(diff)})`, color: 'green', icon: TrendingUp };
+        }
+    }
+
     // Determine risk level styling
     const riskLevel = patient.risk_level || 'low';
     const riskStyles = {
@@ -89,6 +101,13 @@ export default function PatientDetail() {
                         <span className={`px-3 py-1 rounded-full text-sm font-medium border ${riskStyles}`}>
                             {riskLevel.toUpperCase()}
                         </span>
+                        {/* Trend Insight Badge */}
+                        <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium border ${trendInsight.color === 'amber' ? 'bg-amber-500/10 border-amber-500/50 text-amber-400' :
+                            'bg-slate-700/50 border-slate-600 text-slate-300'
+                            }`}>
+                            <trendInsight.icon className="w-3.5 h-3.5" />
+                            {trendInsight.label}
+                        </div>
                     </div>
                     <div className="flex items-center gap-3 text-sm text-slate-400 mt-1">
                         <span>Age: {patient.age}</span>
@@ -96,8 +115,8 @@ export default function PatientDetail() {
                         <span>Condition: {patient.condition}</span>
                         <span>•</span>
                         <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${patient.enrollment_status === 'active'
-                                ? 'bg-green-500/20 text-green-400'
-                                : 'bg-amber-500/20 text-amber-400'
+                            ? 'bg-green-500/20 text-green-400'
+                            : 'bg-amber-500/20 text-amber-400'
                             }`}>
                             {patient.enrollment_status?.toUpperCase()}
                         </span>
@@ -231,6 +250,14 @@ export default function PatientDetail() {
                                 <MessageSquare className="h-4 w-4" />
                                 Send Message
                             </button>
+
+                            {/* Suggested Script */}
+                            <div className="mt-4 p-3 bg-slate-900/50 border border-slate-700 rounded-lg">
+                                <p className="text-xs text-slate-400 mb-2 uppercase font-medium tracking-wider">Suggested Script</p>
+                                <p className="text-sm text-slate-300 italic">
+                                    "This is Nurse Hanna calling. I noticed your {trendInsight.label.toLowerCase()} compared to last week. Have you been taking your Metformin regularly?"
+                                </p>
+                            </div>
                         </div>
                     </div>
 
@@ -250,8 +277,8 @@ export default function PatientDetail() {
                                     <div key={task.id} className="px-6 py-4">
                                         <div className="flex items-center justify-between">
                                             <span className={`px-2 py-0.5 rounded text-xs font-medium ${task.priority === 'critical'
-                                                    ? 'bg-red-500/20 text-red-400'
-                                                    : 'bg-slate-700 text-slate-400'
+                                                ? 'bg-red-500/20 text-red-400'
+                                                : 'bg-slate-700 text-slate-400'
                                                 }`}>
                                                 {task.task_type}
                                             </span>

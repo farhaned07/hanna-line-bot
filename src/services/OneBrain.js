@@ -126,7 +126,58 @@ class OneBrain {
         else if (score >= 5) level = 'high'; // Tweaked: High starts at 5
         else level = 'low'; // 0-4 is Routine
 
-        return { score, level, reasons };
+        let positiveSignals = [];
+
+        // --- 6. Positive Signal Injection (The "Reward" Logic) ---
+        // Calculate Streak from recent history
+        const history = await healthData.getRecentCheckIns(lineUserId, 14); // 2 weeks
+        let streak = 0;
+        if (history && history.length > 0) {
+            // Simple daily consecutive check logic
+            // (Assumes sorted DESC)
+            let lastDate = new Date();
+            lastDate.setHours(0, 0, 0, 0);
+
+            // Check if checked in today
+            const lastCheckIn = new Date(history[0].date);
+            lastCheckIn.setHours(0, 0, 0, 0);
+
+            if (lastCheckIn.getTime() === lastDate.getTime()) {
+                streak = 1;
+            }
+
+            // Count backwards
+            // Count backwards
+            for (let i = 1; i < history.length; i++) {
+                const d = new Date(history[i].date);
+                d.setHours(0, 0, 0, 0);
+                const diffDays = Math.round((lastDate.getTime() - d.getTime()) / (1000 * 3600 * 24));
+
+                if (diffDays === streak) {
+                    streak++;
+                } else if (diffDays < streak) {
+                    // Same day duplicate - ignore
+                } else {
+                    break;
+                }
+            }
+        }
+
+        if (streak > 2) {
+            positiveSignals.push(`${streak}-Day Streak! 🔥`);
+        }
+
+        // Calculate Trend (Glucose)
+        if (summary.averageGlucose) {
+            // Need prev week data? simpler: compare recent vs average
+            // If current (last checkin) is better than average
+            const lastG = history.find(h => h.glucose_level)?.glucose_level;
+            if (lastG && lastG < summary.averageGlucose && lastG < 140) {
+                positiveSignals.push('Glucose trending down 📉');
+            }
+        }
+
+        return { score, level, reasons, positiveSignals };
     }
 
     /**
@@ -145,7 +196,7 @@ class OneBrain {
                 risk_level = $3,
                 risk_reasoning = $4,
                 updated_at = NOW()
-        `, [patientId, risk.score, risk.level, JSON.stringify(risk.reasons)]);
+        `, [patientId, risk.score, risk.level, JSON.stringify({ reasons: risk.reasons, positive: risk.positiveSignals })]);
 
         // 🧾 LEGAL AUDIT LOG
         await db.query(`

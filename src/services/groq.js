@@ -51,7 +51,13 @@ const generateChatResponse = async (userText, riskProfile = {}) => {
             toneInstruction = "Be calm but URGENT. Keep sentences short. Show concern. Advise professional help immediately.";
         }
 
-        const riskContext = riskProfile.reasons ? `\nRISK ALERT: ${riskProfile.level.toUpperCase()} (${riskProfile.reasons.join(', ')})` : '';
+        const riskContext = riskProfile.reasons && riskProfile.reasons.length > 0
+            ? `\nRISK ALERT: ${riskProfile.level.toUpperCase()} (${riskProfile.reasons.join(', ')})`
+            : '';
+
+        const positiveContext = riskProfile.positiveSignals && riskProfile.positiveSignals.length > 0
+            ? `\nPOSITIVE STATUS: ${riskProfile.positiveSignals.join(', ')}`
+            : '';
 
         const systemPrompt = `
         You are Hanna (ฮันนา), a caring AI nurse assistant for chronic disease patients in Thailand.
@@ -63,11 +69,13 @@ const generateChatResponse = async (userText, riskProfile = {}) => {
         
         **Patient Context**:
         ${riskContext}
+        ${positiveContext}
         
         **Rules**:
         1. Keep responses CONCISE (under 2 sentences).
-        2. If they report symptoms, show empathy.
-        3. CRITICAL: NEVER diagnose or prescribe. If risk is high, tell them "I have notified the nurse".
+        2. If "POSITIVE STATUS" is present, PRAISE the patient for their streak/trend.
+        3. If they report symptoms, show empathy.
+        4. CRITICAL: NEVER diagnose or prescribe. If risk is high, tell them "I have notified the nurse".
         
         Reply ONLY with the text of your response.
         `;

@@ -104,7 +104,7 @@ export default function MonitoringView() {
                         icon={Activity}
                         color="red"
                         highlight={monitoringData.summary.critical > 0}
-                        pulse={monitoringData.summary.critical > 0}
+                        pulse={true}
                     />
                 </div>
             ) : null}
@@ -216,10 +216,10 @@ export default function MonitoringView() {
                         <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden">
                             <div
                                 className={`h-full rounded-full transition-all ${infraData.nurseCapacity.capacityPercentage > 80
-                                        ? 'bg-red-500'
-                                        : infraData.nurseCapacity.capacityPercentage > 50
-                                            ? 'bg-amber-500'
-                                            : 'bg-green-500'
+                                    ? 'bg-red-500'
+                                    : infraData.nurseCapacity.capacityPercentage > 50
+                                        ? 'bg-amber-500'
+                                        : 'bg-green-500'
                                     }`}
                                 style={{ width: `${infraData.nurseCapacity.capacityPercentage}%` }}
                             />
@@ -343,8 +343,8 @@ function InfraCard({ label, value, subtext, barValue, barColor, highlight }) {
                 <div className="mt-2 w-full h-1.5 bg-slate-700 rounded-full overflow-hidden">
                     <div
                         className={`h-full rounded-full ${barColor === 'green' ? 'bg-green-500' :
-                                barColor === 'blue' ? 'bg-blue-500' :
-                                    'bg-slate-500'
+                            barColor === 'blue' ? 'bg-blue-500' :
+                                'bg-slate-500'
                             }`}
                         style={{ width: `${barValue}%` }}
                     />

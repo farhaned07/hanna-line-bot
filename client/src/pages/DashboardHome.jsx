@@ -64,7 +64,7 @@ export default function DashboardHome() {
                         value={stats?.activePatients || 0}
                         icon={Users}
                         color="blue"
-                        trend={`+3 this week`}
+                        trend={stats?.redFlags > 0 ? `${stats.redFlags} require attention` : "All signals normal"}
                         onClick={() => navigate('/dashboard/patients')}
                     />
                     <MetricCard
@@ -135,7 +135,7 @@ export default function DashboardHome() {
                         <div className="px-6 py-4 border-b border-slate-700">
                             <h2 className="text-lg font-medium text-white flex items-center gap-2">
                                 <Brain className="w-5 h-5 text-blue-400" />
-                                Recent AI Decisions
+                                Hanna's Watch Log
                             </h2>
                         </div>
 
@@ -334,8 +334,8 @@ function AILogRow({ log }) {
             </span>
             {log.details?.score !== undefined && (
                 <span className={`text-xs font-medium px-2 py-0.5 rounded ${log.details.score >= 7 ? 'bg-red-500/20 text-red-400' :
-                        log.details.score >= 4 ? 'bg-amber-500/20 text-amber-400' :
-                            'bg-green-500/20 text-green-400'
+                    log.details.score >= 4 ? 'bg-amber-500/20 text-amber-400' :
+                        'bg-green-500/20 text-green-400'
                     }`}>
                     {log.details.score}/10
                 </span>
