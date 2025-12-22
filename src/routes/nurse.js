@@ -354,15 +354,66 @@ router.get('/patients/:id', async (req, res) => {
 });
 
 // POST /api/nurse/tasks/:id/resolve
+// Enterprise-grade resolution with mandatory fields and post-resolution monitoring
 router.post('/tasks/:id/resolve', async (req, res) => {
     const taskId = req.params.id;
-    const { nurseId, actionType, notes } = req.body;
+    const {
+        nurseId,
+        actionType,
+        notes,
+        outcome_code,    // MANDATORY: from outcome_codes table
+        action_taken,    // MANDATORY: call/message/escalate/other
+        clinical_notes,  // Optional but recommended
+        follow_up_date   // Optional: scheduled follow-up
+    } = req.body;
+
+    // ============================================================
+    // 1. MANDATORY FIELD VALIDATION (Enterprise Requirement)
+    // ============================================================
+    const requiredFields = ['outcome_code', 'action_taken', 'nurseId'];
+    const missingFields = requiredFields.filter(field => !req.body[field]);
+
+    if (missingFields.length > 0) {
+        console.warn(`⚠️ [Nurse API] Resolution blocked - missing fields: ${missingFields.join(', ')}`);
+        return res.status(400).json({
+            error: 'Missing required fields for case resolution',
+            missing: missingFields,
+            hint: 'All case resolutions must include outcome_code, action_taken, and nurseId'
+        });
+    }
+
+    // Validate outcome_code format (basic check)
+    const validOutcomeCodes = [
+        'REACHED_STABLE', 'REACHED_IMPROVED', 'REACHED_REFERRED',
+        'NOT_REACHED_RETRY', 'NOT_REACHED_ESCALATED',
+        'EMERGENCY_CONFIRMED', 'FALSE_POSITIVE'
+    ];
+    if (!validOutcomeCodes.includes(outcome_code)) {
+        return res.status(400).json({
+            error: 'Invalid outcome_code',
+            valid_codes: validOutcomeCodes
+        });
+    }
 
     try {
-        // 1. Mark Task as Completed
+        // ============================================================
+        // 2. UPDATE TASK STATUS (resolved, not closed)
+        // ============================================================
+        const now = new Date();
+        const recheckAt = new Date(now.getTime() + 24 * 60 * 60 * 1000); // +24 hours
+
         const taskRes = await db.query(
-            `UPDATE nurse_tasks SET status = 'completed', completed_at = NOW() WHERE id = $1 RETURNING *`,
-            [taskId]
+            `UPDATE nurse_tasks 
+             SET status = 'resolved', 
+                 completed_at = NOW(),
+                 outcome_code = $2,
+                 action_taken = $3,
+                 clinical_notes = $4,
+                 follow_up_date = $5,
+                 recheck_scheduled_at = $6
+             WHERE id = $1 
+             RETURNING *`,
+            [taskId, outcome_code, action_taken, clinical_notes || notes, follow_up_date, recheckAt]
         );
 
         if (taskRes.rows.length === 0) {
@@ -370,22 +421,58 @@ router.post('/tasks/:id/resolve', async (req, res) => {
         }
         const task = taskRes.rows[0];
 
-        // 2. Log Action with Structured Data (Outcome/NextAction)
-        const { outcome, nextAction } = req.body;
+        // ============================================================
+        // 3. CREATE NURSE LOG (Structured Documentation)
+        // ============================================================
         const structuredNotes = JSON.stringify({
-            note: notes,
-            outcome: outcome || 'unknown',
-            nextAction: nextAction || 'none'
+            note: clinical_notes || notes,
+            outcome_code: outcome_code,
+            action_taken: action_taken,
+            follow_up_date: follow_up_date || null
         });
 
         await db.query(
             `INSERT INTO nurse_logs (task_id, patient_id, nurse_id, action_type, notes)
              VALUES ($1, $2, $3, $4, $5)`,
-            [taskId, task.patient_id, nurseId || 'system', actionType || 'resolve', structuredNotes]
+            [taskId, task.patient_id, nurseId, action_taken, structuredNotes]
         );
 
-        console.log(`✅ [Nurse API] Task ${taskId} resolved by ${nurseId}`);
-        res.json({ success: true });
+        // ============================================================
+        // 4. SCHEDULE 24H POST-RESOLUTION RECHECK
+        // ============================================================
+        await db.query(
+            `INSERT INTO case_rechecks (task_id, patient_id, scheduled_at)
+             VALUES ($1, $2, $3)`,
+            [taskId, task.patient_id, recheckAt]
+        );
+
+        // ============================================================
+        // 5. AUDIT LOG (Legal Defensibility)
+        // ============================================================
+        await db.query(
+            `INSERT INTO audit_log (actor, action, patient_id, details)
+             VALUES ($1, $2, $3, $4)`,
+            [
+                `Nurse:${nurseId}`,
+                'CASE_RESOLVED',
+                task.patient_id,
+                JSON.stringify({
+                    task_id: taskId,
+                    outcome_code: outcome_code,
+                    action_taken: action_taken,
+                    recheck_at: recheckAt.toISOString()
+                })
+            ]
+        );
+
+        console.log(`✅ [Nurse API] Task ${taskId} RESOLVED by ${nurseId} (${outcome_code}). Recheck at ${recheckAt.toISOString()}`);
+
+        res.json({
+            success: true,
+            status: 'resolved',
+            recheck_scheduled_at: recheckAt.toISOString(),
+            message: 'Case resolved. Patient will be rechecked in 24 hours before formal closure.'
+        });
 
     } catch (error) {
         console.error('Error resolving task:', error);

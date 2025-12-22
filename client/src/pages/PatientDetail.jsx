@@ -242,20 +242,36 @@ export default function PatientDetail() {
                                 <AlertCircle className="h-4 w-4" />
                                 Escalate to Doctor
                             </button>
-                            <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
-                                <Phone className="h-4 w-4" />
-                                Call Patient
-                            </button>
+
+                            {/* Call Button: Real tel: link or disabled based on phone availability */}
+                            {patient.phone_number ? (
+                                <a
+                                    href={`tel:${patient.phone_number}`}
+                                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+                                >
+                                    <Phone className="h-4 w-4" />
+                                    Call {patient.phone_number}
+                                </a>
+                            ) : (
+                                <button
+                                    disabled
+                                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-slate-600 text-slate-400 font-medium rounded-lg cursor-not-allowed opacity-60"
+                                >
+                                    <Phone className="h-4 w-4" />
+                                    No phone on file
+                                </button>
+                            )}
+
                             <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-slate-300 font-medium rounded-lg transition-colors">
                                 <MessageSquare className="h-4 w-4" />
                                 Send Message
                             </button>
 
-                            {/* Suggested Script */}
+                            {/* Suggested Script - Fixed template interpolation */}
                             <div className="mt-4 p-3 bg-slate-900/50 border border-slate-700 rounded-lg">
                                 <p className="text-xs text-slate-400 mb-2 uppercase font-medium tracking-wider">Suggested Script</p>
                                 <p className="text-sm text-slate-300 italic">
-                                    "This is Nurse Hanna calling. I noticed your {trendInsight.label.toLowerCase()} compared to last week. Have you been taking your Metformin regularly?"
+                                    "This is Nurse Hanna calling. I noticed your {trendInsight.label.toLowerCase()} compared to last week. Have you been taking your medication regularly?"
                                 </p>
                             </div>
                         </div>

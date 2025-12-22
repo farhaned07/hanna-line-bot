@@ -45,8 +45,8 @@ const handleAudio = async (event) => {
         // Pass specialized trigger to Brain
         const riskAnalysis = await OneBrain.analyzePatient(user.id, `voice_input:${userText}`);
 
-        // 4. CHAT LAYER (Groq Llama 3): Generate Response (Aware of Risk)
-        const replyText = await groq.generateChatResponse(userText, riskAnalysis);
+        // 4. CHAT LAYER (Groq Llama 3): Generate Response (Aware of Risk + Logging)
+        const replyText = await groq.generateChatResponse(userText, riskAnalysis, user.id);
 
         // 5. TTS: Generate Audio Reply
         const speechBuffer = await tts.generateSpeech(replyText);
@@ -452,8 +452,8 @@ const handleMessage = async (event) => {
                 console.warn('⚠️ OneBrain analysis failed, using default risk profile');
             }
 
-            // Generate AI response
-            const aiReply = await groq.generateChatResponse(text, riskProfile);
+            // Generate AI response (with patient ID for audit logging)
+            const aiReply = await groq.generateChatResponse(text, riskProfile, user.id);
 
             // Store in conversation history
             global.conversationHistory[userId].push({ role: 'assistant', text: aiReply });

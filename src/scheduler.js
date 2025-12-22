@@ -109,9 +109,13 @@ const initScheduler = () => {
     // Safety Safeguard: Escalation Check (Every 15 mins)
     cron.schedule('*/15 * * * *', checkEscalations);
 
-    console.log('✅ Scheduler Initialized: Morning(08:00), Nudge(14:00), Evening(19:00), Escalation(15m)');
+    // Enterprise: Capacity Monitor (Every 5 mins)
+    cron.schedule('*/5 * * * *', checkCapacity);
 
-    console.log('✅ Scheduler Initialized: Morning(08:00), Nudge(14:00), Evening(19:00)');
+    // Enterprise: Post-Resolution Recheck (Every hour)
+    cron.schedule('0 * * * *', processRechecks);
+
+    console.log('✅ Scheduler Initialized: Morning(08:00), Nudge(14:00), Evening(19:00), Escalation(15m), Capacity(5m), Rechecks(1h)');
 };
 
 /**
@@ -181,27 +185,252 @@ const checkSilenceAndNudge = async () => {
 };
 
 /**
- * 🚨 Escalation Monitor (Safeguard)
+ * 🚨 Escalation Monitor (Enterprise-Grade)
  * Checks for Critical Tasks pending > 1 hour.
+ * Sends actual notifications and logs to escalation_log table.
  */
 const checkEscalations = async () => {
     console.log('⏱️ [Scheduler] Checking for Escalations...');
     try {
-        // Find ignored criticals (older than 1 hour)
+        // Find ignored criticals (older than 1 hour, not already escalated today)
         const ignored = await db.query(`
-            SELECT * FROM nurse_tasks 
-            WHERE status = 'pending' 
-            AND priority = 'critical' 
-            AND created_at < NOW() - INTERVAL '1 hour'
+            SELECT nt.*, cp.name as patient_name 
+            FROM nurse_tasks nt
+            JOIN chronic_patients cp ON nt.patient_id = cp.id
+            WHERE nt.status = 'pending' 
+            AND nt.priority = 'critical' 
+            AND nt.created_at < NOW() - INTERVAL '1 hour'
+            AND nt.id NOT IN (
+                SELECT task_id FROM escalation_log 
+                WHERE triggered_at > NOW() - INTERVAL '4 hours'
+            )
         `);
 
         for (const task of ignored.rows) {
-            console.log(`🔥 [ESCALATION] Task ${task.id} unanswered for >1h! Pinging Supervisor...`);
-            // MVP Simulation: Just log. In prod: await smsService.send(SUPERVISOR_PHONE, 'Critical Alert Ignored!');
+            console.log(`🔥 [ESCALATION] Task ${task.id} unanswered for >1h! Escalating...`);
+
+            // Determine escalation level
+            const existingEscalations = await db.query(
+                `SELECT MAX(escalation_level) as max_level FROM escalation_log WHERE task_id = $1`,
+                [task.id]
+            );
+            const currentLevel = (existingEscalations.rows[0]?.max_level || 0) + 1;
+
+            // Log escalation
+            await db.query(`
+                INSERT INTO escalation_log (task_id, patient_id, escalation_level, notification_type, notification_sent)
+                VALUES ($1, $2, $3, $4, $5)
+            `, [task.id, task.patient_id, currentLevel, 'sms', true]);
+
+            // Audit log
+            await db.query(`
+                INSERT INTO audit_log (actor, action, patient_id, details)
+                VALUES ($1, $2, $3, $4)
+            `, [
+                'System',
+                'ESCALATION_TRIGGERED',
+                task.patient_id,
+                JSON.stringify({
+                    task_id: task.id,
+                    escalation_level: currentLevel,
+                    patient_name: task.patient_name,
+                    reason: 'Critical task unresolved >1 hour'
+                })
+            ]);
+
+            // Send notification (using LINE Notify as SMS proxy for MVP)
+            const lineNotify = require('./services/lineNotify');
+            const message = `🚨 ESCALATION L${currentLevel}: Critical task unresolved >1h\nPatient: ${task.patient_name}\nReason: ${task.reason}\nTask ID: ${task.id}`;
+
+            try {
+                await lineNotify.sendAlert(message);
+                console.log(`✅ [ESCALATION] Notification sent for task ${task.id} (Level ${currentLevel})`);
+            } catch (notifyErr) {
+                console.error(`❌ [ESCALATION] Failed to send notification:`, notifyErr.message);
+            }
+        }
+
+        // ============================================================
+        // L2 ESCALATION: Tasks pending >2h that only received L1
+        // ============================================================
+        const l2Candidates = await db.query(`
+            SELECT nt.*, cp.name as patient_name 
+            FROM nurse_tasks nt
+            JOIN chronic_patients cp ON nt.patient_id = cp.id
+            WHERE nt.status = 'pending' 
+            AND nt.priority = 'critical' 
+            AND nt.created_at < NOW() - INTERVAL '2 hours'
+            AND nt.id IN (
+                SELECT task_id FROM escalation_log 
+                WHERE escalation_level = 1
+            )
+            AND nt.id NOT IN (
+                SELECT task_id FROM escalation_log 
+                WHERE escalation_level >= 2 
+                AND triggered_at > NOW() - INTERVAL '4 hours'
+            )
+        `);
+
+        for (const task of l2Candidates.rows) {
+            console.log(`🔴🔴 [L2 ESCALATION] Task ${task.id} unresolved >2h! Escalating to Clinical Director...`);
+
+            // Log L2 escalation
+            await db.query(`
+                INSERT INTO escalation_log (task_id, patient_id, escalation_level, notification_type, notification_sent)
+                VALUES ($1, $2, $3, $4, $5)
+            `, [task.id, task.patient_id, 2, 'line_notify', true]);
+
+            // Audit log
+            await db.query(`
+                INSERT INTO audit_log (actor, action, patient_id, details)
+                VALUES ($1, $2, $3, $4)
+            `, [
+                'System',
+                'L2_ESCALATION_TRIGGERED',
+                task.patient_id,
+                JSON.stringify({
+                    task_id: task.id,
+                    escalation_level: 2,
+                    patient_name: task.patient_name,
+                    reason: 'Critical task unresolved >2 hours after L1'
+                })
+            ]);
+
+            // Send L2 notification (higher urgency)
+            const lineNotify = require('./services/lineNotify');
+            const l2Message = `🚨🚨 L2 ESCALATION - CLINICAL DIRECTOR ATTENTION REQUIRED 🚨🚨\n\nCritical task unresolved >2 HOURS\nPatient: ${task.patient_name}\nReason: ${task.reason}\nTask ID: ${task.id}\n\nThis patient requires immediate clinical attention.`;
+
+            try {
+                await lineNotify.sendAlert(l2Message);
+                console.log(`✅ [L2 ESCALATION] Clinical Director notified for task ${task.id}`);
+            } catch (notifyErr) {
+                console.error(`❌ [L2 ESCALATION] Failed to send notification:`, notifyErr.message);
+            }
         }
     } catch (err) {
         console.error('❌ Escalation Check Error:', err);
     }
 };
 
-module.exports = { initScheduler, checkSilenceAndNudge, checkEscalations };
+/**
+ * 📊 Capacity Monitor (Enterprise-Grade)
+ * Detects nurse overload and triggers alerts.
+ */
+const checkCapacity = async () => {
+    console.log('📊 [Scheduler] Checking Nurse Capacity...');
+    try {
+        const OVERLOAD_THRESHOLD = 30;
+        const WARNING_THRESHOLD = 20;
+
+        const queueRes = await db.query(
+            `SELECT COUNT(*) as cnt FROM nurse_tasks WHERE status = 'pending'`
+        );
+        const queueSize = parseInt(queueRes.rows[0].cnt);
+
+        if (queueSize >= OVERLOAD_THRESHOLD) {
+            console.warn(`🔴 [CAPACITY] OVERLOAD: ${queueSize} pending tasks (threshold: ${OVERLOAD_THRESHOLD})`);
+
+            // Check if we already alerted in last 2 hours
+            const recentAlert = await db.query(`
+                SELECT id FROM capacity_events 
+                WHERE event_type = 'overload_critical' 
+                AND created_at > NOW() - INTERVAL '2 hours'
+            `);
+
+            if (recentAlert.rows.length === 0) {
+                // Log capacity event
+                await db.query(`
+                    INSERT INTO capacity_events (event_type, queue_size, threshold, notification_sent)
+                    VALUES ($1, $2, $3, $4)
+                `, ['overload_critical', queueSize, OVERLOAD_THRESHOLD, true]);
+
+                // Send alert
+                const lineNotify = require('./services/lineNotify');
+                await lineNotify.sendAlert(
+                    `🔴 CAPACITY OVERLOAD: ${queueSize} pending tasks!\nThreshold: ${OVERLOAD_THRESHOLD}\nConsider assigning backup nurse.`
+                );
+            }
+        } else if (queueSize >= WARNING_THRESHOLD) {
+            console.warn(`🟡 [CAPACITY] WARNING: ${queueSize} pending tasks (threshold: ${WARNING_THRESHOLD})`);
+        }
+    } catch (err) {
+        console.error('❌ Capacity Check Error:', err);
+    }
+};
+
+/**
+ * 🔄 Post-Resolution Recheck (Enterprise-Grade)
+ * Processes 24h rechecks and formally closes or reopens cases.
+ */
+const processRechecks = async () => {
+    console.log('🔄 [Scheduler] Processing Post-Resolution Rechecks...');
+    try {
+        // Find due rechecks
+        const dueRechecks = await db.query(`
+            SELECT cr.*, nt.patient_id, cp.name as patient_name
+            FROM case_rechecks cr
+            JOIN nurse_tasks nt ON cr.task_id = nt.id
+            JOIN chronic_patients cp ON nt.patient_id = cp.id
+            WHERE cr.checked_at IS NULL
+            AND cr.scheduled_at <= NOW()
+        `);
+
+        for (const recheck of dueRechecks.rows) {
+            console.log(`🔄 [Recheck] Processing recheck for task ${recheck.task_id}`);
+
+            // Check if patient had new alerts since resolution
+            const newAlerts = await db.query(`
+                SELECT id FROM nurse_tasks 
+                WHERE patient_id = $1 
+                AND status = 'pending'
+                AND created_at > (SELECT completed_at FROM nurse_tasks WHERE id = $2)
+            `, [recheck.patient_id, recheck.task_id]);
+
+            if (newAlerts.rows.length > 0) {
+                // Case needs reopening - new alerts detected
+                console.log(`⚠️ [Recheck] New alerts found for patient ${recheck.patient_name}, case NOT closed`);
+
+                await db.query(`
+                    UPDATE case_rechecks 
+                    SET checked_at = NOW(), result = 'new_alert', new_task_id = $2
+                    WHERE id = $1
+                `, [recheck.id, newAlerts.rows[0].id]);
+
+                await db.query(`
+                    UPDATE nurse_tasks SET recheck_passed = false WHERE id = $1
+                `, [recheck.task_id]);
+
+            } else {
+                // Case passes recheck - formally close
+                console.log(`✅ [Recheck] No new alerts, formally closing case for ${recheck.patient_name}`);
+
+                await db.query(`
+                    UPDATE case_rechecks 
+                    SET checked_at = NOW(), result = 'passed'
+                    WHERE id = $1
+                `, [recheck.id]);
+
+                await db.query(`
+                    UPDATE nurse_tasks 
+                    SET status = 'closed', recheck_passed = true, closed_at = NOW()
+                    WHERE id = $1
+                `, [recheck.task_id]);
+
+                // Audit log
+                await db.query(`
+                    INSERT INTO audit_log (actor, action, patient_id, details)
+                    VALUES ($1, $2, $3, $4)
+                `, [
+                    'System',
+                    'CASE_CLOSED',
+                    recheck.patient_id,
+                    JSON.stringify({ task_id: recheck.task_id, recheck_id: recheck.id })
+                ]);
+            }
+        }
+    } catch (err) {
+        console.error('❌ Recheck Processing Error:', err);
+    }
+};
+
+module.exports = { initScheduler, checkSilenceAndNudge, checkEscalations, checkCapacity, processRechecks };

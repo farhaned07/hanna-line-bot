@@ -2,6 +2,7 @@ const Groq = require('groq-sdk');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const db = require('./db'); // Enterprise: For AI response logging
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
@@ -42,8 +43,12 @@ const transcribeAudio = async (audioBuffer) => {
 /**
  * 🧠 Speaking: Generate Response using Llama 3 (Open Weights)
  * Model: llama-3.3-70b-versatile
+ * 
+ * @param {string} userText - User's message
+ * @param {object} riskProfile - Risk analysis from OneBrain
+ * @param {string|null} patientId - Optional patient ID for audit logging
  */
-const generateChatResponse = async (userText, riskProfile = {}) => {
+const generateChatResponse = async (userText, riskProfile = {}, patientId = null) => {
     try {
         // Tone Calibration based on Risk
         let toneInstruction = "Be friendly, warm, and encouraging. Like a caring granddaughter (Thai: หลานสาว).";
@@ -92,6 +97,31 @@ const generateChatResponse = async (userText, riskProfile = {}) => {
 
         const reply = completion.choices[0]?.message?.content || "ขออภัยค่ะ ฮันนากำลังคิดนิดนึงค่ะ";
         console.log(`🧠 [Groq] Reply: "${reply}"`);
+
+        // ============================================================
+        // ENTERPRISE: Log AI response to chat_history for audit trail
+        // ============================================================
+        if (patientId) {
+            try {
+                await db.query(`
+                    INSERT INTO chat_history (patient_id, role, content, message_type, metadata)
+                    VALUES ($1, 'assistant', $2, 'text', $3)
+                `, [
+                    patientId,
+                    reply,
+                    JSON.stringify({
+                        model: 'llama-3.3-70b-versatile',
+                        risk_level: riskProfile.level || 'unknown',
+                        user_input: userText.substring(0, 200) // Truncate for storage
+                    })
+                ]);
+                console.log(`📝 [Groq] AI response logged to chat_history for patient ${patientId}`);
+            } catch (logError) {
+                console.error('⚠️ [Groq] Failed to log AI response:', logError.message);
+                // Non-blocking - don't fail the response if logging fails
+            }
+        }
+
         return reply;
 
     } catch (error) {

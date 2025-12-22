@@ -218,10 +218,33 @@ class OneBrain {
             const activeCriticals = await db.query(`SELECT COUNT(*) FROM nurse_tasks WHERE status='pending' AND priority='critical'`);
             if (parseInt(activeCriticals.rows[0].count) >= 15) {
                 console.warn(`🚧 [OneBrain] Critical Task Cap Reached (15). Suppressing new alert for ${patient.id}.`);
-                // Start Suppression Logic (maybe log to a 'suppressed' table or send to Supervisor only)
-                // For MVP: We allow it BUT log a warning or maybe set priority to 'high' temporarily?
-                // Let's stick to spec: "Suppress lowest scores". Too complex for SQL right now.
-                // We will just Log it.
+
+                // ENTERPRISE: Log suppression to audit_log (legal requirement)
+                await db.query(`
+                    INSERT INTO audit_log (actor, action, patient_id, details)
+                    VALUES ($1, $2, $3, $4)
+                `, [
+                    'OneBrain',
+                    'TASK_SUPPRESSED_CAP',
+                    patient.id,
+                    JSON.stringify({
+                        reason: 'Critical task cap (15) reached',
+                        suppressed_risk: risk.level,
+                        suppressed_score: risk.score
+                    })
+                ]);
+
+                // ENTERPRISE: Alert supervisor when cap is hit
+                try {
+                    const lineNotify = require('./lineNotify');
+                    await lineNotify.sendAlert(
+                        `⚠️ TASK CAP ALERT: Critical task cap (15) reached!\nNew alert for patient ${patient.id} was suppressed.\nSupervisor action required.`
+                    );
+                } catch (e) {
+                    console.error('Failed to send cap alert:', e.message);
+                }
+
+                return; // Don't create task when cap reached
             }
         }
 
@@ -243,6 +266,23 @@ class OneBrain {
                 console.log(`⚡️ [OneBrain] Escalating to CRITICAL for ${patient.id}`);
             } else {
                 console.log(`✋ [OneBrain] Skipping task for ${patient.id} (Deduplication)`);
+
+                // ENTERPRISE: Log dedup suppression to audit_log (legal requirement)
+                await db.query(`
+                    INSERT INTO audit_log (actor, action, patient_id, details)
+                    VALUES ($1, $2, $3, $4)
+                `, [
+                    'OneBrain',
+                    'TASK_SUPPRESSED_DEDUP',
+                    patient.id,
+                    JSON.stringify({
+                        reason: 'Duplicate within 4h window or pending task exists',
+                        suppressed_risk: risk.level,
+                        suppressed_score: risk.score,
+                        existing_task_id: recentTasks.rows[0]?.id
+                    })
+                ]);
+
                 return;
             }
         }
