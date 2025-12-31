@@ -52,12 +52,46 @@ router.get('/token', async (req, res) => {
 });
 
 // POST /api/voice/chat { text, userId }
+// AUDIT: Logs all voice conversations for compliance
 router.post('/chat', async (req, res) => {
     try {
         const { text, userId } = req.body;
+        const db = require('../services/db');
+
+        // 1. Get patient ID from LINE user ID for logging
+        let patientId = null;
+        try {
+            const patientRes = await db.query(
+                'SELECT id FROM chronic_patients WHERE line_user_id = $1',
+                [userId]
+            );
+            patientId = patientRes.rows[0]?.id;
+        } catch (dbErr) {
+            console.warn('Voice logging: Could not get patient ID:', dbErr.message);
+        }
+
+        // 2. LOG USER VOICE INPUT
+        if (patientId) {
+            await db.query(`
+                INSERT INTO chat_history (patient_id, role, content, message_type, created_at)
+                VALUES ($1, 'user', $2, 'voice', NOW())
+            `, [patientId, text]).catch(e => console.warn('Voice log user failed:', e.message));
+        }
+
+        // 3. Process voice query
         const result = await voiceAgent.processVoiceQuery(text, userId);
+
+        // 4. LOG AI VOICE RESPONSE
+        if (patientId && result.text) {
+            await db.query(`
+                INSERT INTO chat_history (patient_id, role, content, message_type, created_at)
+                VALUES ($1, 'assistant', $2, 'voice', NOW())
+            `, [patientId, result.text]).catch(e => console.warn('Voice log AI failed:', e.message));
+        }
+
         res.json(result);
     } catch (err) {
+        console.error('Voice chat error:', err);
         res.status(500).json({ error: "Agent Error" });
     }
 });

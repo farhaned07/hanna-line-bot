@@ -1,0 +1,133 @@
+{
+    "brand": {
+        "name": "Hanna",
+        "fullName": "Hanna AI",
+        "tagline": "The AI nurse operating system that expands clinical capacity",
+        "website": "https://hanna.care",
+        "salesEmail": "falcon@hanna.care",
+        "supportEmail": "hello@hanna.care"
+    },
+    "identity": {
+        "whatHannaIs": [
+            "An AI-enabled care coordination and engagement system",
+            "A clinical operating infrastructure for chronic care workflows",
+            "A digital extension of care teams for routine monitoring",
+            "A system that scales nursing capacity without headcount",
+            "Care infrastructure that ensures consistency and documented escalation"
+        ],
+        "whatHannaIsNot": [
+            "A virtual doctor",
+            "A diagnostic or clinical decision system",
+            "A consumer wellness app",
+            "A tool that promises cost savings alone",
+            "A replacement for nurses or clinicians"
+        ]
+    },
+    "problemWeSolve": {
+        "coreInsight": "Chronic care fails primarily due to operational breakdown, not medical complexity",
+        "painPoints": [
+            "Care teams cannot maintain consistent follow-ups at scale",
+            "Monitoring patients between visits is unreliable",
+            "High engagement over long periods is unsustainable",
+            "Early deterioration detection requires manual effort",
+            "Continuous documentation creates administrative burden"
+        ],
+        "ourSolution": "Close the gap between appointments with structured, always-on engagement that human teams cannot sustain at scale"
+    },
+    "whatHannaDoes": {
+        "functionally": [
+            "Conducts regular, protocol-driven patient check-ins",
+            "Collects structured health signals and behavioral inputs",
+            "Reinforces care plans, medication routines, and education",
+            "Flags deviations from baseline",
+            "Escalates cases to care teams based on defined rules",
+            "Produces continuous, auditable interaction records"
+        ],
+        "inOnePhrase": "Hanna runs the 'in-between' layer of care"
+    },
+    "valueDelivered": {
+        "whatBuyersGet": [
+            "Extend care team reach without proportional staffing increases",
+            "Maintain consistent patient engagement over months or years",
+            "Improve visibility into patient status between visits",
+            "Reduce manual follow-up and administrative burden",
+            "Standardize execution of care protocols"
+        ],
+        "criticalNote": "Downstream cost or outcome improvement is a byproduct, not the primary pitch"
+    },
+    "targetBuyers": {
+        "primary": [
+            "Provider groups running chronic care programs",
+            "Employers managing long-term employee health risks",
+            "Care operators handling post-discharge or longitudinal follow-up",
+            "Programs where continuity, consistency, and monitoring matter"
+        ],
+        "secondary": [
+            "Payers and insurers (once operational value is proven)"
+        ],
+        "notFor": [
+            "Individual consumers",
+            "Small standalone clinics",
+            "One-time episodic care"
+        ]
+    },
+    "positioning": {
+        "correctFraming": [
+            "Hanna supports long-term condition management by automating continuous patient engagement and escalation",
+            "Stop losing control of chronic patient engagement between visits",
+            "Automate consistent monitoring, adherence support, and escalation so your clinical team can focus on complex care",
+            "Expand clinical capacity without scaling nursing headcount"
+        ],
+        "incorrectFraming": [
+            "Cuts claims by X%",
+            "Replaces nurses",
+            "AI doctor",
+            "Virtual clinic",
+            "Consumer health companion"
+        ],
+        "keyTruth": "Hanna is about capacity, consistency, and safe escalation — not cost cutting"
+    },
+    "outcomesForPitch": {
+        "operationalBenefits": [
+            "Reduces manual follow-ups and checklist work",
+            "Standardizes care delivery (repeatable, auditable)",
+            "Detects early risk signals reliably",
+            "Increases throughput of routine care tasks",
+            "Improves nurse experience (less burnout)"
+        ],
+        "note": "These are everyday operational pain points, not speculative efficiencies"
+    },
+    "prohibitedClaims": [
+        "Cuts claim costs by X%",
+        "Saves money guaranteed",
+        "Replaces your clinical staff",
+        "AI doctor or virtual physician",
+        "Diagnoses conditions",
+        "Makes clinical decisions",
+        "Consumer wellness solution"
+    ],
+    "demo": {
+        "duration": "15 minutes",
+        "bookingMethod": "Reply to this email or visit hanna.care",
+        "focusOn": "Operational capacity gains, not cost savings"
+    },
+    "emailStrategy": {
+        "tone": "Professional, clinical, consultative",
+        "approach": "Problem-first (operational bottleneck), then solution (clinical capacity)",
+        "length": "80-120 words maximum",
+        "mustInclude": [
+            "Acknowledge their operational challenge (staffing, scale, consistency)",
+            "Position Hanna as clinical infrastructure",
+            "Focus on capacity and consistency, not cost",
+            "Clear CTA: Reply or visit hanna.care",
+            "Sign-off: The Hanna AI Team"
+        ],
+        "neverDo": [
+            "Promise cost savings or claim reduction",
+            "Use speculative ROI numbers",
+            "Position as consumer wellness",
+            "Use brackets or placeholder text",
+            "Be pushy or salesy"
+        ]
+    }
+}

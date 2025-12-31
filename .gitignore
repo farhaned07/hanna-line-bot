@@ -3,3 +3,10 @@ node_modules/
 hanna.sqlite
 *.log
 .DS_Store
+
+# Internal confidential documents (founder only)
+docs/internal_truth/
+internal_truth/
+**/internal_truth/
+.env.agents
+data/*.json

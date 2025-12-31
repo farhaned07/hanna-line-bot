@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
     useMonitoringStatus,
-    useInfrastructureHealth
+    useInfrastructureHealth,
+    useAgentMetrics
 } from '../hooks/useNurseData';
 import {
     SkeletonPatientGrid,
@@ -108,6 +109,9 @@ export default function MonitoringView() {
                     />
                 </div>
             ) : null}
+
+            {/* Agent Ecosystem Panel */}
+            <AgentMetricsPanel />
 
             {/* Patient Grid */}
             <div className="bg-slate-800 rounded-xl border border-slate-700 p-6 mb-6">
@@ -350,6 +354,55 @@ function InfraCard({ label, value, subtext, barValue, barColor, highlight }) {
                     />
                 </div>
             )}
+        </div>
+    );
+}
+
+function AgentMetricsPanel() {
+    const { data, loading, error } = useAgentMetrics();
+
+    if (loading) return <SkeletonMetrics count={4} />;
+    if (error || !data) return null;
+
+    const { revenue, system } = data;
+
+    return (
+        <div className="bg-slate-800 rounded-xl border border-slate-700 p-6 mb-6">
+            <h2 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
+                <Users className="w-5 h-5 text-purple-400" />
+                Agent Ecosystem
+            </h2>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <SummaryCard
+                    label="Current MRR"
+                    value={`฿${revenue.currentMRR.toLocaleString()}`}
+                    subtext={`Target: ฿${revenue.target.toLocaleString()}`}
+                    icon={TrendingUp}
+                    color="green"
+                />
+                <SummaryCard
+                    label="Pipeline Value"
+                    value={`฿${revenue.pipelineValue.toLocaleString()}`}
+                    subtext={`${revenue.dealsInProgress} deals in progress`}
+                    icon={Activity}
+                    color="blue"
+                />
+                <SummaryCard
+                    label="Emails Sent"
+                    value={revenue.sentEmails}
+                    subtext={`${revenue.replies} replies`}
+                    icon={RefreshCw}
+                    color="purple"
+                />
+                <SummaryCard
+                    label="System Health"
+                    value={system.status === 'healthy' ? 'OK' : 'Issues'}
+                    subtext={`Last check: ${new Date(system.lastCheck).toLocaleTimeString()}`}
+                    icon={Shield}
+                    color={system.status === 'healthy' ? 'green' : 'red'}
+                    pulse={system.status !== 'healthy'}
+                />
+            </div>
         </div>
     );
 }

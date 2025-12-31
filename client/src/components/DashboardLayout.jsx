@@ -10,7 +10,8 @@ import {
     Eye,
     Cpu,
     AlertCircle,
-    CheckCircle
+    CheckCircle,
+    TrendingUp
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useInfrastructureHealth } from '../hooks/useNurseData'
@@ -27,9 +28,11 @@ export default function DashboardLayout() {
 
     const navigation = [
         { name: 'Mission Control', href: '/dashboard', icon: Activity },
+        { name: 'Analytics', href: '/dashboard/analytics', icon: TrendingUp },
         { name: 'Monitoring', href: '/dashboard/monitoring', icon: Eye },
         { name: 'Patients', href: '/dashboard/patients', icon: Users },
         { name: 'Payments', href: '/dashboard/payments', icon: CreditCard },
+        { name: '🤖 Agent Command', href: '/dashboard/agents', icon: Cpu },
     ]
 
     const isActive = (href) => {
@@ -66,8 +69,8 @@ export default function DashboardLayout() {
                                 to={item.href}
                                 onClick={() => setSidebarOpen(false)}
                                 className={`flex items-center gap-x-3 rounded-lg px-3 py-3 text-base font-medium transition-colors ${isActive(item.href)
-                                        ? 'bg-blue-600 text-white'
-                                        : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                                    ? 'bg-blue-600 text-white'
+                                    : 'text-slate-300 hover:bg-slate-700 hover:text-white'
                                     }`}
                             >
                                 <item.icon className="h-5 w-5 shrink-0" aria-hidden="true" />
@@ -86,8 +89,8 @@ export default function DashboardLayout() {
                         <span className="text-xl font-bold text-white">Hanna</span>
                         {/* System Status Pill */}
                         <div className={`flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium ${systemStatus === 'healthy'
-                                ? 'bg-green-500/20 text-green-400'
-                                : 'bg-amber-500/20 text-amber-400'
+                            ? 'bg-green-500/20 text-green-400'
+                            : 'bg-amber-500/20 text-amber-400'
                             }`}>
                             <span className={`w-2 h-2 rounded-full ${systemStatus === 'healthy' ? 'bg-green-400' : 'bg-amber-400 animate-pulse'
                                 }`}></span>
@@ -105,14 +108,14 @@ export default function DashboardLayout() {
                                             <Link
                                                 to={item.href}
                                                 className={`group flex gap-x-3 rounded-lg p-3 text-sm font-medium transition-colors ${isActive(item.href)
-                                                        ? 'bg-blue-600 text-white'
-                                                        : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                                                    ? 'bg-blue-600 text-white'
+                                                    : 'text-slate-300 hover:bg-slate-700 hover:text-white'
                                                     }`}
                                             >
                                                 <item.icon
                                                     className={`h-5 w-5 shrink-0 ${isActive(item.href)
-                                                            ? 'text-white'
-                                                            : 'text-slate-400 group-hover:text-white'
+                                                        ? 'text-white'
+                                                        : 'text-slate-400 group-hover:text-white'
                                                         }`}
                                                     aria-hidden="true"
                                                 />

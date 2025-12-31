@@ -77,7 +77,7 @@ class OneBrain {
         // --- 1. Emergency Keywords (Immediate +3 or Trigger Critical) ---
         if (patient._tempKeywordTrigger) {
             const k = patient._tempKeywordTrigger.toLowerCase();
-            if (k.includes('chest pain') || k.includes('breathe') || k.includes('faaint')) {
+            if (k.includes('chest pain') || k.includes('breathe') || k.includes('faint')) {
                 score += 3; // Base +3
                 reasons.push(`📢 Emergency Keyword: "${k}"`);
                 // Force Critical override if it's a known SOS

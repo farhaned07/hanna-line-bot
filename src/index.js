@@ -44,9 +44,9 @@ const rateLimitMiddleware = (req, res, next) => {
 app.use('/api', rateLimitMiddleware);
 
 // Admin API Routes
-// Admin API Routes
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/nurse', require('./routes/nurse'));
+app.use('/api/patient', require('./routes/patient')); // PDPA Right-to-Erasure
 
 // Serve React Dashboard (Admin Panel)
 const clientBuildPath = path.join(__dirname, '../client/dist');
@@ -97,6 +97,12 @@ app.post('/webhook', middleware(config.line), (req, res) => {
 
 // JSON parsing for non-webhook routes (AFTER webhook route)
 app.use(express.json());
+
+// Agent Control Routes (needs JSON parsing)
+app.use('/api/agents', require('./routes/agents'));
+
+// Webhooks (Resend, etc.)
+app.use('/api/webhooks', require('./webhooks/resend'));
 
 // Voice API (Project VoiceLess)
 const voiceRoutes = require('./routes/voice');

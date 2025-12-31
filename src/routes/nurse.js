@@ -298,6 +298,46 @@ router.get('/risk-summary', async (req, res) => {
     }
 });
 
+// GET /api/nurse/trends
+// Returns 7-day trend data for analytics dashboard
+router.get('/trends', async (req, res) => {
+    try {
+        // Simple day series generator in Postgres
+        const result = await db.query(`
+            WITH days AS (
+                SELECT generate_series(
+                    CURRENT_DATE - INTERVAL '6 days',
+                    CURRENT_DATE,
+                    '1 day'::interval
+                )::date AS date
+            )
+            SELECT 
+                d.date,
+                (SELECT count(*) FROM check_ins WHERE check_in_time::date = d.date) as checkins,
+                (SELECT count(*) FROM nurse_tasks WHERE created_at::date = d.date AND priority IN ('critical', 'high')) as alerts,
+                (SELECT count(*) FROM nurse_tasks WHERE completed_at::date = d.date AND status = 'resolved') as resolutions,
+                (SELECT count(*) FROM chronic_patients WHERE created_at::date <= d.date AND enrollment_status = 'active') as active_patients
+            FROM days d
+            ORDER BY d.date ASC
+        `);
+
+        // Format dates for frontend (Short Day Name)
+        const trends = result.rows.map(row => ({
+            date: new Date(row.date).toLocaleDateString('en-US', { weekday: 'short' }),
+            fullDate: row.date,
+            checkins: parseInt(row.checkins),
+            alerts: parseInt(row.alerts),
+            resolutions: parseInt(row.resolutions),
+            activePatients: parseInt(row.active_patients)
+        }));
+
+        res.json(trends);
+    } catch (error) {
+        console.error('Error fetching trends:', error);
+        res.status(500).json({ error: 'Database Error' });
+    }
+});
+
 // GET /api/nurse/patients
 // Returns full list of patients
 router.get('/patients', async (req, res) => {

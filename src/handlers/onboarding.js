@@ -1,38 +1,92 @@
 const db = require('../services/db');
 const line = require('../services/line');
 
+/**
+ * Onboarding Flow v2.0 - Patient-First Design
+ * 
+ * NEW FLOW (Patient-First):
+ * Step 0: Warm Welcome + Value Proposition
+ * Step 1: Quick Health Check (Condition Selection)
+ * Step 2: Medication Check (Yes/No)
+ * Step 3: Simplified PDPA Consent
+ * Step 4: Identity Verification
+ * Step 5: Baseline Vitals Prompt (Optional)
+ * → Activation
+ * 
+ * OLD FLOW (Legal-First):
+ * Step 0: PDPA Consent → Step 1: Identity → Done
+ */
+
 const start = async (event) => {
     const userId = event.source.userId;
 
-    // Step 0: PDPA Consent
-    const flexMessage = {
+    // Step 0: Warm Welcome (Patient-First)
+    const welcomeMessage = {
         type: 'flex',
-        altText: '🔒 ขอความยินยอมข้อมูลส่วนบุคคล',
+        altText: '💚 สวัสดีค่ะ! ยินดีต้อนรับ',
         contents: {
             type: 'bubble',
             body: {
                 type: 'box',
                 layout: 'vertical',
                 contents: [
-                    { type: 'text', text: '🔒 ความเป็นส่วนตัวของคุณสำคัญ', weight: 'bold', size: 'lg', color: '#06C755' },
-                    { type: 'text', text: 'เพื่อให้ฮันนาดูแลคุณได้อย่างเต็มที่ ฮันนาขออนุญาตเก็บรวบรวมข้อมูลสุขภาพของคุณตามนโยบายความเป็นส่วนตัวนะคะ', margin: 'md', wrap: true, size: 'sm' },
-                    { type: 'separator', margin: 'md' },
-                    { type: 'text', text: 'อ่านนโยบายความเป็นส่วนตัว', size: 'xs', color: '#007AFF', action: { type: 'uri', label: 'อ่านนโยบาย', uri: `https://${(process.env.BASE_URL || 'hanna-line-bot-production.up.railway.app').replace(/^https?:\/\//, '')}/privacy.html` }, margin: 'sm', align: 'center' }
+                    {
+                        type: 'text',
+                        text: '💚 สวัสดีค่ะ!',
+                        weight: 'bold',
+                        size: 'xl',
+                        color: '#06C755'
+                    },
+                    {
+                        type: 'text',
+                        text: 'ฮันนาเป็นพยาบาล AI ที่จะคอยดูแลสุขภาพคุณทุกวันค่ะ 😊',
+                        margin: 'md',
+                        wrap: true,
+                        size: 'sm'
+                    },
+                    { type: 'separator', margin: 'lg' },
+                    {
+                        type: 'text',
+                        text: 'ฮันนาจะช่วยคุณ:',
+                        weight: 'bold',
+                        margin: 'md',
+                        size: 'sm'
+                    },
+                    { type: 'text', text: '✅ บันทึกน้ำตาล/ความดันง่ายๆ', size: 'sm', margin: 'sm' },
+                    { type: 'text', text: '✅ เตือนกินยาทุกวัน', size: 'sm', margin: 'xs' },
+                    { type: 'text', text: '✅ มีปัญหาบอกได้ตลอด 24 ชม.', size: 'sm', margin: 'xs' },
+                    { type: 'text', text: '✅ พยาบาลจริงๆ คอยดูแลอยู่เบื้องหลัง', size: 'sm', margin: 'xs' },
+                    { type: 'separator', margin: 'lg' },
+                    {
+                        type: 'text',
+                        text: 'ใช้เวลาไม่ถึง 1 นาทีค่ะ ✨',
+                        size: 'xs',
+                        color: '#888888',
+                        margin: 'sm',
+                        align: 'center'
+                    }
                 ]
             },
             footer: {
                 type: 'box',
                 layout: 'vertical',
                 contents: [
-                    { type: 'button', style: 'primary', color: '#06C755', action: { type: 'postback', label: 'ยอมรับและเริ่มใช้งาน ✅', data: 'action=consent_pdpa&value=yes' } },
-                    { type: 'button', action: { type: 'postback', label: 'ไม่ยอมรับ', data: 'action=consent_pdpa&value=no' }, margin: 'sm', height: 'sm', style: 'link', color: '#666666' }
+                    {
+                        type: 'button',
+                        style: 'primary',
+                        color: '#06C755',
+                        action: {
+                            type: 'postback',
+                            label: 'เริ่มกันเลย! 🚀',
+                            data: 'action=start_onboarding&value=yes'
+                        }
+                    }
                 ]
             }
         }
     };
 
-    await line.replyMessage(event.replyToken, flexMessage);
-    // Set step to 0 (Consent)
+    await line.replyMessage(event.replyToken, welcomeMessage);
     await db.query('UPDATE chronic_patients SET onboarding_step = 0 WHERE line_user_id = $1', [userId]);
 };
 
@@ -50,118 +104,218 @@ const handleInput = async (event, user) => {
         action = data.get('action');
     }
 
-    console.log(`[Onboarding] User ${userId} at Step ${step}. Input: ${input}, Action: ${action}`);
+    console.log(`[Onboarding v2] User ${userId} at Step ${step}. Input: ${input}, Action: ${action}`);
 
-    // --- Step 0: PDPA Consent ---
+    // ================================================================
+    // STEP 0: Welcome → Move to Condition Selection
+    // ================================================================
     if (step === 0) {
-        if (action === 'consent_pdpa' && input === 'yes') {
-            console.log(`[Onboarding] User ${userId} accepted consent. Moving to Step 1 (Identity Confirmation).`);
-            // Update DB to Step 1
-            await db.query('UPDATE chronic_patients SET consent_pdpa = TRUE, consent_date = NOW(), onboarding_step = 1 WHERE line_user_id = $1', [userId]);
+        if (action === 'start_onboarding' && input === 'yes') {
+            console.log(`[Onboarding] User ${userId} started. Moving to Step 1 (Condition).`);
+            await db.query('UPDATE chronic_patients SET onboarding_step = 1 WHERE line_user_id = $1', [userId]);
 
-            // Mock "Pre-filled" Data for Confirmation
-            // In production, this would query an Insurer API using the LINE User ID (via phone match)
-            // For Pilot, we simulate finding: Name="คุณสมดุล", DOB="01/01/1955", Condition="เบาหวาน Type 2"
-            const mockName = "คุณสมดุล";
-
-            await line.replyMessage(event.replyToken, [
-                { type: 'text', text: 'ขอบคุณที่ไว้ใจฮันนานะคะ! 💚' },
-                {
-                    type: 'flex',
-                    altText: '🔒 ยืนยันตัวตน',
-                    contents: {
-                        type: 'bubble',
-                        body: {
-                            type: 'box',
-                            layout: 'vertical',
-                            contents: [
-                                { type: 'text', text: '🔒 ยืนยันตัวตน', weight: 'bold', size: 'xl', color: '#06C755' },
-                                { type: 'separator', margin: 'md' },
-                                { type: 'text', text: 'ฮันนาพบข้อมูลสิทธิ์ของคุณจากประกัน:', margin: 'md', size: 'sm', color: '#666666' },
-                                { type: 'text', text: mockName, weight: 'bold', size: 'lg', margin: 'sm' },
-                                { type: 'text', text: 'เกิดวันที่: 01 ม.ค. 2498', size: 'sm', margin: 'xs' },
-                                { type: 'text', text: 'สิทธิ์การดูแล: เบาหวาน (Diabetes)', size: 'sm', margin: 'xs', color: '#007AFF' },
-                                { type: 'separator', margin: 'md' },
-                                { type: 'text', text: 'ข้อมูลนี้ถูกต้องใช่ไหมคะ?', margin: 'md', weight: 'bold', align: 'center' }
-                            ]
-                        },
-                        footer: {
-                            type: 'box',
-                            layout: 'vertical',
-                            contents: [
-                                { type: 'button', style: 'primary', color: '#06C755', action: { type: 'postback', label: 'ใช่ ถูกต้อง ✅', data: 'action=confirm_identity&value=yes' } },
-                                { type: 'button', action: { type: 'postback', label: 'ไม่ใช่ ไม่ใช่ฉัน', data: 'action=confirm_identity&value=no' }, margin: 'sm', height: 'sm', style: 'link', color: '#FF3333' }
-                            ]
-                        }
-                    }
-                }
-            ]);
-        } else {
-            // Re-send Consent (Simulated same as before)
-            const flexMessage = {
+            await line.replyMessage(event.replyToken, {
                 type: 'flex',
-                altText: '🔒 ขอความยินยอมข้อมูลส่วนบุคคล',
+                altText: '🩺 เลือกโรคประจำตัว',
                 contents: {
                     type: 'bubble',
                     body: {
                         type: 'box',
                         layout: 'vertical',
                         contents: [
-                            { type: 'text', text: '⚠️ กรุณากดยอมรับเพื่อดำเนินการต่อ', weight: 'bold', color: '#FF3333', size: 'sm', margin: 'md' },
-                            { type: 'text', text: '🔒 ความเป็นส่วนตัวของคุณสำคัญ', weight: 'bold', size: 'lg', color: '#06C755', margin: 'sm' },
-                            { type: 'text', text: 'เพื่อให้ฮันนาดูแลคุณได้อย่างเต็มที่ ฮันนาขออนุญาตเก็บรวบรวมข้อมูลสุขภาพของคุณตามนโยบายความเป็นส่วนตัวนะคะ', margin: 'md', wrap: true, size: 'sm' },
-                            { type: 'separator', margin: 'md' },
-                            { type: 'text', text: 'อ่านนโยบายความเป็นส่วนตัว', size: 'xs', color: '#007AFF', action: { type: 'uri', label: 'อ่านนโยบาย', uri: `https://${(process.env.BASE_URL || 'hanna-line-bot-production.up.railway.app').replace(/^https?:\/\//, '')}/privacy.html` }, margin: 'sm', align: 'center' }
+                            { type: 'text', text: '🩺 คุณมีโรคประจำตัวอะไรบ้างคะ?', weight: 'bold', size: 'lg', color: '#06C755' },
+                            { type: 'text', text: 'เลือกได้มากกว่า 1 ข้อนะคะ', margin: 'sm', size: 'xs', color: '#888888' }
+                        ]
+                    },
+                    footer: {
+                        type: 'box',
+                        layout: 'vertical',
+                        spacing: 'sm',
+                        contents: [
+                            { type: 'button', style: 'primary', color: '#4ECDC4', action: { type: 'postback', label: '🍬 เบาหวาน (Diabetes)', data: 'action=select_condition&value=diabetes' } },
+                            { type: 'button', style: 'primary', color: '#FF6B6B', action: { type: 'postback', label: '❤️ ความดันโลหิตสูง', data: 'action=select_condition&value=hypertension' } },
+                            { type: 'button', style: 'primary', color: '#9B59B6', action: { type: 'postback', label: '💊 ทั้งเบาหวาน + ความดัน', data: 'action=select_condition&value=both' } },
+                            { type: 'button', style: 'link', color: '#888888', action: { type: 'postback', label: 'ไม่แน่ใจ / อื่นๆ', data: 'action=select_condition&value=other' } }
+                        ]
+                    }
+                }
+            });
+        } else {
+            // Re-show welcome
+            await start(event);
+        }
+
+        // ================================================================
+        // STEP 1: Condition Selection → Medication Check
+        // ================================================================
+    } else if (step === 1) {
+        if (action === 'select_condition') {
+            // Map condition to proper value
+            const conditionMap = {
+                'diabetes': 'Diabetes Type 2',
+                'hypertension': 'Hypertension',
+                'both': 'Diabetes Type 2, Hypertension',
+                'other': 'To be confirmed'
+            };
+            const condition = conditionMap[input] || 'To be confirmed';
+
+            console.log(`[Onboarding] User ${userId} selected condition: ${condition}`);
+            await db.query('UPDATE chronic_patients SET condition = $1, onboarding_step = 2 WHERE line_user_id = $2', [condition, userId]);
+
+            // Step 2: Medication Check
+            await line.replyMessage(event.replyToken, {
+                type: 'flex',
+                altText: '💊 ยาที่กินประจำ',
+                contents: {
+                    type: 'bubble',
+                    body: {
+                        type: 'box',
+                        layout: 'vertical',
+                        contents: [
+                            { type: 'text', text: '💊 คุณกินยาประจำไหมคะ?', weight: 'bold', size: 'lg', color: '#06C755' },
+                            { type: 'text', text: 'ฮันนาจะช่วยเตือนกินยาให้นะคะ 😊', margin: 'md', size: 'sm', wrap: true, color: '#666666' }
+                        ]
+                    },
+                    footer: {
+                        type: 'box',
+                        layout: 'vertical',
+                        spacing: 'sm',
+                        contents: [
+                            { type: 'button', style: 'primary', color: '#06C755', action: { type: 'postback', label: 'กินยาประจำ ✅', data: 'action=has_medication&value=yes' } },
+                            { type: 'button', style: 'link', action: { type: 'postback', label: 'ไม่ได้กินยา', data: 'action=has_medication&value=no' } }
+                        ]
+                    }
+                }
+            });
+        }
+
+        // ================================================================
+        // STEP 2: Medication → Simplified PDPA Consent
+        // ================================================================
+    } else if (step === 2) {
+        if (action === 'has_medication') {
+            const hasMeds = input === 'yes';
+            console.log(`[Onboarding] User ${userId} has medication: ${hasMeds}`);
+
+            // Store medication preference
+            await db.query('UPDATE chronic_patients SET onboarding_step = 3 WHERE line_user_id = $1', [userId]);
+
+            // Step 3: Simplified PDPA (much shorter than before)
+            await line.replyMessage(event.replyToken, {
+                type: 'flex',
+                altText: '🔒 ความเป็นส่วนตัว',
+                contents: {
+                    type: 'bubble',
+                    body: {
+                        type: 'box',
+                        layout: 'vertical',
+                        contents: [
+                            { type: 'text', text: '🔒 ความเป็นส่วนตัว', weight: 'bold', size: 'lg', color: '#06C755' },
+                            { type: 'text', text: 'ข้อมูลสุขภาพของคุณจะถูกเก็บรักษาอย่างปลอดภัย และใช้เพื่อการดูแลสุขภาพเท่านั้นค่ะ', margin: 'md', wrap: true, size: 'sm' },
+                            {
+                                type: 'text',
+                                text: 'อ่านนโยบายความเป็นส่วนตัว',
+                                size: 'xs',
+                                color: '#007AFF',
+                                action: { type: 'uri', label: 'อ่านนโยบาย', uri: `https://${(process.env.BASE_URL || 'hanna-line-bot-production.up.railway.app').replace(/^https?:\/\//, '')}/privacy.html` },
+                                margin: 'md',
+                                align: 'center'
+                            }
                         ]
                     },
                     footer: {
                         type: 'box',
                         layout: 'vertical',
                         contents: [
-                            { type: 'button', style: 'primary', color: '#06C755', action: { type: 'postback', label: 'ยอมรับและเริ่มใช้งาน ✅', data: 'action=consent_pdpa&value=yes' } },
-                            { type: 'button', action: { type: 'postback', label: 'ไม่ยอมรับ', data: 'action=consent_pdpa&value=no' }, margin: 'sm', height: 'sm', style: 'link', color: '#666666' }
+                            { type: 'button', style: 'primary', color: '#06C755', action: { type: 'postback', label: 'ตกลง ยอมรับ ✅', data: 'action=consent_pdpa&value=yes' } }
                         ]
                     }
                 }
-            };
-            await line.replyMessage(event.replyToken, flexMessage);
+            });
         }
 
-        // --- Step 1: Identity Confirmation (Pre-filled) ---
-    } else if (step === 1) {
-        if (action === 'confirm_identity' && input === 'yes') {
-            // Finish Onboarding - Move to Active
-            console.log(`[Onboarding] User ${userId} confirmed identity.`);
+        // ================================================================
+        // STEP 3: PDPA Consent → Identity Verification
+        // ================================================================
+    } else if (step === 3) {
+        if (action === 'consent_pdpa' && input === 'yes') {
+            console.log(`[Onboarding] User ${userId} accepted PDPA. Moving to identity verification.`);
+            await db.query('UPDATE chronic_patients SET consent_pdpa = TRUE, consent_date = NOW(), onboarding_step = 4 WHERE line_user_id = $1', [userId]);
 
-            // In a real app, we would copy the pre-filled data to the user record here.
-            // For simplicity, we just set name/age hardcoded to match the mock above or generic.
+            // In production: Query insurer API using LINE User ID
+            // For now: Show verification with mock data
+            const mockName = "คุณสมดุล";
+
+            await line.replyMessage(event.replyToken, {
+                type: 'flex',
+                altText: '✅ ยืนยันตัวตน',
+                contents: {
+                    type: 'bubble',
+                    body: {
+                        type: 'box',
+                        layout: 'vertical',
+                        contents: [
+                            { type: 'text', text: '✅ ยืนยันตัวตน', weight: 'bold', size: 'lg', color: '#06C755' },
+                            { type: 'text', text: 'ฮันนาพบข้อมูลสิทธิ์ของคุณ:', margin: 'md', size: 'sm', color: '#666666' },
+                            { type: 'separator', margin: 'sm' },
+                            { type: 'text', text: mockName, weight: 'bold', size: 'lg', margin: 'md' },
+                            { type: 'text', text: 'สิทธิ์: ผู้ดูแลโรคเรื้อรัง', size: 'sm', margin: 'xs', color: '#007AFF' },
+                            { type: 'separator', margin: 'md' },
+                            { type: 'text', text: 'ข้อมูลนี้ถูกต้องใช่ไหมคะ?', margin: 'md', weight: 'bold', align: 'center', size: 'sm' }
+                        ]
+                    },
+                    footer: {
+                        type: 'box',
+                        layout: 'vertical',
+                        spacing: 'sm',
+                        contents: [
+                            { type: 'button', style: 'primary', color: '#06C755', action: { type: 'postback', label: 'ใช่ ถูกต้อง ✅', data: 'action=confirm_identity&value=yes' } },
+                            { type: 'button', style: 'link', color: '#FF3333', action: { type: 'postback', label: 'ไม่ใช่ฉัน', data: 'action=confirm_identity&value=no' } }
+                        ]
+                    }
+                }
+            });
+        }
+
+        // ================================================================
+        // STEP 4: Identity Confirmed → Activation
+        // ================================================================
+    } else if (step === 4) {
+        if (action === 'confirm_identity' && input === 'yes') {
+            console.log(`[Onboarding] User ${userId} confirmed identity. Activating account.`);
+
+            // Activate the account
             await db.query(`
                 UPDATE chronic_patients 
-                SET enrollment_status = 'active', onboarding_step = 2, 
-                    name = 'คุณสมดุล', age = '70', condition = 'Diabetes Type 2'
+                SET enrollment_status = 'active', 
+                    onboarding_step = 5, 
+                    name = 'คุณสมดุล', 
+                    age = '70'
                 WHERE line_user_id = $1`, [userId]);
 
+            // Success: Show activation + first health check prompt
             await line.replyMessage(event.replyToken, [
                 {
                     type: 'text',
-                    text: '━━━━━━━━━━━━━━━━━━━\nยืนยันสิทธิ์เรียบร้อย ✅\n━━━━━━━━━━━━━━━━━━━'
+                    text: '🎉 ยินดีต้อนรับสู่ครอบครัวค่ะ!\n\nฮันนาพร้อมดูแลคุณแล้ว 💚'
                 },
                 {
                     type: 'flex',
-                    altText: '✅ เริ่มใช้งาน',
+                    altText: '✨ เริ่มใช้งาน',
                     contents: {
                         type: 'bubble',
                         body: {
                             type: 'box',
                             layout: 'vertical',
                             contents: [
-                                { type: 'text', text: '🎉 ยินดีต้อนรับสู่ครอบครัวค่ะ!', weight: 'bold', size: 'xl', color: '#06C755' },
-                                { type: 'text', text: 'ฮันนาจะคอยเป็นห่วงคุณแทนลูกหลานเองค่ะ 💚', margin: 'md', size: 'sm', color: '#666666' },
+                                { type: 'text', text: '✨ สิ่งที่ฮันนาจะทำให้คุณ', weight: 'bold', size: 'lg', color: '#06C755' },
                                 { type: 'separator', margin: 'md' },
-                                { type: 'text', text: 'หลังจากนี้:', weight: 'bold', margin: 'md' },
-                                { type: 'text', text: '1. ฮันนาจะทักหาทุกเช้า (08:00)', size: 'sm', margin: 'sm' },
-                                { type: 'text', text: '2. ถ้ามีอาการ บอกฮันนาได้เสมอ', size: 'sm', margin: 'sm' },
-                                { type: 'text', text: '3. คุณพยาบาลคอยดูแลอยู่ใกล้ๆ ค่ะ', size: 'sm', margin: 'sm' }
+                                { type: 'text', text: '🌅 ทักทายทุกเช้า (08:00)', size: 'sm', margin: 'md' },
+                                { type: 'text', text: '💊 เตือนกินยา', size: 'sm', margin: 'sm' },
+                                { type: 'text', text: '📊 บันทึกค่าสุขภาพให้', size: 'sm', margin: 'sm' },
+                                { type: 'text', text: '👩‍⚕️ มีปัญหา? บอกได้ตลอด', size: 'sm', margin: 'sm' },
+                                { type: 'separator', margin: 'md' },
+                                { type: 'text', text: 'มาเริ่มดูแลสุขภาพกันเลยนะคะ! 🌟', size: 'sm', margin: 'md', weight: 'bold', color: '#06C755' }
                             ]
                         },
                         footer: {
@@ -172,7 +326,7 @@ const handleInput = async (event, user) => {
                                     type: 'button',
                                     style: 'primary',
                                     color: '#06C755',
-                                    action: { type: 'message', label: 'เริ่มเช็คสุขภาพครั้งแรก', text: 'เช็คสุขภาพ' }
+                                    action: { type: 'message', label: '🩺 เช็คสุขภาพครั้งแรก', text: 'เช็คสุขภาพ' }
                                 }
                             ]
                         }

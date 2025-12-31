@@ -8,6 +8,7 @@ const groq = require('../services/groq');
 const tts = require('../services/edgeTtsAdapter');
 const storage = require('../services/storage');
 const livekitService = require('../services/livekitService');
+const conversationHistory = require('../services/conversationHistory');
 
 const healthData = require('./healthData');
 
@@ -45,8 +46,28 @@ const handleAudio = async (event) => {
         // Pass specialized trigger to Brain
         const riskAnalysis = await OneBrain.analyzePatient(user.id, `voice_input:${userText}`);
 
-        // 4. CHAT LAYER (Groq Llama 3): Generate Response (Aware of Risk + Logging)
-        const replyText = await groq.generateChatResponse(userText, riskAnalysis, user.id);
+        // Save user voice message to conversation history
+        const conversationHistory = require('../services/conversationHistory');
+        await conversationHistory.saveMessage({
+            patientId: user.id,
+            role: 'user',
+            content: userText,
+            messageType: 'audio',
+            metadata: { source: 'line_audio' }
+        });
+
+        // 4. CHAT LAYER (Groq Llama 3): Generate Response (with history)
+        const recentMessages = await conversationHistory.getRecentMessages(user.id, 20);
+        const replyText = await groq.generateChatResponse(userText, riskAnalysis, user.id, recentMessages);
+
+        // Save assistant response to conversation history
+        await conversationHistory.saveMessage({
+            patientId: user.id,
+            role: 'assistant',
+            content: replyText,
+            messageType: 'audio',
+            metadata: { source: 'line_audio', risk_level: riskAnalysis.level }
+        });
 
         // 5. TTS: Generate Audio Reply
         const speechBuffer = await tts.generateSpeech(replyText);
@@ -138,22 +159,102 @@ const handleMessage = async (event) => {
     if (event.message.type === 'text') {
         const text = event.message.text.trim();
 
+        // ================================================================
+        // 🚨 ENHANCED EMERGENCY DETECTION (Tier 2 Upgrade)
+        // ================================================================
+        // Severity Levels: CRITICAL (immediate 1669), HIGH (urgent nurse callback)
 
+        const emergencyPatterns = {
+            // CRITICAL - Life-Threatening (Immediate 1669)
+            critical: [
+                // Cardiac
+                'chest pain', 'เจ็บหน้าอก', 'แน่นหน้าอก', 'heart attack', 'หัวใจวาย',
+                // Breathing
+                'can\'t breathe', 'หายใจไม่ออก', 'หายใจลำบาก', 'หายใจไม่ทัน',
+                // Stroke (FAST: Face, Arms, Speech, Time)
+                'stroke', 'อัมพาต', 'หน้าเบี้ยว', 'แขนอ่อนแรง', 'พูดไม่ชัด', 'เห็นภาพซ้อน',
+                // Loss of consciousness
+                'faint', 'หมดสติ', 'เป็นลม', 'ไม่รู้ตัว', 'unconscious',
+                // Severe bleeding
+                'bleeding', 'เลือดออกมาก', 'เลือดไม่หยุด',
+                // Diabetic emergency
+                'น้ำตาลต่ำมาก', 'hypoglycemia', 'เหงื่อแตก', 'ตัวสั่น', 'สับสน'
+            ],
+            // HIGH - Urgent but not immediately life-threatening
+            high: [
+                // Concerning symptoms
+                'ปวดหัวรุนแรง', 'severe headache', 'วิงเวียนมาก', 'คลื่นไส้รุนแรง',
+                'ปวดท้องมาก', 'อาเจียนเป็นเลือด', 'อุจจาระเป็นเลือด',
+                // Diabetes-related
+                'น้ำตาลสูงมาก', 'น้ำตาล 300', 'น้ำตาล 400', 'น้ำตาล 500',
+                // Hypertension-related
+                'ความดันสูงมาก', 'ความดัน 180', 'ความดัน 200',
+                // General emergency
+                'emergency', 'ฉุกเฉิน', 'ต้องการความช่วยเหลือ', 'ช่วยด้วย', 'help'
+            ]
+        };
 
-        // 🚨 SAFETY CHECK: Emergency Keywords
-        const emergencyKeywords = ['chest pain', 'เจ็บหน้าอก', 'breathe', 'หายใจไม่ออก', 'faint', 'จะเป็นลม', 'emergency', 'ฉุกเฉิน'];
-        const isEmergency = emergencyKeywords.some(kw => text.toLowerCase().includes(kw));
+        // Check for CRITICAL emergencies
+        const isCritical = emergencyPatterns.critical.some(kw =>
+            text.toLowerCase().includes(kw.toLowerCase())
+        );
 
-        if (isEmergency) {
-            console.log(`🚨 [Router] Emergency Keyword Detected: ${text}`);
+        // Check for HIGH emergencies
+        const isHigh = emergencyPatterns.high.some(kw =>
+            text.toLowerCase().includes(kw.toLowerCase())
+        );
 
-            // 1. Trigger Brain Analysis IMMEDIATELY
-            OneBrain.analyzePatient(user.id, `emergency_keyword:${text}`);
+        if (isCritical) {
+            console.log(`🚨🚨 [Router] CRITICAL Emergency Detected: ${text}`);
 
-            // 2. Immediate Safe Response
+            // 1. Trigger OneBrain IMMEDIATELY with critical flag
+            OneBrain.analyzePatient(user.id, `CRITICAL_EMERGENCY:${text}`);
+
+            // 2. Immediate response with 1669
+            return line.replyMessage(event.replyToken, [
+                {
+                    type: 'text',
+                    text: '🚨 ฟังฮันนานะคะ อาการนี้อันตราย!\n\n⚠️ โทร 1669 เดี๋ยวนี้เลย\nหรือให้คนใกล้ชิดพาไปโรงพยาบาลทันที\n\n✅ ฮันนาแจ้งพยาบาลแล้ว เขาจะโทรหาคุณโดยด่วนที่สุด'
+                },
+                {
+                    type: 'flex',
+                    altText: '📞 โทรฉุกเฉิน',
+                    contents: {
+                        type: 'bubble',
+                        body: {
+                            type: 'box',
+                            layout: 'vertical',
+                            contents: [
+                                { type: 'text', text: '📞 กดโทรฉุกเฉินด้านล่าง', weight: 'bold', color: '#FF0000', align: 'center' }
+                            ]
+                        },
+                        footer: {
+                            type: 'box',
+                            layout: 'vertical',
+                            contents: [
+                                {
+                                    type: 'button',
+                                    style: 'primary',
+                                    color: '#FF0000',
+                                    action: { type: 'uri', label: '📞 โทร 1669 ฉุกเฉิน', uri: 'tel:1669' }
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]);
+        }
+
+        if (isHigh) {
+            console.log(`🚨 [Router] HIGH PRIORITY Alert: ${text}`);
+
+            // 1. Trigger OneBrain with high priority
+            OneBrain.analyzePatient(user.id, `HIGH_PRIORITY:${text}`);
+
+            // 2. Urgent but not 1669-level response
             return line.replyMessage(event.replyToken, {
                 type: 'text',
-                text: '🚨 ฮันนารับทราบอาการแล้วค่ะ! \nแจ้งพยาบาลให้ติดต่อกลับด่วนที่สุดแล้ว \n\n⚠️ หากอาการรุนแรง กรุณาโทร 1669 ทันทีนะคะ'
+                text: '⚠️ ฮันนารับทราบอาการแล้วค่ะ\n\nแจ้งพยาบาลให้รีบติดต่อกลับด่วนนะคะ\n\n💡 หากอาการแย่ลง โทร 1669 ได้เลยค่ะ'
             });
         }
 
@@ -396,14 +497,17 @@ const handleMessage = async (event) => {
             }
         }
 
-        // Default response
-        // --- Conversation Memory & Smart Routing ---
-        // Store last 5 messages in memory (for MVP - move to Redis/DB for production)
-        if (!global.conversationHistory) global.conversationHistory = {};
-        if (!global.conversationHistory[userId]) global.conversationHistory[userId] = [];
-
-        global.conversationHistory[userId].push({ role: 'user', text: text });
-        if (global.conversationHistory[userId].length > 5) global.conversationHistory[userId].shift();
+        // ============================================================
+        // PERSISTENT CONVERSATION MEMORY (Tier 1, Task 1.2)
+        // ============================================================
+        // Save user message to database
+        await conversationHistory.saveMessage({
+            patientId: user.id,
+            role: 'user',
+            content: text,
+            messageType: 'text',
+            metadata: { source: 'line' }
+        });
 
         // Smart Routing: Detect complex medical questions
         const complexKeywords = ['ทำไม', 'อย่างไร', 'อาการ', 'สาเหตุ', 'รักษา', 'why', 'how', 'symptom', 'cause'];
@@ -452,12 +556,36 @@ const handleMessage = async (event) => {
                 console.warn('⚠️ OneBrain analysis failed, using default risk profile');
             }
 
-            // Generate AI response (with patient ID for audit logging)
-            const aiReply = await groq.generateChatResponse(text, riskProfile, user.id);
+            // ============================================================
+            // RETRIEVE CONVERSATION HISTORY (Last 20 messages = 10 exchanges)
+            // ============================================================
+            const recentMessages = await conversationHistory.getRecentMessages(user.id, 20);
+            console.log(`📜 [Router] Retrieved ${recentMessages.length} messages from history`);
 
-            // Store in conversation history
-            global.conversationHistory[userId].push({ role: 'assistant', text: aiReply });
-            if (global.conversationHistory[userId].length > 10) global.conversationHistory[userId].shift();
+            // ============================================================
+            // GENERATE AI RESPONSE (with context + history)
+            // ============================================================
+            const aiReply = await groq.generateChatResponse(
+                text,
+                riskProfile,
+                user.id,  // For patient context injection
+                recentMessages  // For conversation continuity
+            );
+
+            // ============================================================
+            // SAVE ASSISTANT RESPONSE TO DATABASE
+            // ============================================================
+            await conversationHistory.saveMessage({
+                patientId: user.id,
+                role: 'assistant',
+                content: aiReply,
+                messageType: 'text',
+                metadata: {
+                    source: 'line',
+                    risk_level: riskProfile.level,
+                    model: 'llama-3.3-70b-versatile'
+                }
+            });
 
             return line.replyMessage(event.replyToken, {
                 type: 'text',

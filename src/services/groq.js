@@ -46,11 +46,41 @@ const transcribeAudio = async (audioBuffer) => {
  * 
  * @param {string} userText - User's message
  * @param {object} riskProfile - Risk analysis from OneBrain
- * @param {string|null} patientId - Optional patient ID for audit logging
+ * @param {number|null} patientId - Patient ID for context injection
+ * @param {Array} conversationHistory - Recent conversation messages from DB
  */
-const generateChatResponse = async (userText, riskProfile = {}, patientId = null) => {
+const generateChatResponse = async (userText, riskProfile = {}, patientId = null, conversationHistory = []) => {
     try {
-        // Tone Calibration based on Risk
+        // ============================================================
+        // PATIENT CONTEXT INJECTION (NEW - Tier 1, Task 1.3)
+        // ============================================================
+        let patientContext = '';
+
+        if (patientId) {
+            try {
+                // Fetch patient profile
+                const patientResult = await db.query(
+                    'SELECT * FROM chronic_patients WHERE id = $1',
+                    [patientId]
+                );
+                const patient = patientResult.rows[0];
+
+                if (patient) {
+                    const healthData = require('../handlers/healthData');
+                    const summary = await healthData.getHealthSummary(patient.line_user_id, 7);
+
+                    // Build rich patient context
+                    patientContext = buildPatientContext(patient, summary, riskProfile);
+                }
+            } catch (contextError) {
+                console.warn('⚠️ [Groq] Could not fetch patient context:', contextError.message);
+                // Continue without context (graceful degradation)
+            }
+        }
+
+        // ============================================================
+        // TONE CALIBRATION (Based on Risk)
+        // ============================================================
         let toneInstruction = "Be friendly, warm, and encouraging. Like a caring granddaughter (Thai: หลานสาว).";
         if (riskProfile.level === 'high' || riskProfile.level === 'critical') {
             toneInstruction = "Be calm but URGENT. Keep sentences short. Show concern. Advise professional help immediately.";
@@ -64,32 +94,43 @@ const generateChatResponse = async (userText, riskProfile = {}, patientId = null
             ? `\nPOSITIVE STATUS: ${riskProfile.positiveSignals.join(', ')}`
             : '';
 
-        const systemPrompt = `
-        You are Hanna (ฮันนา), a caring AI nurse assistant for chronic disease patients in Thailand.
-        
-        **Your Personality**:
-        - ${toneInstruction}
-        - Speak Thai (unless spoken to in English).
-        - Use emojis 💚 😊 💊 to be friendly.
-        
-        **Patient Context**:
-        ${riskContext}
-        ${positiveContext}
-        
-        **Rules**:
-        1. Keep responses CONCISE (under 2 sentences).
-        2. If "POSITIVE STATUS" is present, PRAISE the patient for their streak/trend.
-        3. If they report symptoms, show empathy.
-        4. CRITICAL: NEVER diagnose or prescribe. If risk is high, tell them "I have notified the nurse".
-        
-        Reply ONLY with the text of your response.
-        `;
+        // ============================================================
+        // CONSTRUCT MESSAGES FOR LLM
+        // ============================================================
+        const { HANNA_SYSTEM_PROMPT } = require('../config/prompts');
 
+        const messages = [
+            { role: 'system', content: HANNA_SYSTEM_PROMPT }
+        ];
+
+        // Add patient context if available
+        if (patientContext) {
+            messages.push({ role: 'system', content: patientContext });
+        }
+
+        // Add dynamic tone and risk context
+        messages.push({
+            role: 'system',
+            content: `Current Situation:\n${toneInstruction}\n${riskContext}${positiveContext}`
+        });
+
+        // Add conversation history (last 20 messages)
+        if (conversationHistory && conversationHistory.length > 0) {
+            const formattedHistory = conversationHistory
+                .filter(msg => msg.role !== 'system')
+                .map(msg => ({ role: msg.role, content: msg.content }));
+
+            messages.push(...formattedHistory);
+        }
+
+        // Add current user message
+        messages.push({ role: 'user', content: userText });
+
+        // ============================================================
+        // CALL GROQ API
+        // ============================================================
         const completion = await groq.chat.completions.create({
-            messages: [
-                { role: 'system', content: systemPrompt },
-                { role: 'user', content: userText }
-            ],
+            messages,
             model: "llama-3.3-70b-versatile",
             temperature: 0.6,
             max_tokens: 300,
@@ -97,30 +138,6 @@ const generateChatResponse = async (userText, riskProfile = {}, patientId = null
 
         const reply = completion.choices[0]?.message?.content || "ขออภัยค่ะ ฮันนากำลังคิดนิดนึงค่ะ";
         console.log(`🧠 [Groq] Reply: "${reply}"`);
-
-        // ============================================================
-        // ENTERPRISE: Log AI response to chat_history for audit trail
-        // ============================================================
-        if (patientId) {
-            try {
-                await db.query(`
-                    INSERT INTO chat_history (patient_id, role, content, message_type, metadata)
-                    VALUES ($1, 'assistant', $2, 'text', $3)
-                `, [
-                    patientId,
-                    reply,
-                    JSON.stringify({
-                        model: 'llama-3.3-70b-versatile',
-                        risk_level: riskProfile.level || 'unknown',
-                        user_input: userText.substring(0, 200) // Truncate for storage
-                    })
-                ]);
-                console.log(`📝 [Groq] AI response logged to chat_history for patient ${patientId}`);
-            } catch (logError) {
-                console.error('⚠️ [Groq] Failed to log AI response:', logError.message);
-                // Non-blocking - don't fail the response if logging fails
-            }
-        }
 
         return reply;
 
@@ -131,6 +148,65 @@ const generateChatResponse = async (userText, riskProfile = {}, patientId = null
         return generateFallbackResponse(userText, riskProfile);
     }
 };
+
+/**
+ * Build patient context message for LLM injection
+ * @private
+ */
+function buildPatientContext(patient, summary, riskProfile) {
+    const age = patient.age || 'Unknown';
+    const condition = patient.condition || 'Not specified';
+    const name = patient.name || 'Patient';
+
+    let context = `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PATIENT CONTEXT (Use this to personalize your response)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Patient: ${name}, Age: ${age}
+Condition: ${condition}
+Current Risk Level: ${riskProfile.level?.toUpperCase() || 'UNKNOWN'} (Score: ${riskProfile.score || 0}/10)
+`;
+
+    if (riskProfile.reasons && riskProfile.reasons.length > 0) {
+        context += `Risk Reasons: ${riskProfile.reasons.join(', ')}\n`;
+    }
+
+    if (summary) {
+        context += `\nRecent Health Data (Last 7 Days):
+- Check-ins: ${summary.totalCheckIns || 0} times
+- Medication Adherence: ${summary.adherencePercent || 0}% (${summary.medicationsTaken || 0}/${(summary.medicationsTaken || 0) + (summary.medicationsMissed || 0)})
+`;
+
+        if (summary.averageGlucose) {
+            context += `- Average Glucose: ${Math.round(summary.averageGlucose)} mg/dL\n`;
+        }
+
+        if (summary.latestBP) {
+            context += `- Latest Blood Pressure: ${summary.latestBP.systolic}/${summary.latestBP.diastolic} mmHg\n`;
+        }
+
+        if (summary.goodMoodDays) {
+            context += `- Good Mood Days: ${summary.goodMoodDays}/${summary.totalCheckIns}\n`;
+        }
+    }
+
+    if (riskProfile.positiveSignals && riskProfile.positiveSignals.length > 0) {
+        context += `\nPositive Signals: ${riskProfile.positiveSignals.join(', ')}\n`;
+    }
+
+    context += `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Instructions:
+- Reference this context naturally in your response
+- Acknowledge improvements or concerns based on their data
+- Personalize advice to their specific condition
+- Be encouraging if you see positive trends
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+`;
+
+    return context;
+}
 
 /**
  * Rule-based fallback response when Groq API is unavailable

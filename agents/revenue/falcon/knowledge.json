@@ -1,0 +1,93 @@
+{
+    "company": {
+        "name": "Hanna AI",
+        "product": "Hanna",
+        "website": "https://hanna.care",
+        "email": "hello@hanna.care",
+        "salesEmail": "falcon@hanna.care"
+    },
+    "identity": "Hanna is the AI nurse operating system that expands clinical capacity, automates chronic care workflows, and ensures consistent, protocol-aligned patient engagement — without scaling nursing headcount.",
+    "valueProposition": {
+        "primary": "Expand clinical capacity without scaling nursing headcount",
+        "forBuyers": "Stop losing control of chronic patient engagement between visits — automate consistent monitoring, adherence support, and escalation so your clinical team can focus on complex care."
+    },
+    "painPointsWeSolve": [
+        "Overloaded clinical staff with manual follow-ups",
+        "Inconsistent patient engagement between visits",
+        "Nurse shortage and burnout",
+        "No reliable monitoring between appointments",
+        "Administrative burden of documentation"
+    ],
+    "outcomesWeDeliver": [
+        "Extend care team reach without hiring",
+        "Consistent patient engagement over months",
+        "Improved visibility into patient status",
+        "Reduced manual follow-up burden",
+        "Standardized, auditable care execution"
+    ],
+    "targetBuyers": {
+        "primary": [
+            "Hospitals/provider groups with chronic care programs",
+            "Employers managing employee health risks",
+            "Post-discharge care operators",
+            "Clinical programs needing consistent execution"
+        ],
+        "notFor": [
+            "Individual consumers",
+            "Insurers (not primary buyer - too slow)"
+        ]
+    },
+    "pricing": {
+        "model": "Per-patient monthly subscription",
+        "pilotOffer": "Free pilot to demonstrate operational value"
+    },
+    "demo": {
+        "duration": "15 minutes",
+        "bookingMethod": "Reply to this email or visit hanna.care",
+        "focus": "Operational capacity gains"
+    },
+    "outreachStrategy": {
+        "tone": "Professional, clinical, consultative",
+        "approach": "Problem-first (operational bottleneck), then solution",
+        "emailLength": "80-120 words maximum",
+        "mustInclude": [
+            "Acknowledge operational challenge (staffing, scale)",
+            "Position Hanna as clinical infrastructure",
+            "Focus on capacity and consistency",
+            "CTA: Reply or visit hanna.care",
+            "Sign-off: The Hanna AI Team"
+        ],
+        "neverDo": [
+            "Promise cost savings or claim reduction percentages",
+            "Use speculative ROI numbers",
+            "Mention reducing claims",
+            "Use placeholder text or brackets",
+            "Be pushy or salesy"
+        ]
+    },
+    "prohibitedPhrases": [
+        "[Company Name]",
+        "[Your Name]",
+        "[insert link]",
+        "[insert contact]",
+        "cut claim costs",
+        "reduce claims",
+        "30% reduction",
+        "cost savings",
+        "ROI",
+        "click here",
+        "act now",
+        "limited time",
+        "guarantee",
+        "AI doctor",
+        "virtual doctor",
+        "replaces nurses"
+    ],
+    "emailTemplateGuidelines": {
+        "subject": "{Company Name} — Expand clinical capacity with AI",
+        "opening": "Acknowledge their operational challenge (overloaded staff, consistency gaps)",
+        "body": "Introduce Hanna as clinical infrastructure that scales nursing capacity",
+        "cta": "Reply to this email or visit hanna.care for a 15-minute demo",
+        "signature": "The Hanna AI Team"
+    }
+}
