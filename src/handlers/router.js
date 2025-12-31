@@ -430,6 +430,35 @@ const handleMessage = async (event) => {
             });
         }
 
+        // Admin Command: Clear Rich Menu (Protected)
+        // Usage: admin:clear-richmenu:YOUR_ADMIN_SECRET
+        if (text.startsWith('admin:clear-richmenu')) {
+            const secret = text.split(':')[2];
+            const expectedSecret = process.env.ADMIN_SECRET || 'CHANGE_ME_IN_PRODUCTION';
+            if (secret !== expectedSecret) {
+                return Promise.resolve(null);
+            }
+
+            const { listRichMenus, deleteRichMenu, unlinkDefaultRichMenu } = require('../services/richMenu');
+
+            await line.replyMessage(event.replyToken, { type: 'text', text: '🧹 Clearing all Rich Menus...' });
+
+            try {
+                // 1. Unlink default menu first
+                await unlinkDefaultRichMenu();
+
+                // 2. Delete all menus
+                const existing = await listRichMenus();
+                for (const menu of existing) {
+                    await deleteRichMenu(menu.richMenuId);
+                }
+
+                return line.pushMessage(userId, { type: 'text', text: '✅ All Rich Menus removed.' });
+            } catch (error) {
+                return line.pushMessage(userId, { type: 'text', text: `❌ Setup failed: ${error.message}` });
+            }
+        }
+
         // Admin Command: Setup Rich Menu (Protected)
         // Usage: admin:setup-richmenu:YOUR_ADMIN_SECRET
         if (text.startsWith('admin:setup-richmenu')) {

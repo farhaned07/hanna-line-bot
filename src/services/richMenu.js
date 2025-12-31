@@ -141,6 +141,29 @@ const listRichMenus = async () => {
 };
 
 /**
+ * Unlink default rich menu from all users
+ */
+const unlinkDefaultRichMenu = async () => {
+    try {
+        const response = await fetch('https://api.line.me/v2/bot/user/all/richmenu', {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${config.config.line.channelAccessToken}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to unlink default rich menu');
+        }
+
+        console.log('✅ Default Rich Menu unlinked');
+    } catch (error) {
+        console.error('❌ Error unlinking default rich menu:', error);
+        throw error;
+    }
+};
+
+/**
  * Upload image to Rich Menu
  */
 const uploadRichMenuImage = async (richMenuId, imagePath) => {
@@ -197,5 +220,6 @@ module.exports = {
     setDefaultRichMenu,
     listRichMenus,
     deleteRichMenu,
-    uploadRichMenuImage
+    uploadRichMenuImage,
+    unlinkDefaultRichMenu
 };
