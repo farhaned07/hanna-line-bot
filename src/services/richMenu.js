@@ -23,7 +23,7 @@ const createRichMenu = async () => {
                 bounds: { x: 0, y: 0, width: 833, height: 843 },
                 action: {
                     type: 'uri',
-                    label: 'Call Hanna',
+                    label: 'โทรหาฮันนา',
                     uri: `https://liff.line.me/${process.env.LIFF_ID}`
                 }
             },
@@ -31,14 +31,14 @@ const createRichMenu = async () => {
                 bounds: { x: 833, y: 0, width: 834, height: 843 },
                 action: {
                     type: 'message',
-                    text: 'เช็คสุขภาพ'
+                    text: 'ตรวจสุขภาพ'
                 }
             },
             {
                 bounds: { x: 1667, y: 0, width: 833, height: 843 },
                 action: {
                     type: 'message',
-                    text: 'บันทึกค่า'
+                    text: 'บันทึกค่าสุขภาพ'
                 }
             },
             // Bottom row: Log Meds, Profile, Help
@@ -46,14 +46,14 @@ const createRichMenu = async () => {
                 bounds: { x: 0, y: 843, width: 833, height: 843 },
                 action: {
                     type: 'message',
-                    text: 'บันทึกกินยา'
+                    text: 'บันทึกยา'
                 }
             },
             {
                 bounds: { x: 833, y: 843, width: 834, height: 843 },
                 action: {
                     type: 'message',
-                    text: 'โปรไฟล์ของฉัน'
+                    text: 'ข้อมูลส่วนตัว'
                 }
             },
             {
