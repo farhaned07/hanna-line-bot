@@ -7,9 +7,9 @@ const path = require('path');
  * Size: 2500 x 1686 pixels (3x2 grid for 6 buttons)
  */
 const generateRichMenuImage = () => {
-    // Use the static design asset provided by the design team
-    const sourcePath = path.join(__dirname, '../../assets/richmenu-design.png');
-    const outputPath = path.join(__dirname, '../../assets/richmenu.png');
+    // Use the static design asset provided by the design team (Optimized JPEG < 1MB)
+    const sourcePath = path.join(__dirname, '../../assets/richmenu-optimized.jpg');
+    const outputPath = path.join(__dirname, '../../assets/richmenu.jpg'); // Change output to jpg
 
     // Create assets directory if it doesn't exist
     const assetsDir = path.join(__dirname, '../../assets');
@@ -45,7 +45,7 @@ const generateRichMenuImage = () => {
         ctx.textAlign = 'center';
         ctx.fillText('Hanna Pilot (Fallback)', 1250, 843);
 
-        const buffer = canvas.toBuffer('image/png');
+        const buffer = canvas.toBuffer('image/jpeg');
         fs.writeFileSync(outputPath, buffer);
     }
 

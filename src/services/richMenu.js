@@ -176,7 +176,7 @@ const uploadRichMenuImage = async (richMenuId, imagePath) => {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${config.config.line.channelAccessToken}`,
-                'Content-Type': 'image/png'
+                'Content-Type': 'image/jpeg'
             },
             body: imageBuffer
         });

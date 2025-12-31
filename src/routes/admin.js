@@ -20,7 +20,7 @@ const checkAdminAuth = (req, res, next) => {
 // Debug endpoint to check current image file (PUBLIC)
 router.get('/debug/richmenu', (req, res) => {
     const path = require('path');
-    const imagePath = path.join(__dirname, '../../assets/richmenu.png');
+    const imagePath = path.join(__dirname, '../../assets/richmenu.jpg');
     res.sendFile(imagePath);
 });
 
