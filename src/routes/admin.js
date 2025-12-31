@@ -40,4 +40,11 @@ router.post('/notify-activation', async (req, res) => {
     }
 });
 
+// Debug endpoint to check current image file
+router.get('/debug/richmenu', (req, res) => {
+    const path = require('path');
+    const imagePath = path.join(__dirname, '../../assets/richmenu.png');
+    res.sendFile(imagePath);
+});
+
 module.exports = router;
