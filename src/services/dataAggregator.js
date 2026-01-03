@@ -53,25 +53,17 @@ const aggregatePatientData = async (patientId, timeRangeDays, tenantId = null) =
     startDate.setDate(startDate.getDate() - timeRangeDays);
     startDate.setHours(0, 0, 0, 0);
 
-    // 1. Patient Info (Multi-tenant aware)
+    // 1. Patient Info (works without multi-tenant tables)
     let patientQuery = `
         SELECT 
             cp.id, cp.name, cp.age, cp.condition, 
             cp.phone_number, cp.enrollment_status,
             cp.created_at,
-            p.name as program_name, t.name as tenant_name
+            cp.line_user_id
         FROM chronic_patients cp
-        LEFT JOIN programs p ON cp.program_id = p.id
-        LEFT JOIN tenants t ON cp.tenant_id = t.id
         WHERE cp.id = $1
     `;
     const patientParams = [patientId];
-
-    // Enforce tenant isolation if tenantId is provided
-    if (tenantId) {
-        patientQuery += ` AND cp.tenant_id = $2`;
-        patientParams.push(tenantId);
-    }
 
     const patientRes = await db.query(patientQuery, patientParams);
 
@@ -83,9 +75,12 @@ const aggregatePatientData = async (patientId, timeRangeDays, tenantId = null) =
     // 2. Check-ins and Vitals
     const checkinsRes = await db.query(`
         SELECT 
-            id, date, time_of_day,
-            glucose, systolic, diastolic,
+            id, 
+            check_in_time,
+            COALESCE(glucose_level, glucose) as glucose,
+            systolic, diastolic,
             medication_taken, symptoms,
+            mood, alert_level,
             created_at
         FROM check_ins
         WHERE patient_id = $1 
