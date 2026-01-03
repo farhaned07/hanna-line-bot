@@ -108,6 +108,7 @@ const generateAISummary = (data, language) => {
  */
 const generatePatientSummary = async ({
     patientId,
+    tenantId, // New: Tenant Context
     timeRangeDays,
     language,
     generatedBy
@@ -115,25 +116,46 @@ const generatePatientSummary = async ({
     const startTime = Date.now();
     const auditId = generateAuditId();
 
-    console.log(`[PDF] Starting generation for patient ${patientId}, range: ${timeRangeDays} days`);
+    console.log(`[PDF] Starting generation for patient ${patientId}, tenant: ${tenantId || 'Legacy'}, range: ${timeRangeDays} days`);
 
     try {
-        // 1. Aggregate patient data
+        // 1. Aggregate patient data (Tenant-Aware)
         console.log('[PDF] Aggregating patient data...');
-        const data = await aggregatePatientData(patientId, timeRangeDays);
+        const data = await aggregatePatientData(patientId, timeRangeDays, tenantId);
 
-        // 2. Generate charts
+        // 2. Fetch Tenant Branding (if applicable)
+        let tenant = {
+            name: 'Hanna AI Nurse',
+            logo_url: null, // Default or generic logo
+            code: 'SYSTEM'
+        };
+
+        if (tenantId) {
+            try {
+                const tenantRes = await db.query(
+                    'SELECT name, logo_url, code FROM tenants WHERE id = $1',
+                    [tenantId]
+                );
+                if (tenantRes.rows[0]) {
+                    tenant = tenantRes.rows[0];
+                }
+            } catch (err) {
+                console.warn('[PDF] Failed to fetch tenant branding, using default:', err.message);
+            }
+        }
+
+        // 3. Generate charts
         console.log('[PDF] Generating charts...');
         const charts = await generateCharts(data, timeRangeDays);
 
-        // 3. Generate AI summary
+        // 4. Generate AI summary
         const aiSummary = generateAISummary(data, language);
 
-        // 4. Select template
+        // 5. Select template
         const templateFile = language === 'th' ? 'summary_th.ejs' : 'summary_en.ejs';
         const templatePath = path.join(__dirname, '../templates', templateFile);
 
-        // 5. Render HTML
+        // 6. Render HTML
         console.log('[PDF] Rendering HTML template...');
         const html = await ejs.renderFile(templatePath, {
             patient: data.patient,
@@ -147,6 +169,7 @@ const generatePatientSummary = async ({
             charts,
             aiSummary,
             auditId,
+            tenant, // Pass tenant branding
             generatedAt: new Date().toISOString()
         });
 

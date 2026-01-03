@@ -3,27 +3,18 @@ const router = express.Router();
 const db = require('../services/db');
 const patientSummaryService = require('../services/patientSummaryService');
 
-// AUTH MIDDLEWARE
-const checkNurseAuth = (req, res, next) => {
-    const token = req.headers['authorization'];
-    if (!token) {
-        return res.status(401).json({ error: 'Missing Authorization Header' });
-    }
-    const expected = `Bearer ${process.env.NURSE_DASHBOARD_TOKEN}`;
-    if (token !== expected) {
-        return res.status(403).json({ error: 'Invalid Token' });
-    }
-    next();
-};
+const tenantContext = require('../middleware/tenantContext');
 
-// Protect all routes
-router.use(checkNurseAuth);
+// Protect all routes with Tenant Context Middleware
+// (Replaces checkNurseAuth legacy middleware)
+router.use(tenantContext);
 
 // GET /api/nurse/tasks
 // Fetch pending tasks directly from DB (Securely)
 router.get('/tasks', async (req, res) => {
     try {
-        const result = await db.query(`
+        // Multi-tenant filter
+        let query = `
             SELECT 
                 nt.*, 
                 cp.name as patient_name, 
@@ -32,6 +23,16 @@ router.get('/tasks', async (req, res) => {
             FROM nurse_tasks nt
             JOIN chronic_patients cp ON nt.patient_id = cp.id
             WHERE nt.status = 'pending'
+        `;
+        const params = [];
+
+        // Apply tenant isolation if not system admin
+        if (req.tenant && req.tenant.id) {
+            query += ` AND cp.tenant_id = $${params.length + 1}`;
+            params.push(req.tenant.id);
+        }
+
+        query += `
             ORDER BY 
                 CASE 
                     WHEN priority = 'critical' THEN 1 
@@ -40,7 +41,9 @@ router.get('/tasks', async (req, res) => {
                     ELSE 4 
                 END,
                 created_at ASC
-        `);
+        `;
+
+        const result = await db.query(query, params);
 
         // Map to ensure cleaner frontend consumption
         const tasks = result.rows.map(row => ({
@@ -544,13 +547,15 @@ router.post('/patients/:id/summary', async (req, res) => {
             });
         }
 
-        // Get nurse identifier from auth header (simplified for now)
-        const generatedBy = req.headers['x-nurse-id'] || 'dashboard-user';
+        // Get nurse identifier from auth context or header
+        const generatedBy = req.auth?.staffId || req.headers['x-nurse-id'] || 'dashboard-user';
+        const tenantId = req.tenant?.id || null;
 
-        console.log(`[PDF API] Generating summary for patient ${patientId}, ${timeRangeDays} days, ${language}`);
+        console.log(`[PDF API] Generating summary for patient ${patientId}, tenant: ${tenantId}, ${timeRangeDays} days, ${language}`);
 
         const result = await patientSummaryService.generatePatientSummary({
             patientId,
+            tenantId,
             timeRangeDays,
             language,
             generatedBy

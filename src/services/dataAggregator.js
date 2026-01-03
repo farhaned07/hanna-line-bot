@@ -42,7 +42,7 @@ const formatDate = (date) => {
  * @param {number} timeRangeDays - Number of days (7, 15, or 30)
  * @returns {Promise<Object>} Aggregated data
  */
-const aggregatePatientData = async (patientId, timeRangeDays) => {
+const aggregatePatientData = async (patientId, timeRangeDays, tenantId = null) => {
     // Use mock data for local testing when USE_MOCK_DATA=true
     if (process.env.USE_MOCK_DATA === 'true') {
         console.log('[DataAggregator] Using mock data for local testing');
@@ -53,15 +53,27 @@ const aggregatePatientData = async (patientId, timeRangeDays) => {
     startDate.setDate(startDate.getDate() - timeRangeDays);
     startDate.setHours(0, 0, 0, 0);
 
-    // 1. Patient Info
-    const patientRes = await db.query(`
+    // 1. Patient Info (Multi-tenant aware)
+    let patientQuery = `
         SELECT 
-            id, name, age, condition, 
-            phone_number, enrollment_status,
-            created_at
-        FROM chronic_patients 
-        WHERE id = $1
-    `, [patientId]);
+            cp.id, cp.name, cp.age, cp.condition, 
+            cp.phone_number, cp.enrollment_status,
+            cp.created_at,
+            p.name as program_name, t.name as tenant_name
+        FROM chronic_patients cp
+        LEFT JOIN programs p ON cp.program_id = p.id
+        LEFT JOIN tenants t ON cp.tenant_id = t.id
+        WHERE cp.id = $1
+    `;
+    const patientParams = [patientId];
+
+    // Enforce tenant isolation if tenantId is provided
+    if (tenantId) {
+        patientQuery += ` AND cp.tenant_id = $2`;
+        patientParams.push(tenantId);
+    }
+
+    const patientRes = await db.query(patientQuery, patientParams);
 
     if (!patientRes.rows[0]) {
         throw new Error('Patient not found');
