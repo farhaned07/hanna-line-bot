@@ -32,7 +32,6 @@ export default function DashboardLayout() {
         { name: 'Monitoring', href: '/dashboard/monitoring', icon: Eye },
         { name: 'Patients', href: '/dashboard/patients', icon: Users },
         { name: 'Payments', href: '/dashboard/payments', icon: CreditCard },
-        { name: '🤖 Agent Command', href: '/dashboard/agents', icon: Cpu },
     ]
 
     const isActive = (href) => {

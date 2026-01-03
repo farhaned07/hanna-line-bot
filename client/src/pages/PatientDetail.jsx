@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { usePatientDetail, useTaskActions } from '../hooks/useNurseData';
 import { SkeletonTimeline, SkeletonCard } from '../components/ui/Skeleton';
+import GenerateSummaryModal from '../components/GenerateSummaryModal';
 import {
     ArrowLeft,
     Activity,
@@ -14,7 +16,8 @@ import {
     Brain,
     User,
     Heart,
-    Pill
+    Pill,
+    Download
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 
@@ -27,6 +30,7 @@ export default function PatientDetail() {
     const navigate = useNavigate();
     const { patient, loading, error } = usePatientDetail(id);
     const { resolveTask, processing } = useTaskActions();
+    const [showSummaryModal, setShowSummaryModal] = useState(false);
 
     if (loading) {
         return (
@@ -267,6 +271,15 @@ export default function PatientDetail() {
                                 Send Message
                             </button>
 
+                            {/* Generate Summary Button */}
+                            <button
+                                onClick={() => setShowSummaryModal(true)}
+                                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors"
+                            >
+                                <Download className="h-4 w-4" />
+                                Generate Summary PDF
+                            </button>
+
                             {/* Suggested Script - Fixed template interpolation */}
                             <div className="mt-4 p-3 bg-slate-900/50 border border-slate-700 rounded-lg">
                                 <p className="text-xs text-slate-400 mb-2 uppercase font-medium tracking-wider">Suggested Script</p>
@@ -315,6 +328,14 @@ export default function PatientDetail() {
                     </div>
                 </div>
             </div>
+
+            {/* Generate Summary Modal */}
+            <GenerateSummaryModal
+                isOpen={showSummaryModal}
+                onClose={() => setShowSummaryModal(false)}
+                patientId={id}
+                patientName={patient.name}
+            />
         </div>
     );
 }

@@ -69,7 +69,16 @@ export const useNurseTasks = () => {
 
 /**
  * Hook to fetch Patient Roster
+ * Falls back to mock data if API fails (DEV MODE ONLY)
  */
+const MOCK_PATIENTS = [
+    { id: 'mock-001', name: 'สมชาย ใจดี', age: 58, condition: 'Type 2 Diabetes', enrollment_status: 'active', phone_number: '081-234-5678', created_at: '2025-10-01' },
+    { id: 'mock-002', name: 'มานี มีทรัพย์', age: 62, condition: 'Hypertension', enrollment_status: 'active', phone_number: '089-876-5432', created_at: '2025-11-15' },
+    { id: 'mock-003', name: 'สมศรี สุขใจ', age: 45, condition: 'Type 2 Diabetes, CKD Stage 2', enrollment_status: 'active', phone_number: '086-111-2222', created_at: '2025-09-20' },
+    { id: 'mock-004', name: 'ประยุทธ ชาญกิจ', age: 71, condition: 'Heart Failure', enrollment_status: 'active', phone_number: '081-333-4444', created_at: '2025-12-01' },
+    { id: 'mock-005', name: 'วิภา แสงดี', age: 55, condition: 'Type 2 Diabetes', enrollment_status: 'trial', phone_number: '089-555-6666', created_at: '2025-12-20' },
+];
+
 export const usePatients = () => {
     const [patients, setPatients] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -83,7 +92,14 @@ export const usePatients = () => {
             setError(null);
         } catch (err) {
             console.error("Failed to fetch patients", err);
-            setError(err);
+            // Only use mock data in development mode
+            if (import.meta.env.DEV) {
+                console.warn("[DEV] Using mock patient data");
+                setPatients(MOCK_PATIENTS);
+                setError(null);
+            } else {
+                setError(err);
+            }
         } finally {
             setLoading(false);
         }
@@ -98,6 +114,7 @@ export const usePatients = () => {
 
 /**
  * Hook for Single Patient Detail
+ * Falls back to mock data if API fails (DEV MODE ONLY)
  */
 export const usePatientDetail = (id) => {
     const [patient, setPatient] = useState(null);
@@ -111,8 +128,29 @@ export const usePatientDetail = (id) => {
                 setLoading(true);
                 const res = await api.get(`/api/nurse/patients/${id}`);
                 setPatient(res.data);
+                setError(null);
             } catch (err) {
-                setError(err);
+                console.error("Failed to fetch patient detail", err);
+                // Only use mock data in development mode
+                if (import.meta.env.DEV) {
+                    console.warn("[DEV] Using mock patient detail data");
+                    const mockPatient = MOCK_PATIENTS.find(p => p.id === id) || MOCK_PATIENTS[0];
+                    setPatient({
+                        ...mockPatient,
+                        history: [
+                            { id: 1, check_in_time: new Date().toISOString(), glucose_level: 125, medication_taken: true, symptoms: 'none' },
+                            { id: 2, check_in_time: new Date(Date.now() - 86400000).toISOString(), glucose_level: 132, medication_taken: true, symptoms: 'mild fatigue' },
+                            { id: 3, check_in_time: new Date(Date.now() - 172800000).toISOString(), glucose_level: 145, medication_taken: false, symptoms: 'none' },
+                        ],
+                        tasks: [
+                            { id: 1, task_type: 'follow_up', priority: 'normal', reason: 'Routine check-in', status: 'completed', created_at: new Date().toISOString() },
+                            { id: 2, task_type: 'medication_review', priority: 'high', reason: 'Missed dose detected', status: 'pending', created_at: new Date().toISOString() },
+                        ]
+                    });
+                    setError(null);
+                } else {
+                    setError(err);
+                }
             } finally {
                 setLoading(false);
             }

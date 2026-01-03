@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../services/db');
+const patientSummaryService = require('../services/patientSummaryService');
 
 // AUTH MIDDLEWARE
 const checkNurseAuth = (req, res, next) => {
@@ -517,6 +518,101 @@ router.post('/tasks/:id/resolve', async (req, res) => {
     } catch (error) {
         console.error('Error resolving task:', error);
         res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+// ============================================================
+// PDF SUMMARY GENERATION ENDPOINTS
+// ============================================================
+
+// POST /api/nurse/patients/:id/summary
+// Generate patient health summary PDF
+router.post('/patients/:id/summary', async (req, res) => {
+    try {
+        const patientId = req.params.id;
+        const { timeRangeDays, language } = req.body;
+
+        // Validate inputs
+        if (![7, 15, 30].includes(timeRangeDays)) {
+            return res.status(400).json({
+                error: 'Invalid time range. Must be 7, 15, or 30 days.'
+            });
+        }
+        if (!['th', 'en'].includes(language)) {
+            return res.status(400).json({
+                error: 'Invalid language. Must be "th" or "en".'
+            });
+        }
+
+        // Get nurse identifier from auth header (simplified for now)
+        const generatedBy = req.headers['x-nurse-id'] || 'dashboard-user';
+
+        console.log(`[PDF API] Generating summary for patient ${patientId}, ${timeRangeDays} days, ${language}`);
+
+        const result = await patientSummaryService.generatePatientSummary({
+            patientId,
+            timeRangeDays,
+            language,
+            generatedBy
+        });
+
+        // Return PDF as downloadable response
+        const pdfBuffer = Buffer.from(result.pdfBuffer);
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Length', pdfBuffer.length);
+        res.setHeader('Content-Disposition', `attachment; filename="${result.auditId}.pdf"`);
+        res.setHeader('X-Audit-ID', result.auditId);
+        res.setHeader('X-Checksum', result.checksum);
+        res.end(pdfBuffer);
+
+    } catch (error) {
+        console.error('[PDF API] Generation failed:', error);
+        res.status(500).json({
+            error: 'Failed to generate summary',
+            message: error.message
+        });
+    }
+});
+
+// GET /api/nurse/patients/:id/summary-history
+// Get history of generated PDFs for a patient
+router.get('/patients/:id/summary-history', async (req, res) => {
+    try {
+        const patientId = req.params.id;
+        const limit = parseInt(req.query.limit) || 20;
+
+        const history = await patientSummaryService.getPDFHistory(patientId, limit);
+
+        res.json({
+            patientId,
+            count: history.length,
+            summaries: history.map(h => ({
+                auditId: h.audit_id,
+                timeRangeDays: h.time_range_days,
+                language: h.language,
+                fileSize: h.file_size_bytes,
+                generationTimeMs: h.generation_time_ms,
+                accessedCount: h.accessed_count,
+                createdAt: h.created_at
+            }))
+        });
+    } catch (error) {
+        console.error('[PDF API] History fetch failed:', error);
+        res.status(500).json({ error: 'Failed to fetch summary history' });
+    }
+});
+
+// GET /api/nurse/verify-pdf/:auditId
+// Verify PDF integrity by audit ID
+router.get('/verify-pdf/:auditId', async (req, res) => {
+    try {
+        const { auditId } = req.params;
+        const verification = await patientSummaryService.verifyPDF(auditId);
+
+        res.json(verification);
+    } catch (error) {
+        console.error('[PDF API] Verification failed:', error);
+        res.status(500).json({ error: 'Failed to verify PDF' });
     }
 });
 
