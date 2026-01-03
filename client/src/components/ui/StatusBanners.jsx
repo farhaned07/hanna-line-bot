@@ -78,23 +78,23 @@ export function CriticalAlertBanner({ count, onViewQueue }) {
 
 export function EmptyState({ title, description, actionLabel, onAction }) {
     return (
-        <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-12 text-center">
-            <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+        <div className="bg-[#13151A]/50 border border-white/5 rounded-2xl p-12 text-center">
+            <div className="w-16 h-16 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl">✅</span>
             </div>
-            <h3 className="text-lg font-medium text-white mb-2">{title || 'All Clear'}</h3>
+            <h3 className="text-lg font-bold text-white mb-2">{title || 'All Clear'}</h3>
             <p className="text-slate-400 mb-6">
                 {description || 'No pending actions. All patients stable.'}
             </p>
             {actionLabel && onAction && (
                 <button
                     onClick={onAction}
-                    className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition-colors"
+                    className="px-4 py-2.5 bg-white/5 hover:bg-white/10 text-slate-300 rounded-xl transition-all border border-white/5 font-medium"
                 >
                     {actionLabel}
                 </button>
             )}
-            <p className="text-slate-500 text-xs mt-4">
+            <p className="text-slate-500 text-xs mt-4 font-mono">
                 Last updated: {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </p>
         </div>

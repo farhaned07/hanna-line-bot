@@ -37,17 +37,17 @@ class ErrorBoundary extends Component {
     render() {
         if (this.state.hasError) {
             return (
-                <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
-                    <div className="max-w-md w-full bg-slate-800 rounded-xl shadow-2xl border border-slate-700 p-8">
+                <div className="min-h-screen bg-[#0B0D12] flex items-center justify-center p-4">
+                    <div className="max-w-md w-full bg-[#13151A] rounded-2xl shadow-2xl border border-white/10 p-8">
                         {/* Icon */}
                         <div className="flex justify-center mb-6">
-                            <div className="w-16 h-16 bg-amber-500/20 rounded-full flex items-center justify-center">
-                                <AlertTriangle className="w-8 h-8 text-amber-400" />
+                            <div className="w-16 h-16 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-center justify-center">
+                                <AlertTriangle className="w-8 h-8 text-amber-500" />
                             </div>
                         </div>
 
                         {/* Title */}
-                        <h2 className="text-xl font-semibold text-white text-center mb-2">
+                        <h2 className="text-xl font-bold text-white text-center mb-2">
                             Connection Issue
                         </h2>
 
@@ -60,7 +60,7 @@ class ErrorBoundary extends Component {
                         <div className="space-y-3">
                             <button
                                 onClick={this.handleRetry}
-                                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+                                className="w-full flex items-center justify-center gap-2 px-4 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition-all shadow-lg shadow-indigo-900/30"
                             >
                                 <RefreshCw className="w-4 h-4" />
                                 Retry Now
@@ -68,7 +68,7 @@ class ErrorBoundary extends Component {
 
                             <button
                                 onClick={() => window.location.href = '/dashboard/patients'}
-                                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-slate-300 font-medium rounded-lg transition-colors"
+                                className="w-full flex items-center justify-center gap-2 px-4 py-3.5 bg-white/5 hover:bg-white/10 text-slate-300 font-medium rounded-xl transition-all border border-white/5"
                             >
                                 <WifiOff className="w-4 h-4" />
                                 View Cached Data
@@ -84,7 +84,7 @@ class ErrorBoundary extends Component {
                         {process.env.NODE_ENV === 'development' && (
                             <details className="mt-4 text-xs text-slate-500">
                                 <summary className="cursor-pointer">Technical Details</summary>
-                                <pre className="mt-2 p-2 bg-slate-900 rounded overflow-auto max-h-32">
+                                <pre className="mt-2 p-3 bg-[#0B0D12] rounded-xl overflow-auto max-h-32 border border-white/5 font-mono">
                                     {this.state.error?.toString()}
                                 </pre>
                             </details>

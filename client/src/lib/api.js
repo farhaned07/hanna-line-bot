@@ -14,7 +14,13 @@ const api = axios.create({
 
 // Request interceptor to add the Nurse Token
 api.interceptors.request.use((config) => {
-    const token = import.meta.env.VITE_NURSE_TOKEN;
+    // 1. Check LocalStorage (Dynamic Login)
+    const storedToken = localStorage.getItem('nurse_token');
+    // 2. Fallback to Env Var (Legacy/Dev)
+    const envToken = import.meta.env.VITE_NURSE_TOKEN;
+
+    const token = storedToken || envToken;
+
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }

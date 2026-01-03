@@ -86,16 +86,16 @@ export default function Payments() {
             {/* Header */}
             <div>
                 <h1 className="text-2xl font-bold text-white flex items-center gap-3">
-                    <CreditCard className="w-7 h-7 text-amber-400" />
+                    <CreditCard className="w-7 h-7 text-amber-500" />
                     Pending Payments
                 </h1>
-                <p className="text-slate-400 text-sm mt-1">
+                <p className="text-slate-400 text-sm mt-1 font-medium">
                     {payments.length} payment{payments.length !== 1 ? 's' : ''} waiting for verification
                 </p>
             </div>
 
             {/* Table */}
-            <div className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
+            <div className="bg-[#13151A] rounded-2xl border border-white/5 overflow-hidden shadow-xl">
                 {loading ? (
                     <SkeletonTable rows={5} />
                 ) : payments.length === 0 ? (
@@ -107,37 +107,37 @@ export default function Payments() {
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-slate-700">
-                            <thead className="bg-slate-900">
+                        <table className="min-w-full divide-y divide-white/5">
+                            <thead className="bg-white/[0.02]">
                                 <tr>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                         Patient
                                     </th>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                         Plan
                                     </th>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                         Submitted
                                     </th>
-                                    <th className="px-6 py-4 text-right text-xs font-medium text-slate-400 uppercase tracking-wider">
+                                    <th className="px-6 py-4 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                         Actions
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-700">
+                            <tbody className="divide-y divide-white/5">
                                 {payments.map((payment) => (
                                     <tr
                                         key={payment.id}
-                                        className={`hover:bg-slate-700/50 transition-colors ${processing === payment.id ? 'opacity-50' : ''}`}
+                                        className={`hover:bg-white/[0.02] transition-colors ${processing === payment.id ? 'opacity-50' : ''}`}
                                     >
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="text-white font-medium">{payment.name}</div>
-                                            <div className="text-slate-500 text-xs truncate max-w-[200px]">
+                                            <div className="text-slate-500 text-xs truncate max-w-[200px] font-mono">
                                                 {payment.line_user_id}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-400">
+                                            <span className="inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
                                                 {payment.subscription_plan || 'Standard'}
                                             </span>
                                         </td>
@@ -154,7 +154,7 @@ export default function Payments() {
                                                 <button
                                                     onClick={() => handleVerify(payment)}
                                                     disabled={processing === payment.id}
-                                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-600 hover:bg-green-700 disabled:bg-green-600/50 text-white text-sm font-medium rounded-lg transition-colors"
+                                                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:bg-emerald-600/50 text-white text-sm font-semibold rounded-xl transition-all shadow-lg shadow-emerald-900/20"
                                                 >
                                                     <CheckCircle className="w-4 h-4" />
                                                     Verify
@@ -162,7 +162,7 @@ export default function Payments() {
                                                 <button
                                                     onClick={() => handleReject(payment)}
                                                     disabled={processing === payment.id}
-                                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-600/20 hover:bg-red-600/30 border border-red-600/50 text-red-400 text-sm font-medium rounded-lg transition-colors"
+                                                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-white/5 hover:bg-rose-500/10 border border-white/10 hover:border-rose-500/30 text-slate-400 hover:text-rose-400 text-sm font-medium rounded-xl transition-all"
                                                 >
                                                     <XCircle className="w-4 h-4" />
                                                     Reject

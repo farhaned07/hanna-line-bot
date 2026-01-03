@@ -111,10 +111,10 @@ const AgentCommand = () => {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center h-screen bg-slate-900">
+            <div className="flex items-center justify-center h-screen bg-[#0B0D12]">
                 <div className="text-center">
-                    <Activity className="w-12 h-12 animate-spin text-blue-500 mx-auto mb-4" />
-                    <p className="text-slate-400">Loading Agent Command Center...</p>
+                    <Activity className="w-12 h-12 animate-spin text-indigo-500 mx-auto mb-4" />
+                    <p className="text-slate-400 font-medium">Loading Agent Command Center...</p>
                 </div>
             </div>
         );
@@ -123,20 +123,20 @@ const AgentCommand = () => {
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="bg-gradient-to-r from-slate-800 to-slate-700 rounded-lg p-6 border border-slate-600 shadow-lg">
+            <div className="bg-[#13151A] rounded-2xl p-6 border border-white/5 shadow-xl">
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-3xl font-bold flex items-center gap-2 text-white">
-                            <Cpu className="w-8 h-8 text-blue-400" />
+                            <Cpu className="w-8 h-8 text-indigo-400" />
                             Agent Command Center
                         </h1>
-                        <p className="text-slate-300 mt-2">Your AI-powered business operating system</p>
+                        <p className="text-slate-400 mt-2">Your AI-powered business operating system</p>
                     </div>
                     <div className="text-right">
                         <div className="text-3xl font-bold text-white">{stats.enabledCount}/{stats.totalCount}</div>
-                        <div className="text-sm text-slate-400">Agents Active</div>
+                        <div className="text-sm text-slate-500 font-medium">Agents Active</div>
                         {stats.dryRun && (
-                            <div className="mt-2 bg-amber-500/20 border border-amber-600 rounded px-3 py-1 text-xs text-amber-400">
+                            <div className="mt-2 bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-1 text-xs text-amber-400 font-semibold">
                                 🔒 DRY RUN MODE
                             </div>
                         )}
@@ -146,24 +146,24 @@ const AgentCommand = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Chat with Friday */}
-                <div className="lg:col-span-2 bg-slate-800 rounded-lg border border-slate-700 shadow-md p-6">
-                    <div className="flex items-center gap-2 mb-4 pb-4 border-b border-slate-700">
-                        <Sparkles className="w-5 h-5 text-blue-400" />
+                <div className="lg:col-span-2 bg-[#13151A] rounded-2xl border border-white/5 shadow-xl p-6">
+                    <div className="flex items-center gap-2 mb-4 pb-4 border-b border-white/5">
+                        <Sparkles className="w-5 h-5 text-indigo-400" />
                         <h2 className="text-xl font-bold text-white">Chat with Friday</h2>
-                        <span className="ml-auto text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded border border-green-600">Online</span>
+                        <span className="ml-auto text-xs bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-lg border border-emerald-500/20 font-semibold">Online</span>
                     </div>
 
                     {/* Chat Messages */}
                     <div className="h-96 overflow-y-auto mb-4 space-y-3">
                         {chatMessages.map((msg, idx) => (
                             <div key={idx} className={`flex ${msg.from === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                <div className={`max-w-[80%] p-3 rounded-lg ${msg.from === 'user'
-                                        ? 'bg-blue-600 text-white'
-                                        : 'bg-slate-700 text-slate-100 border border-slate-600'
+                                <div className={`max-w-[80%] p-3 rounded-xl ${msg.from === 'user'
+                                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/20'
+                                    : 'bg-[#0B0D12] text-slate-100 border border-white/5'
                                     }`}>
-                                    {msg.from === 'friday' && <div className="text-xs font-semibold text-blue-400 mb-1">✨ Friday</div>}
+                                    {msg.from === 'friday' && <div className="text-xs font-semibold text-indigo-400 mb-1">✨ Friday</div>}
                                     <div className="text-sm">{msg.message}</div>
-                                    <div className="text-xs opacity-60 mt-1">
+                                    <div className="text-xs opacity-60 mt-1 font-mono">
                                         {msg.time ? new Date(msg.time).toLocaleTimeString() : ''}
                                     </div>
                                 </div>
@@ -179,11 +179,11 @@ const AgentCommand = () => {
                             onChange={(e) => setChatInput(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && sendChatMessage()}
                             placeholder="Ask Friday anything... (e.g., 'show pipeline', 'status')"
-                            className="flex-1 px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="flex-1 px-4 py-2.5 bg-[#0B0D12] border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
                         />
                         <button
                             onClick={sendChatMessage}
-                            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                            className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-500 transition-all font-semibold shadow-lg shadow-indigo-900/20"
                         >
                             Send
                         </button>
@@ -191,34 +191,34 @@ const AgentCommand = () => {
 
                     {/* Quick Commands */}
                     <div className="mt-4 flex flex-wrap gap-2">
-                        <button onClick={() => setChatInput('show status')} className="px-3 py-1 bg-slate-700 border border-slate-600 text-slate-300 text-sm rounded hover:bg-slate-600">
+                        <button onClick={() => setChatInput('show status')} className="px-3 py-1.5 bg-white/5 border border-white/10 text-slate-300 text-sm rounded-lg hover:bg-white/10 transition-all font-medium">
                             📊 Status
                         </button>
-                        <button onClick={() => setChatInput('show pipeline')} className="px-3 py-1 bg-slate-700 border border-slate-600 text-slate-300 text-sm rounded hover:bg-slate-600">
+                        <button onClick={() => setChatInput('show pipeline')} className="px-3 py-1.5 bg-white/5 border border-white/10 text-slate-300 text-sm rounded-lg hover:bg-white/10 transition-all font-medium">
                             💰 Pipeline
                         </button>
-                        <button onClick={() => setChatInput('help')} className="px-3 py-1 bg-slate-700 border border-slate-600 text-slate-300 text-sm rounded hover:bg-slate-600">
+                        <button onClick={() => setChatInput('help')} className="px-3 py-1.5 bg-white/5 border border-white/10 text-slate-300 text-sm rounded-lg hover:bg-white/10 transition-all font-medium">
                             ❓ Help
                         </button>
                     </div>
                 </div>
 
                 {/* Recent Activity */}
-                <div className="bg-slate-800 rounded-lg border border-slate-700 shadow-md p-6">
+                <div className="bg-[#13151A] rounded-2xl border border-white/5 shadow-xl p-6">
                     <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-white">
-                        <Activity className="w-5 h-5 text-blue-400" />
+                        <Activity className="w-5 h-5 text-indigo-400" />
                         Recent Activity
                     </h3>
                     <div className="space-y-2">
                         {logs.map((log, idx) => (
-                            <div key={idx} className="text-sm p-2 bg-slate-700/50 rounded border-l-4 border-blue-500">
+                            <div key={idx} className="text-sm p-3 bg-[#0B0D12] rounded-xl border-l-4 border-indigo-500">
                                 <div className="flex items-center justify-between">
                                     <span className="font-semibold text-slate-200">{log.agent.toUpperCase()}</span>
-                                    <span className="text-xs text-slate-400">
+                                    <span className="text-xs text-slate-500 font-mono">
                                         {log.time ? new Date(log.time).toLocaleTimeString() : ''}
                                     </span>
                                 </div>
-                                <div className="text-slate-300 mt-1">{log.message}</div>
+                                <div className="text-slate-400 mt-1">{log.message}</div>
                             </div>
                         ))}
                     </div>
@@ -228,28 +228,28 @@ const AgentCommand = () => {
             {/* Agent Grid */}
             <div>
                 <h2 className="text-2xl font-bold mb-4 flex items-center gap-2 text-white">
-                    <TrendingUp className="w-6 h-6 text-blue-400" />
+                    <TrendingUp className="w-6 h-6 text-indigo-400" />
                     Your AI Team
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {agents.map(agent => (
-                        <div key={agent.id} className={`bg-slate-800 rounded-lg border shadow-md p-4 ${agent.enabled ? 'border-green-600' : 'border-slate-600'
+                        <div key={agent.id} className={`bg-[#13151A] rounded-2xl border shadow-xl p-5 transition-all hover:-translate-y-0.5 ${agent.enabled ? 'border-emerald-500/30' : 'border-white/5'
                             }`}>
                             <div className="flex items-start justify-between mb-3">
                                 <div className="flex items-center gap-2">
                                     <span className="text-3xl">{agent.icon}</span>
                                     <div>
                                         <h3 className="font-bold text-white">{agent.name}</h3>
-                                        <p className="text-xs text-slate-400">{agent.role}</p>
+                                        <p className="text-xs text-slate-500 font-medium">{agent.role}</p>
                                     </div>
                                 </div>
-                                <div className={`px-2 py-1 rounded text-xs font-semibold ${agent.enabled ? 'bg-green-500/20 text-green-400 border border-green-600' : 'bg-slate-700 text-slate-400'
+                                <div className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${agent.enabled ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-white/5 text-slate-500 border border-white/10'
                                     }`}>
                                     {agent.enabled ? 'ON' : 'OFF'}
                                 </div>
                             </div>
 
-                            <div className="text-xs text-slate-400 mb-3 flex items-center gap-1">
+                            <div className="text-xs text-slate-500 mb-4 flex items-center gap-1 font-medium">
                                 <Radio className="w-3 h-3" />
                                 {agent.schedule}
                             </div>
@@ -258,15 +258,15 @@ const AgentCommand = () => {
                                 <button
                                     onClick={() => triggerAgent(agent.id)}
                                     disabled={!agent.enabled}
-                                    className={`flex-1 px-3 py-2 rounded text-sm font-medium transition flex items-center justify-center gap-1 ${agent.enabled
-                                            ? 'bg-blue-600 text-white hover:bg-blue-700'
-                                            : 'bg-slate-700 text-slate-500 cursor-not-allowed'
+                                    className={`flex-1 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-1 ${agent.enabled
+                                        ? 'bg-indigo-600 text-white hover:bg-indigo-500 shadow-lg shadow-indigo-900/20'
+                                        : 'bg-white/5 text-slate-500 cursor-not-allowed border border-white/5'
                                         }`}
                                 >
                                     <Play className="w-4 h-4" />
                                     Run Now
                                 </button>
-                                <button className="px-3 py-2 rounded text-sm border border-slate-600 text-slate-400 hover:bg-slate-700">
+                                <button className="px-3 py-2.5 rounded-xl text-sm border border-white/10 text-slate-400 hover:bg-white/5 transition-all">
                                     <Settings className="w-4 h-4" />
                                 </button>
                             </div>

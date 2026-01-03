@@ -41,13 +41,13 @@ export default function Patients() {
             <div className="flex flex-wrap gap-4">
                 {/* Search */}
                 <div className="relative flex-1 max-w-md">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-500" />
                     <input
                         type="text"
                         placeholder="Search patients..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full pl-10 pr-4 py-2.5 bg-[#13151A] border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                     />
                 </div>
 
@@ -55,7 +55,7 @@ export default function Patients() {
                 <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className="px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="px-4 py-2.5 bg-[#13151A] border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all cursor-pointer"
                 >
                     <option value="all">All Status</option>
                     <option value="active">Active</option>
@@ -65,7 +65,7 @@ export default function Patients() {
             </div>
 
             {/* Table */}
-            <div className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
+            <div className="bg-[#13151A] rounded-2xl border border-white/5 overflow-hidden shadow-xl">
                 {loading ? (
                     <SkeletonTable rows={8} />
                 ) : filteredPatients.length === 0 ? (
@@ -77,36 +77,36 @@ export default function Patients() {
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-slate-700">
-                            <thead className="bg-slate-900">
+                        <table className="min-w-full divide-y divide-white/5">
+                            <thead className="bg-white/[0.02]">
                                 <tr>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                         Patient
                                     </th>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                         Status
                                     </th>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                         Condition
                                     </th>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                         Age
                                     </th>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                         Joined
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-700">
+                            <tbody className="divide-y divide-white/5">
                                 {filteredPatients.map((patient) => (
                                     <tr
                                         key={patient.id}
-                                        className="hover:bg-slate-700/50 transition-colors"
+                                        className="hover:bg-white/[0.02] transition-colors"
                                     >
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <Link
                                                 to={`/dashboard/patients/${patient.id}`}
-                                                className="text-white font-medium hover:text-blue-400 transition-colors"
+                                                className="text-white font-medium hover:text-indigo-400 transition-colors"
                                             >
                                                 {patient.name}
                                             </Link>

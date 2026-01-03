@@ -132,12 +132,12 @@ export default function PatientDetail() {
                 {/* Left Column: Patient Info & Vitals */}
                 <div className="lg:col-span-2 space-y-6">
                     {/* Vitals Chart */}
-                    <div className="bg-slate-800 rounded-xl border border-slate-700 p-6">
-                        <h3 className="text-lg font-medium text-white flex items-center gap-2 mb-4">
-                            <Activity className="h-5 w-5 text-blue-400" />
+                    <div className="bg-[#13151A] rounded-2xl border border-white/5 p-6 shadow-xl">
+                        <h3 className="text-lg font-bold text-white flex items-center gap-2 mb-6">
+                            <Activity className="h-5 w-5 text-indigo-400" />
                             Vitals Trends
                         </h3>
-                        <div className="h-64 w-full">
+                        <div className="h-72 w-full">
                             {chartData.length > 0 ? (
                                 <ResponsiveContainer width="100%" height="100%">
                                     <LineChart data={chartData}>
@@ -166,23 +166,23 @@ export default function PatientDetail() {
                     </div>
 
                     {/* Recent Check-ins */}
-                    <div className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
-                        <div className="px-6 py-4 border-b border-slate-700 bg-slate-900">
-                            <h3 className="text-lg font-medium text-white flex items-center gap-2">
+                    <div className="bg-[#13151A] rounded-2xl border border-white/5 overflow-hidden shadow-xl">
+                        <div className="px-6 py-4 border-b border-white/5 bg-white/[0.02]">
+                            <h3 className="text-lg font-bold text-white flex items-center gap-2">
                                 <Calendar className="h-5 w-5 text-slate-400" />
                                 Recent Check-ins
                             </h3>
                         </div>
-                        <div className="divide-y divide-slate-700 max-h-80 overflow-y-auto">
+                        <div className="divide-y divide-white/5 max-h-80 overflow-y-auto">
                             {(patient.history || []).length === 0 ? (
                                 <div className="p-6 text-center text-slate-500">No check-ins recorded</div>
                             ) : (
                                 patient.history.map((log) => (
-                                    <div key={log.id} className="px-6 py-4 hover:bg-slate-700/50">
+                                    <div key={log.id} className="px-6 py-4 hover:bg-white/[0.02] transition-colors">
                                         <div className="flex justify-between">
                                             <div className="text-sm font-medium text-white">
                                                 {log.symptoms && log.symptoms !== 'none' ? (
-                                                    <span className="text-red-400">{log.symptoms}</span>
+                                                    <span className="text-rose-400">{log.symptoms}</span>
                                                 ) : (
                                                     'Routine Check'
                                                 )}
@@ -204,8 +204,8 @@ export default function PatientDetail() {
                 {/* Right Column: Actions & History */}
                 <div className="space-y-6">
                     {/* Patient Card */}
-                    <div className="bg-slate-800 rounded-xl border border-slate-700 p-6">
-                        <h3 className="text-lg font-medium text-white flex items-center gap-2 mb-4">
+                    <div className="bg-[#13151A] rounded-2xl border border-white/5 p-6 shadow-xl">
+                        <h3 className="text-lg font-bold text-white flex items-center gap-2 mb-4">
                             <User className="h-5 w-5 text-slate-400" />
                             Patient Info
                         </h3>
@@ -232,8 +232,8 @@ export default function PatientDetail() {
                     </div>
 
                     {/* Clinical Actions */}
-                    <div className="bg-slate-800 rounded-xl border border-slate-700 p-6">
-                        <h3 className="text-lg font-medium text-white mb-4">Clinical Actions</h3>
+                    <div className="bg-[#13151A] rounded-2xl border border-white/5 p-6 shadow-xl">
+                        <h3 className="text-lg font-bold text-white mb-4">Clinical Actions</h3>
                         <div className="flex flex-col gap-3">
                             <button
                                 onClick={() => {
@@ -281,9 +281,9 @@ export default function PatientDetail() {
                             </button>
 
                             {/* Suggested Script - Fixed template interpolation */}
-                            <div className="mt-4 p-3 bg-slate-900/50 border border-slate-700 rounded-lg">
-                                <p className="text-xs text-slate-400 mb-2 uppercase font-medium tracking-wider">Suggested Script</p>
-                                <p className="text-sm text-slate-300 italic">
+                            <div className="mt-4 p-4 bg-[#0B0D12] border border-white/5 rounded-xl">
+                                <p className="text-xs text-slate-500 mb-2 uppercase font-semibold tracking-wider">Suggested Script</p>
+                                <p className="text-sm text-slate-300 italic leading-relaxed">
                                     "This is Nurse Hanna calling. I noticed your {trendInsight.label.toLowerCase()} compared to last week. Have you been taking your medication regularly?"
                                 </p>
                             </div>
@@ -291,33 +291,33 @@ export default function PatientDetail() {
                     </div>
 
                     {/* Care History */}
-                    <div className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
-                        <div className="px-6 py-4 border-b border-slate-700 bg-slate-900">
-                            <h3 className="text-lg font-medium text-white flex items-center gap-2">
+                    <div className="bg-[#13151A] rounded-2xl border border-white/5 overflow-hidden shadow-xl">
+                        <div className="px-6 py-4 border-b border-white/5 bg-white/[0.02]">
+                            <h3 className="text-lg font-bold text-white flex items-center gap-2">
                                 <FileText className="h-5 w-5 text-slate-400" />
                                 Care History
                             </h3>
                         </div>
-                        <div className="divide-y divide-slate-700 max-h-80 overflow-y-auto">
+                        <div className="divide-y divide-white/5 max-h-80 overflow-y-auto">
                             {(patient.tasks || []).length === 0 ? (
                                 <div className="p-6 text-center text-slate-500">No tasks recorded</div>
                             ) : (
                                 patient.tasks.map((task) => (
-                                    <div key={task.id} className="px-6 py-4">
+                                    <div key={task.id} className="px-6 py-4 hover:bg-white/[0.02] transition-colors">
                                         <div className="flex items-center justify-between">
-                                            <span className={`px-2 py-0.5 rounded text-xs font-medium ${task.priority === 'critical'
-                                                ? 'bg-red-500/20 text-red-400'
-                                                : 'bg-slate-700 text-slate-400'
+                                            <span className={`px-2.5 py-1 rounded-lg text-xs font-medium ${task.priority === 'critical'
+                                                ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                                                : 'bg-white/5 text-slate-400 border border-white/10'
                                                 }`}>
                                                 {task.task_type}
                                             </span>
-                                            <span className="text-xs text-slate-500">
+                                            <span className="text-xs text-slate-500 font-mono">
                                                 {new Date(task.created_at).toLocaleDateString()}
                                             </span>
                                         </div>
                                         <p className="mt-2 text-sm text-slate-400">{task.reason || 'No details'}</p>
                                         {task.status === 'completed' && (
-                                            <div className="mt-2 text-xs text-green-400 flex items-center gap-1">
+                                            <div className="mt-2 text-xs text-emerald-400 flex items-center gap-1">
                                                 <CheckCircle className="h-3 w-3" /> Resolved
                                             </div>
                                         )}

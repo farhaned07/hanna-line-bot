@@ -110,24 +110,27 @@ export default function MonitoringView() {
             ) : null}
 
             {/* Patient Grid */}
-            <div className="bg-slate-800 rounded-xl border border-slate-700 p-6 mb-6">
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-lg font-medium text-white">Patient Grid</h2>
-                    <div className="flex items-center gap-4 text-xs text-slate-400">
+            <div className="bg-[#13151A] rounded-2xl border border-white/5 p-6 mb-6 shadow-xl">
+                <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                        <Users className="w-5 h-5 text-indigo-400" />
+                        Patient Grid
+                    </h2>
+                    <div className="flex items-center gap-4 text-xs font-medium text-slate-400 bg-black/20 p-2 rounded-lg border border-white/5">
                         <span className="flex items-center gap-1.5">
-                            <span className="w-3 h-3 rounded-full bg-green-500"></span>
+                            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]"></span>
                             Stable
                         </span>
                         <span className="flex items-center gap-1.5">
-                            <span className="w-3 h-3 rounded-full bg-amber-500"></span>
+                            <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.4)]"></span>
                             Drifting
                         </span>
                         <span className="flex items-center gap-1.5">
-                            <span className="w-3 h-3 rounded-full bg-red-500 animate-pulse"></span>
+                            <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.4)]"></span>
                             Critical
                         </span>
                         <span className="flex items-center gap-1.5">
-                            <span className="w-3 h-3 rounded-full border-2 border-slate-500"></span>
+                            <span className="w-2.5 h-2.5 rounded-full border border-slate-500"></span>
                             Silent
                         </span>
                     </div>
@@ -142,7 +145,7 @@ export default function MonitoringView() {
                     />
                 ) : (
                     <div className="relative">
-                        <div className="grid grid-cols-10 sm:grid-cols-12 md:grid-cols-15 lg:grid-cols-20 gap-2">
+                        <div className="grid grid-cols-10 sm:grid-cols-12 md:grid-cols-15 lg:grid-cols-20 gap-3">
                             {monitoringData?.patients?.map(patient => (
                                 <PatientDot
                                     key={patient.id}
@@ -155,7 +158,7 @@ export default function MonitoringView() {
 
                         {/* Hover Card */}
                         {hoveredPatient && (
-                            <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-4 z-10">
+                            <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-4 z-20">
                                 <PatientHoverCard patient={hoveredPatient} />
                             </div>
                         )}
@@ -164,9 +167,10 @@ export default function MonitoringView() {
             </div>
 
             {/* Infrastructure Panel */}
-            <div className="bg-slate-800 rounded-xl border border-slate-700 p-6">
-                <h2 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
-                    <Cpu className="w-5 h-5 text-slate-400" />
+            {/* Infrastructure Panel */}
+            <div className="bg-[#13151A] rounded-2xl border border-white/5 p-6 shadow-xl">
+                <h2 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                    <Cpu className="w-5 h-5 text-indigo-400" />
                     Infrastructure Status
                 </h2>
 
@@ -204,27 +208,27 @@ export default function MonitoringView() {
 
                 {/* Nurse Capacity Bar */}
                 {infraData?.nurseCapacity && (
-                    <div className="mt-6 p-4 bg-slate-900 rounded-lg">
-                        <div className="flex items-center justify-between text-sm mb-2">
-                            <span className="text-slate-400">Nurse Bandwidth</span>
-                            <span className="text-slate-300">
+                    <div className="mt-6 p-4 bg-[#0B0D12] rounded-xl border border-white/5">
+                        <div className="flex items-center justify-between text-sm mb-3">
+                            <span className="text-slate-400 font-medium">Nurse Bandwidth</span>
+                            <span className="text-slate-300 font-mono text-xs">
                                 Active: {infraData.nurseCapacity.activeNurses} |
                                 Avg Response: {infraData.nurseCapacity.avgResponseMinutes} min |
                                 Queue: {infraData.nurseCapacity.currentQueueSize} tasks
                             </span>
                         </div>
-                        <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden">
+                        <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
                             <div
                                 className={`h-full rounded-full transition-all ${infraData.nurseCapacity.capacityPercentage > 80
-                                    ? 'bg-red-500'
+                                    ? 'bg-rose-500'
                                     : infraData.nurseCapacity.capacityPercentage > 50
                                         ? 'bg-amber-500'
-                                        : 'bg-green-500'
+                                        : 'bg-emerald-500'
                                     }`}
                                 style={{ width: `${infraData.nurseCapacity.capacityPercentage}%` }}
                             />
                         </div>
-                        <div className="text-right text-xs text-slate-500 mt-1">
+                        <div className="text-right text-xs text-slate-500 mt-1.5 font-medium">
                             {infraData.nurseCapacity.capacityPercentage}% capacity
                         </div>
                     </div>
@@ -240,27 +244,27 @@ export default function MonitoringView() {
 
 function SummaryCard({ label, value, icon: Icon, color, subtext, highlight, pulse }) {
     const colorClasses = {
-        blue: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-        green: 'bg-green-500/20 text-green-400 border-green-500/30',
-        amber: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
-        red: 'bg-red-500/20 text-red-400 border-red-500/30'
+        blue: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+        green: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+        amber: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+        red: 'bg-rose-500/10 text-rose-400 border-rose-500/20'
     };
 
     return (
         <div className={`
-            bg-slate-800 rounded-xl border p-4 relative
-            ${highlight ? colorClasses[color] : 'border-slate-700'}
+            bg-[#13151A] rounded-2xl border p-5 relative transition-all hover:-translate-y-1 hover:shadow-lg
+            ${highlight ? colorClasses[color] : 'border-white/5'}
         `}>
             <div className="flex items-center justify-between">
                 <div>
-                    <p className="text-slate-400 text-sm">{label}</p>
-                    <p className={`text-3xl font-bold ${highlight ? `text-${color}-400` : 'text-white'}`}>
+                    <p className="text-slate-400 text-sm font-semibold uppercase tracking-wider">{label}</p>
+                    <p className={`text-3xl font-bold mt-2 ${highlight ? `text-${color}-400` : 'text-white'}`}>
                         {value}
                     </p>
-                    {subtext && <p className="text-slate-500 text-xs mt-1">{subtext}</p>}
+                    {subtext && <p className="text-slate-500 text-xs mt-1 font-medium">{subtext}</p>}
                 </div>
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${colorClasses[color]}`}>
-                    <Icon className={`w-5 h-5 ${pulse ? 'animate-pulse' : ''}`} />
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center border ${colorClasses[color]?.replace('bg-', 'border-') || 'border-white/5 bg-white/5'}`}>
+                    <Icon className={`w-6 h-6 ${pulse ? 'animate-pulse' : ''}`} />
                 </div>
             </div>
         </div>

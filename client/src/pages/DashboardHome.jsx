@@ -96,15 +96,15 @@ export default function DashboardHome() {
                 {/* Left Column: Triage Queue Preview */}
                 <div className="lg:col-span-2 space-y-6">
                     {/* Triage Queue Preview */}
-                    <div className="bg-slate-800 rounded-xl border border-slate-700">
-                        <div className="px-6 py-4 border-b border-slate-700 flex items-center justify-between">
-                            <h2 className="text-lg font-medium text-white flex items-center gap-2">
-                                <AlertTriangle className="w-5 h-5 text-amber-400" />
+                    <div className="bg-[#13151A] rounded-2xl border border-white/5 shadow-xl">
+                        <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+                            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                                <AlertTriangle className="w-5 h-5 text-amber-500" />
                                 Triage Queue
                             </h2>
                             <Link
                                 to="/dashboard/monitoring"
-                                className="text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1"
+                                className="text-sm text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-medium transition-colors"
                             >
                                 View Full Queue <ArrowRight className="w-4 h-4" />
                             </Link>
@@ -113,16 +113,16 @@ export default function DashboardHome() {
                         {tasksLoading ? (
                             <SkeletonTable rows={3} />
                         ) : tasks?.length === 0 ? (
-                            <div className="p-6">
+                            <div className="p-8">
                                 <EmptyState
-                                    title="All Clear"
-                                    description="No pending actions. All patients stable."
+                                    title="All Systems Operational"
+                                    description="No pending actions. Patient cohort stable."
                                     actionLabel="View Patients"
                                     onAction={() => navigate('/dashboard/patients')}
                                 />
                             </div>
                         ) : (
-                            <div className="divide-y divide-slate-700">
+                            <div className="divide-y divide-white/5">
                                 {tasks?.slice(0, 5).map(task => (
                                     <TaskRow key={task.id} task={task} />
                                 ))}
@@ -131,10 +131,10 @@ export default function DashboardHome() {
                     </div>
 
                     {/* Recent AI Decisions */}
-                    <div className="bg-slate-800 rounded-xl border border-slate-700">
-                        <div className="px-6 py-4 border-b border-slate-700">
-                            <h2 className="text-lg font-medium text-white flex items-center gap-2">
-                                <Brain className="w-5 h-5 text-blue-400" />
+                    <div className="bg-[#13151A] rounded-2xl border border-white/5 shadow-xl">
+                        <div className="px-6 py-4 border-b border-white/5 bg-white/[0.02]">
+                            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                                <Brain className="w-5 h-5 text-indigo-500" />
                                 Hanna's Watch Log
                             </h2>
                         </div>
@@ -160,9 +160,9 @@ export default function DashboardHome() {
                 {/* Right Column: Risk Distribution */}
                 <div className="space-y-6">
                     {/* Risk Distribution */}
-                    <div className="bg-slate-800 rounded-xl border border-slate-700 p-6">
-                        <h2 className="text-lg font-medium text-white flex items-center gap-2 mb-4">
-                            <TrendingUp className="w-5 h-5 text-slate-400" />
+                    <div className="bg-[#13151A] rounded-2xl border border-white/5 p-6 shadow-xl">
+                        <h2 className="text-lg font-bold text-white flex items-center gap-2 mb-6">
+                            <TrendingUp className="w-5 h-5 text-slate-500" />
                             Risk Distribution
                         </h2>
 
@@ -170,7 +170,7 @@ export default function DashboardHome() {
                             <div className="space-y-3">
                                 {[1, 2, 3, 4].map(i => (
                                     <div key={i} className="animate-pulse">
-                                        <div className="h-4 bg-slate-700 rounded w-full"></div>
+                                        <div className="h-4 bg-white/5 rounded w-full"></div>
                                     </div>
                                 ))}
                             </div>
@@ -205,18 +205,18 @@ export default function DashboardHome() {
                     </div>
 
                     {/* Quick Actions */}
-                    <div className="bg-slate-800 rounded-xl border border-slate-700 p-6">
-                        <h2 className="text-lg font-medium text-white mb-4">Quick Actions</h2>
-                        <div className="space-y-2">
+                    <div className="bg-[#13151A] rounded-2xl border border-white/5 p-6 shadow-xl">
+                        <h2 className="text-lg font-bold text-white mb-4">Quick Actions</h2>
+                        <div className="space-y-3">
                             <Link
                                 to="/dashboard/monitoring"
-                                className="block w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white text-center font-medium rounded-lg transition-colors"
+                                className="block w-full px-4 py-3.5 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white text-center font-semibold rounded-xl transition-all shadow-lg shadow-indigo-900/20"
                             >
                                 View Monitoring Grid
                             </Link>
                             <Link
                                 to="/dashboard/patients"
-                                className="block w-full px-4 py-3 bg-slate-700 hover:bg-slate-600 text-slate-300 text-center font-medium rounded-lg transition-colors"
+                                className="block w-full px-4 py-3.5 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-center font-medium rounded-xl transition-all border border-white/5"
                             >
                                 Browse All Patients
                             </Link>
@@ -234,33 +234,36 @@ export default function DashboardHome() {
 
 function MetricCard({ label, value, icon: Icon, color, trend, highlight, onClick }) {
     const colorClasses = {
-        blue: { bg: 'bg-blue-500/20', text: 'text-blue-400', icon: 'text-blue-400' },
-        green: { bg: 'bg-green-500/20', text: 'text-green-400', icon: 'text-green-400' },
-        amber: { bg: 'bg-amber-500/20', text: 'text-amber-400', icon: 'text-amber-400' },
-        red: { bg: 'bg-red-500/20', text: 'text-red-400', icon: 'text-red-400' },
-        purple: { bg: 'bg-purple-500/20', text: 'text-purple-400', icon: 'text-purple-400' },
-        slate: { bg: 'bg-slate-700', text: 'text-slate-400', icon: 'text-slate-400' }
-    }[color] || { bg: 'bg-slate-700', text: 'text-slate-400', icon: 'text-slate-400' };
+        blue: { bg: 'bg-blue-500/10 border-blue-500/20', text: 'text-blue-400', icon: 'text-blue-400' },
+        green: { bg: 'bg-emerald-500/10 border-emerald-500/20', text: 'text-emerald-400', icon: 'text-emerald-400' },
+        amber: { bg: 'bg-amber-500/10 border-amber-500/20', text: 'text-amber-400', icon: 'text-amber-400' },
+        red: { bg: 'bg-rose-500/10 border-rose-500/20', text: 'text-rose-400', icon: 'text-rose-400' },
+        purple: { bg: 'bg-purple-500/10 border-purple-500/20', text: 'text-purple-400', icon: 'text-purple-400' },
+        slate: { bg: 'bg-white/5 border-white/10', text: 'text-slate-400', icon: 'text-slate-500' }
+    }[color] || { bg: 'bg-white/5 border-white/10', text: 'text-slate-400', icon: 'text-slate-500' };
 
     return (
         <div
             onClick={onClick}
             className={`
-                bg-slate-800 rounded-xl border p-5 cursor-pointer transition-all hover:scale-[1.02]
-                ${highlight ? 'border-amber-500/50 shadow-lg shadow-amber-500/10' : 'border-slate-700'}
+                bg-[#13151A] rounded-2xl border p-5 cursor-pointer transition-all hover:scale-[1.02] hover:shadow-xl
+                ${highlight ? 'border-amber-500/30 shadow-lg shadow-amber-900/10' : 'border-white/5'}
             `}
         >
             <div className="flex items-center justify-between">
-                <p className="text-slate-400 text-sm font-medium">{label}</p>
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${colorClasses.bg}`}>
+                <p className="text-slate-400 text-sm font-semibold uppercase tracking-wider">{label}</p>
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${colorClasses.bg}`}>
                     <Icon className={`w-5 h-5 ${colorClasses.icon}`} />
                 </div>
             </div>
-            <p className={`text-3xl font-bold mt-2 ${highlight ? colorClasses.text : 'text-white'}`}>
+            <p className={`text-3xl font-bold mt-3 ${highlight ? colorClasses.text : 'text-white'}`}>
                 {value}
             </p>
             {trend && (
-                <p className="text-slate-500 text-xs mt-1">{trend}</p>
+                <div className="flex items-center gap-1.5 mt-2">
+                    <div className={`w-1.5 h-1.5 rounded-full ${color === 'blue' || color === 'green' ? 'bg-emerald-500' : 'bg-slate-500'}`}></div>
+                    <p className="text-slate-500 text-xs font-medium">{trend}</p>
+                </div>
             )}
         </div>
     );
