@@ -67,8 +67,8 @@ export default function Login() {
                 localStorage.setItem('user_role', 'admin')
             }
 
-            // 4. Redirect
-            navigate('/')
+            // 4. Redirect - use window.location to force full page reload and session state refresh
+            window.location.href = '/dashboard'
 
         } catch (err) {
             console.error('Login failed:', err)

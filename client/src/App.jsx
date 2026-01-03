@@ -14,27 +14,42 @@ import MonitoringView from './pages/MonitoringView'
 import AgentCommand from './pages/AgentCommand'
 
 function App() {
-  const [session, setSession] = useState(
-    localStorage.getItem('nurse_token') || null
-  )
+  // Use a function to initialize state to ensure fresh localStorage read
+  const [session, setSession] = useState(() => {
+    const token = localStorage.getItem('nurse_token')
+    return token ? { user: { email: localStorage.getItem('user_email') || 'staff@hanna' } } : null
+  })
 
   useEffect(() => {
-    // Check for custom auth token
-    const token = localStorage.getItem('nurse_token')
-    if (token) {
-      setSession({ user: { email: localStorage.getItem('user_email') || 'staff@hanna' } })
+    // Listen for storage changes (e.g., after login)
+    const handleStorageChange = () => {
+      const token = localStorage.getItem('nurse_token')
+      if (token) {
+        setSession({ user: { email: localStorage.getItem('user_email') || 'staff@hanna' } })
+      } else {
+        setSession(null)
+      }
     }
 
-    // Also listen for Supabase auth state (Legacy)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) {
-        setSession(session)
+    // Listen for custom login event (for same-tab updates)
+    window.addEventListener('storage', handleStorageChange)
+
+    // Also check on mount
+    handleStorageChange()
+
+    // Supabase auth state (Legacy fallback)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, supabaseSession) => {
+      if (supabaseSession) {
+        setSession(supabaseSession)
       } else if (!localStorage.getItem('nurse_token')) {
         setSession(null)
       }
     })
 
-    return () => subscription.unsubscribe()
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      subscription.unsubscribe()
+    }
   }, [])
 
   return (
