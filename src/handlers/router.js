@@ -103,12 +103,24 @@ const handleAudio = async (event) => {
 const handleFollow = async (event) => {
     const userId = event.source.userId;
     try {
-        // Create user if not exists
+        // 1. BRIDGE: Get Default Tenant (Hanna HQ) to prevent orphans
+        // In a real multi-tenant app, we'd ask for a Hospital Code first.
+        const tenantRes = await db.query("SELECT id FROM tenants WHERE code = 'HANNA_HQ'");
+        const defaultTenantId = tenantRes.rows[0]?.id;
+
+        const progRes = await db.query("SELECT id FROM programs WHERE tenant_id = $1 AND name = 'General Care'", [defaultTenantId]);
+        const defaultProgramId = progRes.rows[0]?.id;
+
+        // 2. Create user with Tenant Context
         await db.query(
-            `INSERT INTO chronic_patients(line_user_id, enrollment_status, onboarding_step)
-VALUES($1, 'onboarding', 0) 
-         ON CONFLICT(line_user_id) DO UPDATE SET enrollment_status = 'onboarding', onboarding_step = 0`,
-            [userId]
+            `INSERT INTO chronic_patients(line_user_id, enrollment_status, onboarding_step, tenant_id, program_id)
+             VALUES($1, 'onboarding', 0, $2, $3) 
+             ON CONFLICT(line_user_id) DO UPDATE SET 
+                enrollment_status = 'onboarding', 
+                onboarding_step = 0,
+                tenant_id = COALESCE(chronic_patients.tenant_id, $2), -- Preserve existing if any
+                program_id = COALESCE(chronic_patients.program_id, $3)`,
+            [userId, defaultTenantId, defaultProgramId]
         );
         return onboarding.start(event);
     } catch (error) {
