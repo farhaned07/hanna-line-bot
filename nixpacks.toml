@@ -3,13 +3,16 @@
 
 [phases.setup]
 nixPkgs = ["nodejs_18", "chromium"]
+aptPkgs = ["libnss3", "libatk1.0-0", "libatk-bridge2.0-0", "libcups2", "libgbm1", "libasound2", "libpangocairo-1.0-0", "libxss1", "libgtk-3-0"]
 
 [phases.install]
 cmds = ["npm ci"]
 
-[phases.build]
-cmds = ["cd client && npm ci && npm run build"]
+# No build phase needed - frontend is deployed separately on Vercel
+
+[start]
+cmd = "npm start"
 
 [variables]
 PUPPETEER_SKIP_CHROMIUM_DOWNLOAD = "true"
-PUPPETEER_EXECUTABLE_PATH = "/nix/store/chromium/bin/chromium"
+PUPPETEER_EXECUTABLE_PATH = "/usr/bin/chromium"
