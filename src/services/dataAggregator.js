@@ -77,7 +77,7 @@ const aggregatePatientData = async (patientId, timeRangeDays, tenantId = null) =
         SELECT 
             id, 
             check_in_time,
-            COALESCE(glucose_level, glucose) as glucose,
+            glucose_level as glucose,
             systolic, diastolic,
             medication_taken, symptoms,
             mood, alert_level,
