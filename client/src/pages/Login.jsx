@@ -47,7 +47,7 @@ export default function Login() {
         try {
             // 1. Validate credentials by making a test API call
             // We manually construct the header for the test to override any existing interceptor logic temporarily
-            const response = await api.get('/nurse/stats', {
+            const response = await api.get('/api/nurse/stats', {
                 headers: {
                     'Authorization': `Bearer ${tokenToTest}`
                 }
