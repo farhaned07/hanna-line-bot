@@ -22,7 +22,7 @@ const generateReport = async (userId) => {
                     AVG(glucose_level) as avg_glucose,
                     SUM(CASE WHEN medication_taken = true THEN 1 ELSE 0 END) as meds_taken,
                     SUM(CASE WHEN medication_taken = false THEN 1 ELSE 0 END) as meds_missed,
-                    COUNT(CASE WHEN alert_level = 'red' THEN 1 END) as red_flags
+                    COUNT(CASE WHEN symptoms IS NOT NULL AND symptoms != '' THEN 1 END) as symptom_reports
                 FROM check_ins
                 WHERE line_user_id = $1 
                 AND check_in_time >= NOW() - INTERVAL '30 days'
@@ -43,7 +43,7 @@ const generateReport = async (userId) => {
 
             // --- Patient Info ---
             doc.rect(50, 100, 500, 80).stroke();
-            doc.text(`Name: ${patient.name || 'N/A'}`, 60, 110);
+            doc.text(`Name: ${patient.name || patient.display_name || 'N/A'}`, 60, 110);
             doc.text(`Age: ${patient.age || 'N/A'}`, 60, 130);
             doc.text(`Condition: ${patient.condition || 'N/A'}`, 60, 150);
             doc.text(`ID: ${userId.substring(0, 8)}...`, 300, 110);
@@ -54,7 +54,8 @@ const generateReport = async (userId) => {
             doc.moveDown();
 
             doc.font('Helvetica').fontSize(12);
-            doc.text(`Average Glucose: ${Math.round(stats.avg_glucose) || '-'} mg/dL`);
+            const avgGlucose = stats.avg_glucose ? Math.round(stats.avg_glucose) : '-';
+            doc.text(`Average Glucose: ${avgGlucose} mg/dL`);
 
             // H7 FIX: Prevent division by zero
             const medsTaken = parseInt(stats.meds_taken) || 0;
@@ -63,7 +64,7 @@ const generateReport = async (userId) => {
             const adherence = totalMeds > 0 ? Math.round((medsTaken / totalMeds) * 100) : 0;
             doc.text(`Medication Adherence: ${adherence}%`);
 
-            doc.text(`Red Flag Incidents: ${stats.red_flags || 0}`);
+            doc.text(`Symptom Reports: ${stats.symptom_reports || 0}`);
             doc.text(`Total Check-ins: ${stats.total_checkins || 0}`);
 
             // --- Disclaimer ---
