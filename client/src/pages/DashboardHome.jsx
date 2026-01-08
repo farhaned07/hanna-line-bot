@@ -56,9 +56,17 @@ export default function DashboardHome() {
 
             {/* Primary Metrics Row */}
             {statsLoading ? (
-                <SkeletonMetrics count={4} />
+                <SkeletonMetrics count={5} />
             ) : (
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+                    <MetricCard
+                        label="Capacity Multiplier"
+                        value={`${stats?.capacityMultiplier || 0}:1`}
+                        icon={TrendingUp}
+                        color="purple"
+                        highlight={stats?.capacityMultiplier >= 10}
+                        trend={stats?.capacityMultiplier >= 10 ? "10x goal achieved!" : "Patients per action"}
+                    />
                     <MetricCard
                         label="Active Patients"
                         value={stats?.activePatients || 0}
@@ -86,7 +94,7 @@ export default function DashboardHome() {
                         label="Check-ins Today"
                         value={stats?.todayCheckins || 0}
                         icon={Activity}
-                        color="purple"
+                        color="blue"
                     />
                 </div>
             )}

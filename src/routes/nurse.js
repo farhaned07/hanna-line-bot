@@ -74,12 +74,22 @@ router.get('/stats', async (req, res) => {
         // Count RESOLVED tasks today as "Clinician Actions Today"
         const resolutionsRes = await db.query(`SELECT count(*) FROM nurse_tasks WHERE status = 'completed' AND completed_at >= CURRENT_DATE`);
 
+        // Calculate capacity multiplier (patients per nurse action needed)
+        const activePatients = parseInt(activeRes.rows[0].count);
+        const pendingActions = parseInt(alertsRes.rows[0].count);
+        // Ratio: How many patients are being handled by AI vs needing human attention
+        // If 100 patients and 5 pending = 20:1 ratio = AI handling 95%
+        const capacityMultiplier = pendingActions > 0
+            ? Math.round(activePatients / pendingActions)
+            : activePatients > 0 ? activePatients : 0;
+
         res.json({
-            activePatients: parseInt(activeRes.rows[0].count),
+            activePatients: activePatients,
             pendingPayments: parseInt(pendingRes.rows[0].count),
             todayCheckins: parseInt(checkinsRes.rows[0].count),
-            redFlags: parseInt(alertsRes.rows[0].count),
-            todayResolutions: parseInt(resolutionsRes.rows[0].count)
+            redFlags: pendingActions,
+            todayResolutions: parseInt(resolutionsRes.rows[0].count),
+            capacityMultiplier: capacityMultiplier // How many patients per 1 requiring nurse attention
         });
     } catch (error) {
         console.error('Error fetching stats:', error);
