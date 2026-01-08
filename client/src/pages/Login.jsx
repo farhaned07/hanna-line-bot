@@ -116,7 +116,7 @@ export default function Login() {
                                     10x nurse capacity<br />through supervised AI
                                 </h1>
                                 <p className="text-slate-400 text-base leading-relaxed max-w-sm font-light">
-                                    The enterprise standard for patient monitoring. Secure, scalable, and designed for clinical excellence.
+                                    AI-powered patient engagement that surfaces exceptions, so nurses focus on who needs them most.
                                 </p>
                             </div>
 

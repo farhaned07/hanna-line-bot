@@ -11,7 +11,7 @@ import Patients from './pages/Patients'
 import PatientDetail from './pages/PatientDetail'
 import Payments from './pages/Payments'
 import MonitoringView from './pages/MonitoringView'
-import AgentCommand from './pages/AgentCommand'
+// AgentCommand removed - not aligned with core mission: "10x nurse capacity through supervised AI"
 
 function App() {
   // Use a function to initialize state to ensure fresh localStorage read
@@ -62,7 +62,6 @@ function App() {
           <Route path="patients" element={<Patients />} />
           <Route path="patients/:id" element={<PatientDetail />} />
           <Route path="payments" element={<Payments />} />
-          <Route path="agents" element={<AgentCommand />} />
         </Route>
         <Route path="/" element={<Navigate to="/dashboard" />} />
       </Routes>
