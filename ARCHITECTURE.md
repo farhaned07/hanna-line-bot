@@ -8,13 +8,14 @@
 
 ## Overview
 
-Hanna is a **hybrid intelligence network** for chronic disease management in Thailand, combining:
-- **OneBrain Intelligence**: A centralized Risk Engine (Groq Llama 3.3 70B) that performs systematic data collection and risk assessment.
-- **LINE Bot**: For asynchronous daily check-ins, vitals logging, and "Active Nudge" reminders.
-- **Hanna Voice**: Real-time voice conversations via LiveKit WebRTC + EdgeTTS.
-- **Nurse Dashboard**: A priority-based Mission Control for human supervision.
+Hanna is a **Supervised Care Intelligence System** designed to be a **nurse force multiplier**.
 
-**Critical Distinction**: Hanna performs **nurse force multiplication** through systematic data collection — NOT medical triage.
+It solves the capacity constraint of human nurses by:
+1.  **Automating Data Collection**: Using LINE and Voice AI to gather patient data 24/7.
+2.  **Centralizing Intelligence**: The **OneBrain™** engine assesses risk and detects exceptions.
+3.  **Prioritizing Focus**: The **Nurse Command Center** ensures human nurses only spend time on patients who need it *now*.
+
+**Strategic Goal**: Allow one nurse to safely manage 500+ chronic patients.
 
 ---
 

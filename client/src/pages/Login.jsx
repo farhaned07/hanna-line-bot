@@ -113,7 +113,7 @@ export default function Login() {
                             {/* Hero Text */}
                             <div className="mb-4">
                                 <h1 className="text-4xl font-medium leading-[1.15] tracking-tight mb-5 text-white">
-                                    Care intelligence<br />at scale
+                                    10x nurse capacity<br />through supervised AI
                                 </h1>
                                 <p className="text-slate-400 text-base leading-relaxed max-w-sm font-light">
                                     The enterprise standard for patient monitoring. Secure, scalable, and designed for clinical excellence.

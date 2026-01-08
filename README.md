@@ -1,164 +1,93 @@
-# Hanna AI Nurse
+# Hanna: 10x Nurse Capacity through Supervised AI
 
-**Hybrid Intelligence Network for Chronic Disease Management**
+**Hanna is the supervised care assistant that lets one nurse safely manage 500+ chronic patients.**
 
-[![Railway](https://img.shields.io/badge/Backend-Railway-purple)](https://railway.app)
-[![Vercel](https://img.shields.io/badge/Dashboard-Vercel-black)](https://vercel.com)
-[![LINE](https://img.shields.io/badge/LINE-Official-00C300)](https://line.me)
-
----
-
-## Overview
-
-Hanna is a **nurse force multiplier** for chronic disease management in Thailand. It performs:
-- **Systematic data collection** via LINE chat and voice
-- **Risk assessment** using AI-powered analysis
-- **Nurse prioritization** through an exception-based dashboard
-
-**What Hanna is NOT**: A medical triage system or diagnostic tool.
+[![Status](https://img.shields.io/badge/Status-Production-green)]()
+[![System](https://img.shields.io/badge/Type-Supervised_Infrastructure-blue)]()
 
 ---
 
-## System Components
+## The Problem: The Nurse Shortage
 
-| Component | Technology | Purpose |
-|-----------|------------|---------|
-| **LINE Bot** | LINE Messaging API | Patient interaction, vitals logging |
-| **Voice Interface** | LiveKit + EdgeTTS | Real-time Thai voice conversations |
-| **OneBrain** | Groq Llama 3.3 70B | Risk scoring and response generation |
-| **Dashboard** | React + Tailwind | Nurse Mission Control |
-| **Database** | Supabase PostgreSQL | Patient data and audit logs |
+Thailand faces a shortage of **35,000 nurses**. Hospitals cannot hire their way out of this crisis. The result is burnout, missed follow-ups, and readmissions.
+
+## The Solution: Nurse Force Multiplication
+
+Hanna gives each nurse **10x capacity** by:
+1.  **Handling Routine Follow-up**: Automated daily check-ins for vitals, meds, and symptoms via LINE & Voice.
+2.  **Surfacing Exceptions**: OneBrain™ engine detects risks and prioritizes them for human review.
+3.  **Supervised Control**: Nurses oversee everything through the Command Center. AI never makes clinical decisions alone.
+
+> **"We don't replace nurses. We give them superpowers."**
 
 ---
 
-## Quick Start
+## Core Capabilities
+
+### 1. Automated Patient Coverage (The "Eyes")
+- **LINE Bot**: Daily health logging and medication reminders.
+- **Gemini Live Voice**: Thai-speaking voice assistant for elderly friendly check-ins.
+- **100% Reach**: Reaches patients where they are, 24/7.
+
+### 2. OneBrain™ Intelligence (The "Brain")
+- **Risk Scoring**: Real-time 0-10 risk score for every patient.
+- **Exception Detection**: Flags "Red" (Critical) and "Amber" (Drifting) patients.
+- **Safeguards**: Clinical caps and rule-based escalation.
+
+### 3. Nurse Command Center (the "Hands")
+- **Triage Queue**: Prioritized list of who needs a call *right now*.
+- **Capacity Meter**: Real-time view of nurse bandwidth and patient load.
+- **One-Click Action**: Efficient workflow to close loops fast.
+
+---
+
+## Architecture: Human-in-the-Loop
+
+```mermaid
+graph LR
+    P[Patient] <-->|LINE/Voice| AI[Hanna AI Layer]
+    AI -->|Surfaces Exceptions| N[Nurse Command Center]
+    N -->|Clinical Decision| P
+    N -.->|Supervision| AI
+```
+
+Hanna acts as the **infrastructure layer** between the patient and the clinical team.
+
+---
+
+## Deployment
 
 ### Prerequisites
 - Node.js 18+
-- LINE Developer Account
-- Supabase Project
-- Groq API Key
-- LiveKit Cloud Account
+- PostgreSQL (Supabase)
+- LINE Official Account
+- Groq API Key (Llama 3.3)
+- LiveKit Cloud (for Voice)
 
-### Installation
-
+### Quick Start
 ```bash
 # Clone repository
 git clone https://github.com/farhaned07/hanna-line-bot.git
-cd hanna-line-bot
 
 # Install dependencies
 npm install
 
 # Configure environment
 cp .env.example .env
-# Edit .env with your credentials
 
 # Run locally
 npm start
 ```
 
-### Environment Variables
-
-```bash
-# LINE
-LINE_CHANNEL_SECRET=your_channel_secret
-LINE_CHANNEL_ACCESS_TOKEN=your_access_token
-LIFF_ID=your_liff_id
-
-# AI
-GROQ_API_KEY=your_groq_key
-
-# Voice
-LIVEKIT_URL=wss://your-app.livekit.cloud
-LIVEKIT_API_KEY=your_api_key
-LIVEKIT_API_SECRET=your_api_secret
-
-# Database
-DATABASE_URL=postgresql://...
-
-# Dashboard Auth
-NURSE_DASHBOARD_TOKEN=your_secure_token
-```
-
----
-
-## Features
-
-### For Patients (LINE)
-- 🎙️ **Voice Calls** - Talk to Hanna in Thai
-- 📊 **Vitals Logging** - Record blood pressure, glucose
-- 💊 **Medication Tracking** - Daily reminders
-- 🚨 **Emergency Detection** - Immediate escalation
-
-### For Nurses (Dashboard)
-- 📋 **Mission Control** - Real-time patient overview
-- 🔴 **Risk Alerts** - Prioritized by severity
-- 📞 **One-Click Call** - Connect with patients
-- 📈 **Patient History** - Context for decisions
-
----
-
-## Architecture
-
-```
-LINE App  ─────┐
-               │    ┌────────────────────┐    ┌──────────────┐
-LIFF Voice ────┼───▶│  Railway Backend   │───▶│   Supabase   │
-               │    │  (Express + Node)  │    │  PostgreSQL  │
-               │    └────────────────────┘    └──────────────┘
-               │              │
-               │              ▼
-               │    ┌────────────────────┐
-               └───▶│  Vercel Dashboard  │
-                    │  (React + Tailwind)│
-                    └────────────────────┘
-```
-
----
-
-## Deployment
-
-### Backend (Railway)
-```bash
-# Push to GitHub triggers auto-deploy
-git push origin main
-```
-
-### Dashboard (Vercel)
-Separate repository: `hanna-nurse-dashboard`
-
-```bash
-# Vercel auto-deploys from GitHub
-```
-
----
-
-## API Endpoints
-
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/webhook` | POST | LINE webhook receiver |
-| `/api/nurse/stats` | GET | Dashboard statistics |
-| `/api/nurse/tasks` | GET | Task queue |
-| `/api/nurse/patients` | GET | Patient list |
-| `/api/voice/token` | GET | LiveKit token |
-| `/api/voice/chat` | POST | Voice chat processing |
-| `/health` | GET | Health check |
-
 ---
 
 ## Documentation
 
-- [WIREFRAME.md](./WIREFRAME.md) - UX specification
-- [ARCHITECTURE.md](./ARCHITECTURE.md) - Technical architecture
+- [**Product Canon**](./docs/PRODUCT_CANON.md) - The single source of truth.
+- [**Architecture**](./ARCHITECTURE.md) - Technical system design.
+- [**Regulatory Posture**](./docs/REGULATORY_POSTURE.md) - Legal & safety framework.
 
 ---
 
-## License
+**Built for Hospitals. Powered by Supervised AI.**
 
-Proprietary - All rights reserved.
-
----
-
-**Built for healthcare. Designed for nurses. Powered by AI.**
