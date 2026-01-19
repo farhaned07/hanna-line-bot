@@ -38,6 +38,34 @@
 
 **Risk Levels:** Score 8-10 = CRITICAL, Score 5-7 = HIGH, Score 0-4 = LOW (routine, AI handles).
 
+### Q: What happens during a daily check-in?
+**A:** Hanna uses a structured button-based flow:
+1. **Mood**: "วันนี้เป็นยังไง?" → [ดี] [ปกติ] [ไม่ดี]
+2. **Medication**: "กินยาครบไหม?" → [ได้ ครบ] [บางส่วน] [ไม่ได้เลย]
+3. **Symptoms**: "มีอาการผิดปกติไหม?" → [ไม่] [มีอาการบ้าง]
+4. **Completion**: Streak celebration if Day 7/14/30
+
+Messages vary daily to prevent fatigue. Time-based greetings (morning/afternoon/evening) make interactions feel personal.
+
+### Q: What are streak celebrations?
+**A:** Hanna celebrates patient consistency:
+- 🔥 **Day 7**: "7 วันติดต่อกัน! สุดยอด!"
+- 🏆 **Day 14**: "2 อาทิตย์แล้ว! เก่งมาก!"
+- ⭐ **Day 30**: "1 เดือนเต็ม! ยอดเยี่ยม!"
+
+This gamification improves engagement and medication adherence.
+
+### Q: What if a patient stops responding?
+**A:** Hanna follows a 7-day non-responder protocol:
+| Day | Action |
+|-----|--------|
+| 3-4 | Concern message: "เรากังวลเพราะคุณไม่ได้ตอบ" |
+| 5-6 | Personal appeal: "เราคิดถึงคุณนะ" |
+| 7 | Final choice: restart or contact nurse |
+| 8+ | Auto-escalation to nurse dashboard |
+
+Silence is treated as a risk signal, not ignored.
+
 ### Q: What happens when Hanna detects a problem?
 **A:** A task appears on the nurse dashboard with full context: what triggered it, patient history, and a suggested action. The nurse reviews and decides what to do. Hanna never acts autonomously on clinical matters.
 

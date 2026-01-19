@@ -69,6 +69,40 @@ This handbook provides everything you need to use the Hanna dashboard effectivel
 
 ---
 
+## 3.5 Understanding Daily Check-Ins
+
+### Structured Button Flow
+
+Patients receive a button-based check-in (not free text):
+
+| Step | Question | Buttons |
+|------|----------|---------|
+| 1 | How are you today? | [ดี] [ปกติ] [ไม่ดี] |
+| 2 | Did you take your meds? | [ได้ ครบ] [บางส่วน] [ไม่ได้เลย] |
+| 3 | Any symptoms? | [ไม่] [มีอาการบ้าง] |
+| 4 | (If symptoms) Which? | [มีไข้] [ปวดศีรษะ] [คลื่นไส้] etc. |
+
+### Streak Celebrations
+
+Patients see celebration messages at milestones:
+- 🔥 Day 7: "7 วันติดต่อกัน!"
+- 🏆 Day 14: "2 อาทิตย์แล้ว!"
+- ⭐ Day 30: "1 เดือนเต็ม!"
+
+### Non-Responder Protocol
+
+If a patient doesn't respond:
+- **Day 3-4:** Concern message sent
+- **Day 5-6:** Personal appeal sent
+- **Day 7:** Final choice offered
+- **Day 8+:** Alert appears on your dashboard (HIGH priority)
+
+### Recurring Symptoms
+
+If the same symptom is reported 3+ days in a row, a **CRITICAL** task is created automatically.
+
+---
+
 ## 4. Reading Patient Alerts
 
 ### What You See
