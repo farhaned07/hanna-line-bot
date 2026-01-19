@@ -1,4 +1,5 @@
 const onboarding = require('./onboarding');
+const dailyCheckin = require('./dailyCheckin');
 const OneBrain = require('../services/OneBrain');
 // Payment handler removed for B2B model
 const db = require('../services/db');
@@ -656,6 +657,11 @@ const handlePostback = async (event) => {
 
         if (user && user.enrollment_status === 'onboarding') {
             return onboarding.handleInput(event, user);
+        }
+
+        // Route daily check-in postbacks
+        if (user && ['checkin_mood', 'checkin_med', 'checkin_symptom', 'checkin_symptom_select'].includes(action)) {
+            return dailyCheckin.handleCheckInPostback(event, user);
         }
 
         return Promise.resolve(null);

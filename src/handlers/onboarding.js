@@ -278,26 +278,78 @@ const handleInput = async (event, user) => {
         }
 
         // ================================================================
-        // STEP 4: Identity Confirmed → Activation
+        // STEP 4: Identity Confirmed → Time Selection
         // ================================================================
     } else if (step === 4) {
         if (action === 'confirm_identity' && input === 'yes') {
-            console.log(`[Onboarding] User ${userId} confirmed identity. Activating account.`);
+            console.log(`[Onboarding] User ${userId} confirmed identity. Moving to time selection.`);
 
-            // Activate the account
+            // Move to time selection step
+            await db.query('UPDATE chronic_patients SET onboarding_step = 5 WHERE line_user_id = $1', [userId]);
+
+            await line.replyMessage(event.replyToken, {
+                type: 'flex',
+                altText: '⏰ เลือกเวลาเช็คสุขภาพ',
+                contents: {
+                    type: 'bubble',
+                    body: {
+                        type: 'box',
+                        layout: 'vertical',
+                        contents: [
+                            { type: 'text', text: '⏰ เลือกเวลาที่เหมาะสมที่สุด', weight: 'bold', size: 'lg', color: '#06C755' },
+                            { type: 'text', text: 'ฮันนาจะส่งคำถามสุขภาพในเวลานี้ทุกวันค่ะ', margin: 'md', size: 'sm', color: '#666666', wrap: true }
+                        ]
+                    },
+                    footer: {
+                        type: 'box',
+                        layout: 'vertical',
+                        spacing: 'sm',
+                        contents: [
+                            { type: 'button', style: 'primary', color: '#06C755', action: { type: 'postback', label: '🌅 08:00 (เช้า)', data: 'action=select_time&value=08:00' } },
+                            { type: 'button', style: 'secondary', action: { type: 'postback', label: '☀️ 12:00 (เที่ยง)', data: 'action=select_time&value=12:00' } },
+                            { type: 'button', style: 'secondary', action: { type: 'postback', label: '🌆 17:00 (เย็น)', data: 'action=select_time&value=17:00' } },
+                            { type: 'button', style: 'secondary', action: { type: 'postback', label: '🌙 20:00 (ค่ำ)', data: 'action=select_time&value=20:00' } }
+                        ]
+                    }
+                }
+            });
+
+        } else if (action === 'confirm_identity' && input === 'no') {
+            await line.replyMessage(event.replyToken, {
+                type: 'text',
+                text: 'ขออภัยในความไม่สะดวกค่ะ 🙏\n\nหากข้อมูลไม่ถูกต้อง กรุณาติดต่อฝ่ายบริการลูกค้าของบริษัทประกันของคุณเพื่อแก้ไขข้อมูลนะคะ\n\n(หรือพิมพ์ "เริ่มใหม่" เพื่อลองอีกครั้ง)'
+            });
+        }
+
+        // ================================================================
+        // STEP 5: Time Selected → Activation
+        // ================================================================
+    } else if (step === 5) {
+        if (action === 'select_time') {
+            console.log(`[Onboarding] User ${userId} selected time: ${input}. Activating account.`);
+
+            // Activate the account with preferred time
             await db.query(`
                 UPDATE chronic_patients 
                 SET enrollment_status = 'active', 
-                    onboarding_step = 5, 
-                    name = 'คุณสมดุล', 
-                    age = '70'
-                WHERE line_user_id = $1`, [userId]);
+                    onboarding_step = 6,
+                    preferred_check_in_time = $2,
+                    name = COALESCE(name, 'คุณสมาชิก'), 
+                    age = COALESCE(age, '65')
+                WHERE line_user_id = $1`, [userId, input]);
+
+            const timeLabels = {
+                '08:00': '08:00 (เช้า)',
+                '12:00': '12:00 (เที่ยง)',
+                '17:00': '17:00 (เย็น)',
+                '20:00': '20:00 (ค่ำ)'
+            };
 
             // Success: Show activation + first health check prompt
             await line.replyMessage(event.replyToken, [
                 {
                     type: 'text',
-                    text: '🎉 ยินดีต้อนรับสู่ครอบครัวค่ะ!\n\nฮันนาพร้อมดูแลคุณแล้ว 💚'
+                    text: `🎉 ยินดีต้อนรับสู่ครอบครัวค่ะ!\n\nฮันนาพร้อมดูแลคุณแล้ว 💚\n\n📅 คำถามแรกจะมาถึงเวลา ${timeLabels[input] || input} พรุ่งนี้ค่ะ`
                 },
                 {
                     type: 'flex',
@@ -310,7 +362,7 @@ const handleInput = async (event, user) => {
                             contents: [
                                 { type: 'text', text: '✨ สิ่งที่ฮันนาจะทำให้คุณ', weight: 'bold', size: 'lg', color: '#06C755' },
                                 { type: 'separator', margin: 'md' },
-                                { type: 'text', text: '🌅 ทักทายทุกเช้า (08:00)', size: 'sm', margin: 'md' },
+                                { type: 'text', text: `⏰ ทักทายทุกวันเวลา ${timeLabels[input] || input}`, size: 'sm', margin: 'md' },
                                 { type: 'text', text: '💊 เตือนกินยา', size: 'sm', margin: 'sm' },
                                 { type: 'text', text: '📊 บันทึกค่าสุขภาพให้', size: 'sm', margin: 'sm' },
                                 { type: 'text', text: '👩‍⚕️ มีปัญหา? บอกได้ตลอด', size: 'sm', margin: 'sm' },
@@ -333,12 +385,6 @@ const handleInput = async (event, user) => {
                     }
                 }
             ]);
-
-        } else if (action === 'confirm_identity' && input === 'no') {
-            await line.replyMessage(event.replyToken, {
-                type: 'text',
-                text: 'ขออภัยในความไม่สะดวกค่ะ 🙏\n\nหากข้อมูลไม่ถูกต้อง กรุณาติดต่อฝ่ายบริการลูกค้าของบริษัทประกันของคุณเพื่อแก้ไขข้อมูลนะคะ\n\n(หรือพิมพ์ "เริ่มใหม่" เพื่อลองอีกครั้ง)'
-            });
         }
     }
 };

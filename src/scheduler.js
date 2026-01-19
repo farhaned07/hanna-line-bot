@@ -34,10 +34,10 @@ const initScheduler = () => {
 
     // Morning Check-in (8:00 AM)
     cron.schedule('0 8 * * *', async () => {
-        console.log('Running morning check-in...');
+        console.log('Running morning check-in with structured flow...');
 
-        // NOTE: checkTrialStatus was removed - trial logic handled differently in B2B model
-        // await checkTrialStatus();
+        // Import dailyCheckin handler
+        const dailyCheckin = require('./handlers/dailyCheckin');
 
         try {
             const result = await db.query(
@@ -48,13 +48,13 @@ const initScheduler = () => {
             let failCount = 0;
 
             for (const user of result.rows) {
-                const success = await sendWithRetry(user.line_user_id, {
-                    type: 'text',
-                    text: `สวัสดีตอนเช้าค่ะ คุณ${user.name || ''} ☀️\nได้เวลาวัดน้ำตาลแล้วนะคะ วันนี้ได้ค่าเท่าไหร่ บอกฮันนาหน่อยนะคะ`
-                });
-
-                if (success) successCount++;
-                else failCount++;
+                try {
+                    await dailyCheckin.startCheckIn(user.line_user_id, user.name || '');
+                    successCount++;
+                } catch (err) {
+                    console.error(`❌ Failed to start check-in for ${user.line_user_id}:`, err.message);
+                    failCount++;
+                }
             }
 
             console.log(`✅ Morning check-in complete: ${successCount} sent, ${failCount} failed`);
@@ -106,6 +106,14 @@ const initScheduler = () => {
         timezone: "Asia/Bangkok"
     });
 
+    // Non-Responder Protocol (10:00 AM - Check for 3/5/7 day silent patients)
+    cron.schedule('0 10 * * *', async () => {
+        const engagement = require('./services/engagement');
+        await engagement.processNonResponders();
+    }, {
+        timezone: "Asia/Bangkok"
+    });
+
     // Safety Safeguard: Escalation Check (Every 15 mins)
     cron.schedule('*/15 * * * *', checkEscalations);
 
@@ -115,7 +123,7 @@ const initScheduler = () => {
     // Enterprise: Post-Resolution Recheck (Every hour)
     cron.schedule('0 * * * *', processRechecks);
 
-    console.log('✅ Scheduler Initialized: Morning(08:00), Nudge(14:00), Evening(19:00), Escalation(15m), Capacity(5m), Rechecks(1h)');
+    console.log('✅ Scheduler Initialized: Morning(08:00), NonResponder(10:00), Nudge(14:00), Evening(19:00), Escalation(15m), Capacity(5m), Rechecks(1h)');
 };
 
 /**
