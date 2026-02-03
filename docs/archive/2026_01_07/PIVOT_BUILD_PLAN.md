@@ -177,7 +177,7 @@
 
 #### B2C Landing Page (Keep for Patient Acquisition)
 
-**URL**: `hanna.health` or `hanna.co.th`
+**URL**: `hanna.care` or `hanna.co.th`
 
 **Purpose**: Acquire trial users for clinical proof
 
@@ -200,7 +200,7 @@
 
 #### B2B Landing Page (New - For Insurers)
 
-**URL**: `hanna.health/insurers` or `hanna-enterprise.com`
+**URL**: `hanna.care/insurers` or `hanna-enterprise.com`
 
 **Purpose**: Generate demo requests from insurers
 

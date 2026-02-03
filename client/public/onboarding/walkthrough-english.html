@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hanna System Walkthrough — Venture Fund Presentation</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #050505;
+            --bg-secondary: #0A0A0A;
+            --text-primary: #E5E5E5;
+            --text-secondary: #888888;
+            --text-tertiary: #666666;
+            --border: #222222;
+            --accent: #0047FF;
+            --success: #22C55E;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding-bottom: 4rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 4rem;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 600;
+            letter-spacing: -0.03em;
+            margin-bottom: 1rem;
+            line-height: 1.1;
+        }
+
+        .header-subtitle {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .header-meta {
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            margin-top: 2rem;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 4rem;
+            padding-bottom: 4rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section-number {
+            font-family: 'Menlo', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-tertiary);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .section h2 {
+            font-size: 2rem;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            margin-bottom: 2rem;
+            color: var(--text-primary);
+        }
+
+        .section h3 {
+            font-size: 1.25rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            margin-top: 2rem;
+            color: var(--text-primary);
+        }
+
+        .section p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 1.05rem;
+        }
+
+        .section ul,
+        .section ol {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .section ul li,
+        .section ol li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .section ul li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--text-tertiary);
+        }
+
+        .section ol {
+            counter-reset: list-counter;
+        }
+
+        .section ol li {
+            counter-increment: list-counter;
+        }
+
+        .section ol li::before {
+            content: counter(list-counter) ".";
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Executive Summary Box */
+        .exec-summary {
+            background: var(--bg-secondary);
+            padding: 2.5rem;
+            border: 1px solid var(--border);
+            margin-bottom: 4rem;
+        }
+
+        .exec-summary h2 {
+            margin-top: 0;
+            font-size: 1.75rem;
+        }
+
+        .highlight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .highlight-item span {
+            display: block;
+            font-family: 'Menlo', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-tertiary);
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight-item strong {
+            font-size: 1.125rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            font-size: 0.95rem;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 1.25rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            font-family: 'Menlo', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-tertiary);
+            font-weight: 400;
+        }
+
+        td {
+            color: var(--text-secondary);
+        }
+
+        td:first-child {
+            color: var(--text-primary);
+            font-weight: 500;
+            width: 30%;
+        }
+
+        /* Architecture Diagram */
+        .architecture-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            margin: 2rem 0;
+            font-family: 'Menlo', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+        }
+
+        .layer {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .layer:last-child {
+            margin-bottom: 0;
+        }
+
+        .layer-title {
+            font-family: 'Menlo', monospace;
+            font-size: 0.70rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+
+        .layer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .layer-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .layer-item-name {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .layer-item-desc {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            margin-top: 0.25rem;
+        }
+
+        /* Screenshot Box */
+        .screenshot-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .screenshot-box img {
+            width: 100%;
+            border: 1px solid var(--border);
+            margin-bottom: 1rem;
+        }
+
+        .screenshot-caption {
+            font-family: 'Menlo', monospace;
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            text-align: center;
+        }
+
+        /* Status Badges */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 2px;
+            font-family: 'Menlo', monospace;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-right: 0.5rem;
+        }
+
+        .badge-critical {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .badge-success {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        /* Metric Cards */
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .metric-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+
+        .metric-label {
+            font-family: 'Menlo', monospace;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-tertiary);
+            margin-top: 0.5rem;
+        }
+
+        /* Quote Box */
+        .quote-box {
+            border-left: 3px solid var(--accent);
+            padding-left: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .quote-box p {
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            font-style: italic;
+        }
+
+        /* Comparison Table */
+        .comparison-table td:nth-child(2) {
+            color: var(--text-tertiary);
+        }
+
+        .comparison-table td:nth-child(3) {
+            color: var(--success);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding-top: 4rem;
+            margin-top: 4rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer p {
+            font-size: 0.875rem;
+            color: var(--text-tertiary);
+        }
+
+        /* ----- PRINT OPTIMIZATION ----- */
+        @media print {
+            @page {
+                size: A4;
+                margin: 0;
+            }
+
+            body {
+                background-color: #050505 !important;
+                color: #E5E5E5 !important;
+                margin: 0;
+                width: 100%;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .container {
+                max-width: 100% !important;
+                width: 100% !important;
+                padding: 2.5cm !important;
+                margin: 0 !important;
+            }
+
+            .section {
+                border-color: #222 !important;
+                page-break-inside: auto;
+            }
+
+            h1,
+            h2,
+            h3,
+            h4,
+            .section-number {
+                break-after: avoid;
+                page-break-after: avoid;
+            }
+
+            p,
+            li {
+                orphans: 3;
+                widows: 3;
+            }
+
+            .exec-summary,
+            .architecture-box,
+            .screenshot-box,
+            .metric-card,
+            table,
+            .layer {
+                break-inside: avoid;
+                page-break-inside: avoid;
+                border: 1px solid #222 !important;
+                background-color: #0A0A0A !important;
+            }
+
+            .header {
+                break-inside: avoid;
+            }
+
+            .container {
+                background-color: #050505 !important;
+            }
+
+            .page-break {
+                page-break-after: always;
+                display: block;
+                height: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- Header -->
+        <header class="header">
+            <img src="/hanna-logo.png" alt="Hanna Logo"
+                style="height: 80px; margin-bottom: 2rem; filter: brightness(0.9);">
+            <h1>Hanna System Walkthrough</h1>
+            <p class="header-subtitle">Venture Fund Presentation</p>
+            <div class="header-meta">10x Nurse Capacity Through Supervised AI</div>
+        </header>
+
+        <!-- Executive Summary -->
+        <div class="exec-summary">
+            <span class="section-number">Executive Summary</span>
+            <h2>The Opportunity</h2>
+            <p style="margin-top: 1rem;">
+                Healthcare systems face a critical constraint: <strong>nurse scarcity</strong>.
+                With chronic diseases growing rapidly, a small nursing team cannot physically monitor
+                hundreds of patients daily. Hanna is a <strong>nurse force multiplier</strong> —
+                a hybrid intelligence system that collects data from patients via LINE, assesses risk
+                using a transparent algorithm, and surfaces exceptions so nurses focus only on who needs attention.
+            </p>
+
+            <div class="highlight-grid">
+                <div class="highlight-item">
+                    <span>Capacity Multiplier</span>
+                    <strong>10x More Patients</strong>
+                </div>
+                <div class="highlight-item">
+                    <span>Patient Interface</span>
+                    <strong>LINE Chat + Voice</strong>
+                </div>
+                <div class="highlight-item">
+                    <span>Clinical Model</span>
+                    <strong>Supervised AI</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. System Architecture -->
+        <section class="section">
+            <span class="section-number">01 / System Architecture</span>
+            <h2>Three-Layer Intelligence Stack</h2>
+
+            <div class="architecture-box">
+                <div class="layer">
+                    <div class="layer-title">Layer 1 — User Interfaces</div>
+                    <div class="layer-content">
+                        <div class="layer-item">
+                            <div class="layer-item-name">LINE Chat Bot</div>
+                            <div class="layer-item-desc">Rich Menu • Thai AI</div>
+                        </div>
+                        <div class="layer-item">
+                            <div class="layer-item-name">Hanna Voice</div>
+                            <div class="layer-item-desc">Thai AI Voice Calls</div>
+                        </div>
+                        <div class="layer-item">
+                            <div class="layer-item-name">Nurse Dashboard</div>
+                            <div class="layer-item-desc">React SPA</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layer">
+                    <div class="layer-title">Layer 2 — Intelligence (OneBrain™)</div>
+                    <div class="layer-content">
+                        <div class="layer-item">
+                            <div class="layer-item-name">Risk Scoring</div>
+                            <div class="layer-item-desc">0-10 Scale</div>
+                        </div>
+                        <div class="layer-item">
+                            <div class="layer-item-name">Exception Detection</div>
+                            <div class="layer-item-desc">Alert Fatigue Prevention</div>
+                        </div>
+                        <div class="layer-item">
+                            <div class="layer-item-name">Task Generation</div>
+                            <div class="layer-item-desc">Prioritized Queue</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layer">
+                    <div class="layer-title">Layer 3 — Data</div>
+                    <div class="layer-content">
+                        <div class="layer-item" style="grid-column: 1 / -1;">
+                            <div class="layer-item-name">Supabase PostgreSQL</div>
+                            <div class="layer-item-desc">Encrypted • PDPA Compliant • Full Audit Trail</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Patient Interface -->
+        <section class="section">
+            <span class="section-number">02 / Patient Interface</span>
+            <h2>LINE Bot — 50M+ Thai Users</h2>
+
+            <p>Patients interact with Hanna through LINE — Thailand's dominant messaging platform.
+                No app download required. Features natural Thai language AI for both text and voice.</p>
+
+            <h3>1. Onboarding (Zero Friction)</h3>
+            <p><strong>Goal:</strong> Activate patient in < 30 seconds without installing new apps.</p>
+
+                    <div class="architecture-box" style="font-family: 'Inter', sans-serif;">
+                        <!-- Step 1: Scan QR -->
+                        <div
+                            style="margin-bottom: 1.5rem; text-align: center; border-bottom: 1px dashed var(--border); padding-bottom: 1rem;">
+                            <span
+                                style="background: var(--bg-primary); padding: 0.2rem 0.8rem; border-radius: 4px; border: 1px solid var(--border); font-size: 0.75rem; color: var(--text-tertiary);">STEP
+                                1: HOSPITAL VISIT</span>
+                            <div style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">
+                                Nurse shows <strong>QR Code</strong> to patient
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Patient Scans (Simulated System Action) -->
+                        <div style="margin-bottom: 1.5rem; text-align: center;">
+                            <div style="font-size: 0.8rem; color: var(--success); margin-bottom: 0.5rem;">📸 PATIENT
+                                SCANS QR</div>
+                            <div
+                                style="background: rgba(34, 197, 94, 0.1); color: var(--success); padding: 0.5rem; border-radius: 4px; display: inline-block; font-size: 0.8rem;">
+                                Auto-verifying HN & Phone Number...
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Welcome Message -->
+                        <div>
+                            <div style="color: var(--accent); font-size: 0.8rem; margin-bottom: 0.5rem;">🤖 HANNA
+                                (Instant Reply)</div>
+                            <div
+                                style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; margin-left: 0;">
+                                <strong>Welcome Khun Somchai!</strong> 💚<br><br>
+                                I am Hanna, your personal nurse assistant. I will help take care of you every
+                                day.<br><br>
+                                Please press "Health Check" to start!
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3>2. Daily Interaction (Rich Menu)</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Button</th>
+                                <th>Function</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>🎙️ Call Hanna</td>
+                                <td>Voice call with AI nurse assistant (Thai natural language)</td>
+                            </tr>
+                            <tr>
+                                <td>❤️ Health Check</td>
+                                <td>Daily health check-in conversation</td>
+                            </tr>
+                            <tr>
+                                <td>📊 Log Vitals</td>
+                                <td>Record blood pressure, glucose readings</td>
+                            </tr>
+                            <tr>
+                                <td>💊 Log Medication</td>
+                                <td>Track medication adherence</td>
+                            </tr>
+                            <tr>
+                                <td>👤 Profile</td>
+                                <td>View patient summary & history</td>
+                            </tr>
+                            <tr>
+                                <td>ℹ️ Help</td>
+                                <td>Help center & commands</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>3. Daily Check-in Flow (Example Conversation)</h3>
+                    <div class="architecture-box" style="font-family: 'Inter', sans-serif;">
+                        <div style="margin-bottom: 1.5rem;">
+                            <div style="color: var(--accent); font-size: 0.8rem; margin-bottom: 0.5rem;">🤖 HANNA (10:00
+                                AM)
+                            </div>
+                            <div
+                                style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; margin-left: 0;">
+                                สวัสดีค่ะ คุณสมชาย วันนี้รู้สึกเป็นอย่างไรบ้างคะ? 💚
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 1.5rem;">
+                            <div
+                                style="color: var(--success); font-size: 0.8rem; margin-bottom: 0.5rem; text-align: right;">
+                                👤
+                                PATIENT</div>
+                            <div
+                                style="background: rgba(34, 197, 94, 0.15); padding: 1rem; border-radius: 8px; margin-left: 20%;">
+                                ดีครับ แต่ปวดหัวเล็กน้อย
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 1.5rem;">
+                            <div style="color: var(--accent); font-size: 0.8rem; margin-bottom: 0.5rem;">🤖 HANNA</div>
+                            <div
+                                style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; margin-left: 0;">
+                                เข้าใจค่ะ ปวดหัวเล็กน้อย วันนี้ทานยาตอนเช้าแล้วหรือยังคะ?
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 1.5rem;">
+                            <div
+                                style="color: var(--success); font-size: 0.8rem; margin-bottom: 0.5rem; text-align: right;">
+                                👤
+                                PATIENT</div>
+                            <div
+                                style="background: rgba(34, 197, 94, 0.15); padding: 1rem; border-radius: 8px; margin-left: 20%;">
+                                ทานแล้วครับ
+                            </div>
+                        </div>
+                        <div>
+                            <div style="color: var(--accent); font-size: 0.8rem; margin-bottom: 0.5rem;">🤖 HANNA</div>
+                            <div
+                                style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; margin-left: 0;">
+                                ดีมากค่ะ! 👍 Hanna บันทึกข้อมูลให้เรียบร้อยแล้ว หากมีอาการผิดปกติ สามารถแจ้ง Hanna
+                                ได้ตลอดนะคะ
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3>4. Emergency Detection & Voice</h3>
+                    <div class="quote-box">
+                        <p>"เจ็บหน้าอกมาก หายใจไม่ออก"</p>
+                    </div>
+                    <div class="architecture-box" style="font-family: 'Inter', sans-serif;">
+                        <div>
+                            <div style="color: var(--danger); font-size: 0.8rem; margin-bottom: 0.5rem;">🚨 HANNA
+                                (Emergency
+                                Mode)</div>
+                            <div
+                                style="background: rgba(239, 68, 68, 0.15); padding: 1rem; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.3);">
+                                <strong style="color: var(--danger);">⚠️ อาการฉุกเฉิน!</strong><br><br>
+                                กรุณาโทร <strong>1669</strong> ทันทีค่ะ<br><br>
+                                Hanna ได้แจ้งเตือนพยาบาลเรียบร้อยแล้ว ทีมจะติดต่อกลับโดยเร็วที่สุด
+                            </div>
+                        </div>
+                    </div>
+                    <p>When emergency keywords are detected (chest pain, breathing difficulty, severe symptoms), Hanna
+                        immediately:</p>
+                    <ul>
+                        <li>Instructs patient to call 1669</li>
+                        <li>Creates a <strong>Critical priority task</strong> for nurses</li>
+                        <li>Sends LINE notification to on-duty staff</li>
+                    </ul>
+
+                    <p style="margin-top: 1.5rem;"><strong>Voice Call Interface:</strong> Patients can speak naturally
+                        in Thai. Hanna's voice AI understands dialects, confirms understanding, and works 24/7.</p>
+
+                    <div class="highlight-grid">
+                        <div class="highlight-item">
+                            <span>Response Time</span>
+                            <strong>
+                                < 2 seconds</strong>
+                        </div>
+                        <div class="highlight-item">
+                            <span>Language</span>
+                            <strong>Thai + Voice</strong>
+                        </div>
+                        <div class="highlight-item">
+                            <span>Availability</span>
+                            <strong>24/7</strong>
+                        </div>
+                    </div>
+        </section>
+
+        <!-- 3. Nurse Dashboard -->
+        <section class="section">
+            <span class="section-number">03 / Nurse Dashboard</span>
+            <h2>Mission Control for Clinical Teams</h2>
+
+            <p>The dashboard transforms chaotic patient data into a clear, prioritized action queue.
+                Nurses see only the patients who need attention — not everyone.</p>
+
+            <h3>3.1 Login</h3>
+            <div class="screenshot-box">
+                <img src="hanna_dashboard_login_page_1769044785476.png" alt="Hanna Dashboard Login">
+                <div class="screenshot-caption">Secure token-based authentication • Enterprise-grade security</div>
+            </div>
+
+            <h3>3.2 Mission Control</h3>
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <div class="metric-value">13</div>
+                    <div class="metric-label">Active Patients</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">9</div>
+                    <div class="metric-label">Pending Actions</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">8</div>
+                    <div class="metric-label">Check-ins Today</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">1:1</div>
+                    <div class="metric-label">Capacity Ratio</div>
+                </div>
+            </div>
+
+            <div class="screenshot-box">
+                <img src="hanna_mission_control_page_1769045654542.png" alt="Mission Control Dashboard">
+                <div class="screenshot-caption">Real-time situational awareness for nursing team</div>
+            </div>
+
+            <h3>3.3 Patient Monitoring Grid</h3>
+            <p>Visual representation of all patients with color-coded risk status:</p>
+
+            <p style="margin-bottom: 1rem;">
+                <span class="badge badge-critical">Critical: 3</span>
+                <span class="badge badge-warning">Drifting: 11</span>
+                <span class="badge badge-success">Stable: 0</span>
+            </p>
+
+            <div class="screenshot-box">
+                <img src="hanna_monitoring_view_page_1769045729414.png" alt="Patient Monitoring Grid">
+                <div class="screenshot-caption">Color-coded patient status for at-a-glance monitoring</div>
+            </div>
+
+            <h3>3.4 Patient Registry</h3>
+            <div class="screenshot-box">
+                <img src="hanna_patients_list_page_1769045798246.png" alt="Patient Registry">
+                <div class="screenshot-caption">Searchable patient database with status filtering</div>
+            </div>
+
+            <h3>3.5 Clinical Patient View</h3>
+            <div class="screenshot-box">
+                <img src="hanna_patient_detail_page_1769045892365.png" alt="Patient Detail View">
+                <div class="screenshot-caption">Deep dive: vitals trends, check-ins, clinical actions</div>
+            </div>
+
+            <h3>3.6 PDF Report Generation</h3>
+            <div class="screenshot-box">
+                <img src="hanna_report_generation_modal_1769046041137.png" alt="PDF Generation Modal">
+                <div class="screenshot-caption">Clinical-grade PDF summaries • Thai/English • 7/15/30 days</div>
+            </div>
+        </section>
+
+        <!-- 4. Intelligence Layer -->
+        <section class="section">
+            <span class="section-number">04 / Intelligence Layer</span>
+            <h2>OneBrain™ Risk Scoring</h2>
+
+            <p>A transparent, deterministic algorithm — not a black box. Every score is explainable.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Factor</th>
+                        <th>Points</th>
+                        <th>Trigger</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>🚨 Emergency Keywords</td>
+                        <td>+10</td>
+                        <td>Chest pain, breathing difficulty</td>
+                    </tr>
+                    <tr>
+                        <td>⚠️ Vital Danger</td>
+                        <td>+2</td>
+                        <td>BP >180/110, Glucose >400 or <70< /td>
+                    </tr>
+                    <tr>
+                        <td>💊 Missed Medications</td>
+                        <td>+2</td>
+                        <td>>3 consecutive days missed</td>
+                    </tr>
+                    <tr>
+                        <td>📉 Worsening Trend</td>
+                        <td>+1</td>
+                        <td>3+ days trending worse</td>
+                    </tr>
+                    <tr>
+                        <td>🔇 Patient Silence</td>
+                        <td>+1</td>
+                        <td>>48 hours no contact</td>
+                    </tr>
+                    <tr>
+                        <td>👴 Age Modifier</td>
+                        <td>×1.2</td>
+                        <td>If patient age > 70</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Risk Levels</h3>
+            <p style="margin-bottom: 1rem;">
+                <span class="badge badge-success">0-4: Routine</span>
+                <span class="badge badge-warning">5-7: Task Created</span>
+                <span class="badge badge-critical">8-10: Immediate</span>
+            </p>
+
+            <div class="quote-box">
+                <p>"Hanna assists. Nurses decide."</p>
+            </div>
+            <p>All clinical decisions require human authorization. AI surfaces exceptions; nurses take action.</p>
+        </section>
+
+        <!-- 5. Scalability -->
+        <section class="section">
+            <span class="section-number">05 / Scalability & Value</span>
+            <h2>10x Capacity Multiplier</h2>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Traditional</th>
+                        <th>With Hanna</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Patient : Nurse Ratio</td>
+                        <td>1 : 20</td>
+                        <td>1 : 200+</td>
+                    </tr>
+                    <tr>
+                        <td>Data Review</td>
+                        <td>Manual, all patients</td>
+                        <td>Exceptions only</td>
+                    </tr>
+                    <tr>
+                        <td>Alert Management</td>
+                        <td>Alert fatigue</td>
+                        <td>Prioritized queue</td>
+                    </tr>
+                    <tr>
+                        <td>Care Model</td>
+                        <td>Reactive</td>
+                        <td>Proactive</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="highlight-grid">
+                <div class="highlight-item">
+                    <span>Data Security</span>
+                    <strong>PDPA Compliant</strong>
+                </div>
+                <div class="highlight-item">
+                    <span>Encryption</span>
+                    <strong>End-to-End</strong>
+                </div>
+                <div class="highlight-item">
+                    <span>Audit Trail</span>
+                    <strong>Full Logging</strong>
+                </div>
+                <div class="highlight-item">
+                    <span>AI Review</span>
+                    <strong>Human-in-Loop</strong>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p style="margin-bottom: 0.5rem;">Hanna is a product of Archangel Co., Ltd.</p>
+            <p>Document generated: January 2026 | Hanna OS v2.1</p>
+        </footer>
+
+    </div>
+
+</body>
+
+</html>

@@ -45,7 +45,10 @@ app.use('/api', rateLimitMiddleware);
 
 // Admin API Routes
 app.use('/api/admin', require('./routes/admin'));
+app.use('/api/auth', express.json(), require('./routes/auth'));
 app.use('/api/nurse', express.json(), require('./routes/nurse'));
+app.use('/api/analytics', express.json(), require('./routes/analytics'));
+app.use('/api/superadmin', express.json(), require('./routes/superadmin'));
 app.use('/api/patient', require('./routes/patient')); // PDPA Right-to-Erasure
 
 // Serve React Dashboard (Admin Panel)

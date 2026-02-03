@@ -183,6 +183,67 @@ const testRateLimiting = () => {
 };
 
 // ============================================================================
+// Test 5: Sentiment Analysis (False Negative Mitigation)
+// ============================================================================
+const testSentimentAnalysis = () => {
+    // Import the actual module
+    const sentimentAnalysis = require('../src/services/sentimentAnalysis');
+
+    // Test hedging detection
+    const testCases = [
+        { input: 'ปวดหัวนิดหน่อยค่ะ', expectHedging: true, minConcern: 1 },
+        { input: 'I have a little chest discomfort', expectHedging: true, minConcern: 2 },
+        { input: 'not too bad, just tired', expectHedging: true, minConcern: 1 },
+        { input: 'วันนี้สบายดีค่ะ', expectHedging: false, minConcern: 0 },
+        { input: 'I feel great today!', expectHedging: false, minConcern: 0 },
+        { input: 'เจ็บแค่นิดเดียว ไม่ค่อยหนัก', expectHedging: true, minConcern: 1 },
+    ];
+
+    testCases.forEach(tc => {
+        const result = sentimentAnalysis.analyzeHedging(tc.input);
+        assert(
+            result.hedgingDetected === tc.expectHedging,
+            `Hedging detection for "${tc.input}" should be ${tc.expectHedging}`
+        );
+        assert(
+            result.concernScore >= tc.minConcern,
+            `Concern score for "${tc.input}" should be >= ${tc.minConcern}, got ${result.concernScore}`
+        );
+    });
+};
+
+// ============================================================================
+// Test 6: Trend Detection Logic (False Negative Mitigation)
+// ============================================================================
+const testTrendDetection = () => {
+    // Simulate trend calculation logic
+    const calculateTrend = (thisWeekAvg, prevWeekAvg) => {
+        if (!prevWeekAvg || prevWeekAvg === 0) return { trendPct: 0, isWorsening: false };
+        const trendPct = ((thisWeekAvg - prevWeekAvg) / prevWeekAvg) * 100;
+        return {
+            trendPct: Math.round(trendPct),
+            isWorsening: trendPct > 10
+        };
+    };
+
+    const testCases = [
+        { thisWeek: 180, prevWeek: 140, expectWorsening: true },  // +28%
+        { thisWeek: 150, prevWeek: 145, expectWorsening: false }, // +3%
+        { thisWeek: 130, prevWeek: 150, expectWorsening: false }, // -13% (improving)
+        { thisWeek: 200, prevWeek: 180, expectWorsening: true },  // +11%
+        { thisWeek: 140, prevWeek: 140, expectWorsening: false }, // 0%
+    ];
+
+    testCases.forEach(tc => {
+        const result = calculateTrend(tc.thisWeek, tc.prevWeek);
+        assert(
+            result.isWorsening === tc.expectWorsening,
+            `Trend ${tc.thisWeek} vs ${tc.prevWeek} should be worsening=${tc.expectWorsening}, got ${result.trendPct}%`
+        );
+    });
+};
+
+// ============================================================================
 // Run All Tests
 // ============================================================================
 async function runTests() {
@@ -197,6 +258,8 @@ async function runTests() {
         { name: 'Risk Score Calculation', fn: testRiskScoreLogic },
         { name: 'Auth Token Validation', fn: testAuthTokenValidation },
         { name: 'Rate Limiting Logic', fn: testRateLimiting },
+        { name: 'Sentiment Analysis (Hedging)', fn: testSentimentAnalysis },
+        { name: 'Trend Detection Logic', fn: testTrendDetection },
     ];
 
     for (const t of tests) {

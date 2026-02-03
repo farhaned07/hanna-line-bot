@@ -297,7 +297,7 @@
                 <div class="snapshot-grid">
                     <div class="snapshot-item">
                         <span class="snapshot-label">รหัสผู้ป่วย</span>
-                        <span class="snapshot-value">HN-<%= patient.id.substring(0, 8).toUpperCase() %></span>
+                        <span class="snapshot-value">HN-<%= String(patient.id).padStart(8, '0' ) %></span>
                     </div>
                     <div class="snapshot-item">
                         <span class="snapshot-label">อายุ / เพศ</span>

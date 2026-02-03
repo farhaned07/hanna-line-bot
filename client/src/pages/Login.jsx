@@ -45,29 +45,36 @@ export default function Login() {
         }
 
         try {
-            // 1. Validate credentials by making a test API call
-            // We manually construct the header for the test to override any existing interceptor logic temporarily
-            const response = await api.get('/api/nurse/stats', {
-                headers: {
-                    'Authorization': `Bearer ${tokenToTest}`
-                }
-            })
+            // 1. Verify token with auth endpoint
+            const response = await api.post('/api/auth/verify', { token: tokenToTest })
 
-            console.log('Login successful, stats access granted')
+            if (!response.data.valid) {
+                throw new Error('Invalid credentials')
+            }
+
+            console.log('Login successful:', response.data)
 
             // 2. Save Session
             localStorage.setItem('nurse_token', tokenToTest)
 
-            // 3. Save user context and role
-            if (activeTab === 'staff') {
-                localStorage.setItem('user_email', email)
-                localStorage.setItem('user_role', 'staff') // Staff users have limited access
-            } else {
-                // Legacy token = admin access
+            // 3. Save user context from response
+            if (response.data.staff) {
+                localStorage.setItem('user_email', response.data.staff.email || email)
+                localStorage.setItem('user_role', response.data.staff.role || 'staff')
+            }
+
+            if (response.data.isSystemAdmin) {
                 localStorage.setItem('user_role', 'admin')
             }
 
-            // 4. Redirect - use window.location to force full page reload and session state refresh
+            // 4. Save tenant context
+            if (response.data.tenant) {
+                localStorage.setItem('tenant_id', response.data.tenant.id)
+                localStorage.setItem('tenant_name', response.data.tenant.name)
+                localStorage.setItem('tenant_code', response.data.tenant.code)
+            }
+
+            // 5. Redirect - use window.location to force full page reload and session state refresh
             window.location.href = '/dashboard'
 
         } catch (err) {

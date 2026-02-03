@@ -11,6 +11,8 @@ import Patients from './pages/Patients'
 import PatientDetail from './pages/PatientDetail'
 import Payments from './pages/Payments'
 import MonitoringView from './pages/MonitoringView'
+import Staff from './pages/Staff'
+import Analytics from './pages/Analytics'
 // AgentCommand removed - not aligned with core mission: "10x nurse capacity through supervised AI"
 
 function App() {
@@ -61,6 +63,8 @@ function App() {
           <Route path="monitoring" element={<MonitoringView />} />
           <Route path="patients" element={<Patients />} />
           <Route path="patients/:id" element={<PatientDetail />} />
+          <Route path="analytics" element={<Analytics />} />
+          <Route path="staff" element={<Staff />} />
           <Route path="payments" element={<Payments />} />
         </Route>
         <Route path="/" element={<Navigate to="/dashboard" />} />

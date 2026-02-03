@@ -1,5 +1,5 @@
 # Hanna Pilot ROI Summary
-**Why ฿237K is a Strategic Investment, Not a Cost**
+**Why ฿79K/month is a Strategic Investment, Not a Cost**
 
 ---
 
@@ -7,7 +7,9 @@
 
 | Item | Amount |
 |------|--------|
-| **Pilot Fee (90 days)** | ฿237,000 |
+| **Monthly Fee** | ฿79,000/month |
+| **Pilot Duration** | 3 months |
+| **Total Pilot Investment** | ฿237,000 |
 
 ---
 
@@ -72,7 +74,7 @@ If pilot succeeds, full deployment pricing:
 
 | Scale | Patients | Monthly Fee | Cost per Patient |
 |-------|----------|-------------|------------------|
-| Pilot | 500 | ฿237K (one-time) | ฿474/patient (pilot) |
+| Pilot | 500 | ฿79K/month | ฿158/patient/month |
 | Growth | 2,000 | ฿99K/month | ฿50/patient/month |
 | Scale | 8,000 | ฿149K/month | ฿19/patient/month |
 
@@ -108,7 +110,9 @@ If pilot succeeds, full deployment pricing:
 
 | Metric | Value |
 |--------|-------|
-| Pilot Investment | ฿237,000 |
+| Monthly Fee | ฿79,000 |
+| Pilot Duration | 3 months |
+| Total Pilot Investment | ฿237,000 |
 | Nurse time freed (90 days) | ~฿81,000 value |
 | Potential readmissions prevented | 5+ (฿250,000+ value) |
 | Scale pricing | ฿19/patient/month |

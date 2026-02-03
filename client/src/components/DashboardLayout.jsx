@@ -11,7 +11,9 @@ import {
     Cpu,
     AlertCircle,
     CheckCircle,
-    TrendingUp
+    TrendingUp,
+    BarChart3,
+    UserPlus
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useInfrastructureHealth } from '../hooks/useNurseData'
@@ -35,6 +37,8 @@ export default function DashboardLayout() {
         { name: 'Mission Control', href: '/dashboard', icon: Activity },
         { name: 'Monitoring', href: '/dashboard/monitoring', icon: Eye },
         { name: 'Patients', href: '/dashboard/patients', icon: Users },
+        { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
+        { name: 'Staff', href: '/dashboard/staff', icon: UserPlus, adminOnly: true },
         { name: 'Payments', href: '/dashboard/payments', icon: CreditCard, adminOnly: true },
     ]
 
@@ -106,7 +110,12 @@ export default function DashboardLayout() {
                             <div className="w-8 h-8 bg-indigo-500/10 rounded-lg flex items-center justify-center border border-indigo-500/20">
                                 <Activity className="w-5 h-5 text-indigo-400" />
                             </div>
-                            <span className="text-lg font-bold text-white tracking-wide">Hanna</span>
+                            <div>
+                                <span className="text-lg font-bold text-white tracking-wide">Hanna</span>
+                                {localStorage.getItem('tenant_name') && (
+                                    <p className="text-xs text-slate-500 -mt-0.5">{localStorage.getItem('tenant_name')}</p>
+                                )}
+                            </div>
                         </div>
                         {/* System Status Pill */}
                         <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium uppercase tracking-wider border ${systemStatus === 'healthy'

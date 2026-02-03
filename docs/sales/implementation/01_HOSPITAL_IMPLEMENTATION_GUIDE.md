@@ -251,7 +251,7 @@ Hanna team compiles:
 |------|---------|---------------|
 | **Implementation Manager** | [Name, Email, Phone] | Same day |
 | **Clinical Support** | [Email] | 24 hours |
-| **Technical Support** | support@hanna.health | 24 hours (2 hours for critical) |
+| **Technical Support** | support@hanna.care | 24 hours (2 hours for critical) |
 | **Emergency Escalation** | [Direct phone] | Immediate |
 
 ---

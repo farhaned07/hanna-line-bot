@@ -123,7 +123,21 @@ const initScheduler = () => {
     // Enterprise: Post-Resolution Recheck (Every hour)
     cron.schedule('0 * * * *', processRechecks);
 
-    console.log('✅ Scheduler Initialized: Morning(08:00), NonResponder(10:00), Nudge(14:00), Evening(19:00), Escalation(15m), Capacity(5m), Rechecks(1h)');
+    // PRODUCTIZATION: Daily Health Summary (9:00 AM)
+    cron.schedule('0 9 * * *', async () => {
+        const alerting = require('./services/alerting');
+        await alerting.sendDailyHealthSummary();
+    }, {
+        timezone: "Asia/Bangkok"
+    });
+
+    // PRODUCTIZATION: Health Checks (Every 2 hours)
+    cron.schedule('0 */2 * * *', async () => {
+        const alerting = require('./services/alerting');
+        await alerting.runHealthChecks();
+    });
+
+    console.log('✅ Scheduler Initialized: Morning(08:00), NonResponder(10:00), Nudge(14:00), Evening(19:00), Escalation(15m), Capacity(5m), Rechecks(1h), HealthSummary(09:00), HealthChecks(2h)');
 };
 
 /**

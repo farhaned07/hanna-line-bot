@@ -22,7 +22,7 @@
 
 ### 2. Clinical Support
 
-📧 Email: clinical@hanna.health  
+📧 Email: clinical@hanna.care  
 🕐 Response Time: 24 hours
 
 **Use for:**
@@ -35,7 +35,7 @@
 
 ### 3. Technical Support
 
-📧 Email: support@hanna.health  
+📧 Email: support@hanna.care  
 📱 Phone: +66-2-XXX-XXXX  
 🕐 Hours: Mon-Fri, 8am-6pm
 
@@ -94,7 +94,7 @@ Level 3: Hanna Leadership
 
 We want to hear from you! Share feedback anytime:
 
-📧 feedback@hanna.health
+📧 feedback@hanna.care
 
 ---
 

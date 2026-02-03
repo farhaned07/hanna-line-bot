@@ -1,5 +1,6 @@
 const db = require('./db');
 const healthData = require('../handlers/healthData');
+const sentimentAnalysis = require('./sentimentAnalysis');
 
 /**
  * OneBrain Service
@@ -56,13 +57,15 @@ class OneBrain {
     }
 
     /**
-     * Logic to determine Risk Score (0-10) - V3 SAFETY POLISH
+     * Logic to determine Risk Score (0-10) - V4 FALSE NEGATIVE MITIGATION
      * Formula:
      * +3 Emergency Keyword
      * +2 Vital Danger (BP >180, Gluc >400/<70)
      * +2 Missed Meds > 3 days
      * +1 High Trend
      * +1 Silence > 48h
+     * +1 Hedging/Underreporting detected (NEW)
+     * +1 Worsening 7-day trend (NEW)
      */
     async calculateRisk(patient) {
         // Get LINE User ID for healthData lookups
@@ -111,10 +114,45 @@ class OneBrain {
             reasons.push('Silent > 48h');
         }
 
-        // --- 5. Age Modifier ---
+        // --- 5. SENTIMENT ANALYSIS (FALSE NEGATIVE MITIGATION) ---
+        // Detect hedging language that suggests underreporting
+        try {
+            const recentChat = await db.query(`
+                SELECT content, role FROM chat_history 
+                WHERE patient_id = $1 AND role = 'user'
+                AND created_at > NOW() - INTERVAL '24 hours'
+                ORDER BY created_at DESC LIMIT 10
+            `, [patient.id]);
+
+            if (recentChat.rows.length > 0) {
+                const chatAnalysis = sentimentAnalysis.analyzeChatHistory(recentChat.rows);
+                if (chatAnalysis.maxConcern >= 2 || chatAnalysis.flaggedMessages.length > 0) {
+                    score += 1;
+                    reasons.push('⚠️ Possible underreporting detected');
+                }
+            }
+        } catch (err) {
+            console.warn('[OneBrain] Sentiment analysis skipped:', err.message);
+        }
+
+        // --- 6. 7-DAY WORSENING TREND (FALSE NEGATIVE MITIGATION) ---
+        // Compare this week vs previous week
+        try {
+            const prevWeekSummary = await this.getPreviousWeekSummary(lineUserId);
+            if (prevWeekSummary && summary.averageGlucose && prevWeekSummary.averageGlucose) {
+                const trendPct = ((summary.averageGlucose - prevWeekSummary.averageGlucose) / prevWeekSummary.averageGlucose) * 100;
+                if (trendPct > 10) {
+                    score += 1;
+                    reasons.push(`📈 Worsening trend: +${Math.round(trendPct)}% glucose`);
+                }
+            }
+        } catch (err) {
+            console.warn('[OneBrain] Trend analysis skipped:', err.message);
+        }
+
+        // --- 7. Age Modifier ---
         if (patient.age && patient.age > 70) {
             score = Math.ceil(score * 1.2);
-            // reasons.push('Age Modifier'); // Internal detail, maybe don't show on card unless relevant
         }
 
         // Cap score
@@ -178,6 +216,41 @@ class OneBrain {
         }
 
         return { score, level, reasons, positiveSignals };
+    }
+
+    /**
+     * Get previous week's summary for trend comparison
+     * Days 8-14 ago
+     */
+    async getPreviousWeekSummary(lineUserId) {
+        try {
+            // Look up patient_id first
+            const patientRes = await db.query('SELECT id FROM chronic_patients WHERE line_user_id = $1', [lineUserId]);
+            const patientId = patientRes.rows[0]?.id;
+            if (!patientId) return null;
+
+            const result = await db.query(`
+                SELECT 
+                    AVG(glucose_level) as avg_glucose,
+                    COUNT(*) as total_checkins
+                FROM check_ins
+                WHERE patient_id = $1
+                AND check_in_time >= CURRENT_TIMESTAMP - INTERVAL '14 days'
+                AND check_in_time < CURRENT_TIMESTAMP - INTERVAL '7 days'
+            `, [patientId]);
+
+            if (result.rows.length === 0 || !result.rows[0].avg_glucose) {
+                return null;
+            }
+
+            return {
+                averageGlucose: Math.round(result.rows[0].avg_glucose),
+                totalCheckIns: parseInt(result.rows[0].total_checkins || 0)
+            };
+        } catch (error) {
+            console.warn('[OneBrain] getPreviousWeekSummary error:', error.message);
+            return null;
+        }
     }
 
     /**

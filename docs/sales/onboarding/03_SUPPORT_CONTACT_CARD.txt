@@ -1,0 +1,109 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+                         📇 SUPPORT CONTACT CARD
+                              Hanna Support
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚨 EMERGENCY CONTACTS
+
+If a patient reports life-threatening symptoms, call 1669 immediately.
+
+    ─────────────────────────────────────────────────────────────────────
+    🚑 National Emergency:  1669
+    🏥 Hospital Emergency:  [Your Hospital ER Number]
+    ─────────────────────────────────────────────────────────────────────
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📞 HANNA SUPPORT CHANNELS
+
+1️⃣  Implementation Manager (Primary Contact)
+
+    👤 Name: [Assigned Manager Name]
+    📧 Email: [manager@hanna.care]
+    📱 Phone: [+66-XX-XXX-XXXX]
+    🕐 Response Time: Same business day
+
+    Use for:
+    • Pilot planning questions
+    • Training requests
+    • Escalation issues
+    • Weekly check-in calls
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+2️⃣  Clinical Support
+
+    📧 Email: clinical@hanna.care
+    🕐 Response Time: 24 hours
+
+    Use for:
+    • Clinical workflow questions
+    • Risk scoring clarification
+    • Protocol adjustments
+    • Clinical governance issues
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+3️⃣  Technical Support
+
+    📧 Email: support@hanna.care
+    📱 Phone: +66-2-XXX-XXXX
+    🕐 Hours: Mon-Fri, 8am-6pm
+
+    Use for:
+    • Dashboard login issues
+    • Patient enrollment problems
+    • System errors or bugs
+    • Data export requests
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⏱️ RESPONSE TIME TARGETS
+
+    Issue Type              Target Response
+    ─────────────────────────────────────────────────────────────────────
+    🔴 Critical (System Down)    2 hours
+    🟠 High (Major Issue)        4 hours
+    🟢 Normal (Questions)        24 hours
+    📋 Feature Requests          Weekly review
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📝 HOW TO REPORT AN ISSUE
+
+When contacting support, please include:
+
+    ✅ Your hospital name
+    ✅ Patient ID (if applicable)
+    ✅ Screenshot (if possible)
+    ✅ Date and time of issue
+    ✅ Steps to reproduce
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔧 QUICK FIXES
+
+Before contacting support, try these:
+
+    Problem                     Quick Fix
+    ─────────────────────────────────────────────────────────────────────
+    🔐 Can't login              Clear browser cache, try incognito mode
+    🐌 Dashboard slow           Refresh page, try Chrome or Firefox
+    📵 Patient not receiving    Check LINE is added, check patient status
+    🔔 Alert not appearing      Wait 5 min, check filters, refresh
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💬 FEEDBACK
+
+We want to hear from you! Share feedback anytime:
+
+    📧 feedback@hanna.care
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+                         Hanna by Archangel Co., Ltd.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

@@ -73,20 +73,20 @@ const aggregatePatientData = async (patientId, timeRangeDays, tenantId = null) =
     const patient = patientRes.rows[0];
 
     // 2. Check-ins and Vitals
+    // Note: check_ins uses line_user_id, not patient_id
     const checkinsRes = await db.query(`
         SELECT 
             id, 
             check_in_time,
             glucose_level as glucose,
-            systolic, diastolic,
-            medication_taken, symptoms,
-            mood, alert_level,
-            created_at
+            medication_taken, 
+            symptoms,
+            mood
         FROM check_ins
-        WHERE patient_id = $1 
-        AND created_at >= $2
-        ORDER BY created_at ASC
-    `, [patientId, startDate]);
+        WHERE line_user_id = $1 
+        AND check_in_time >= $2
+        ORDER BY check_in_time ASC
+    `, [patient.line_user_id, startDate]);
 
     const checkins = checkinsRes.rows;
 
@@ -98,7 +98,7 @@ const aggregatePatientData = async (patientId, timeRangeDays, tenantId = null) =
     // Create a map of dates with check-ins
     const checkinsByDate = {};
     checkins.forEach(c => {
-        const dateKey = new Date(c.created_at).toDateString();
+        const dateKey = new Date(c.check_in_time).toDateString();
         if (!checkinsByDate[dateKey]) {
             checkinsByDate[dateKey] = [];
         }
@@ -125,12 +125,13 @@ const aggregatePatientData = async (patientId, timeRangeDays, tenantId = null) =
         });
 
         // Vitals data (use last reading of the day)
+        // Note: systolic/diastolic from vitals_log, glucose from check_ins
         const lastVital = dayCheckins[dayCheckins.length - 1];
         dailyVitals.push({
             date: formatDate(currentDate),
             glucose: lastVital?.glucose || null,
-            systolic: lastVital?.systolic || null,
-            diastolic: lastVital?.diastolic || null
+            systolic: null, // BP data would come from vitals_log if needed
+            diastolic: null
         });
 
         // Adherence data

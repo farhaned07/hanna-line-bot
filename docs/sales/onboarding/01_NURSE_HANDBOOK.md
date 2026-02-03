@@ -7,7 +7,7 @@
 
 This handbook provides everything you need to use the Hanna dashboard effectively. Keep it as a desk reference.
 
-**Support:** If you have questions, contact your Implementation Manager or email support@hanna.health
+**Support:** If you have questions, contact your Implementation Manager or email support@hanna.care
 
 ---
 
@@ -241,7 +241,7 @@ Hanna automatically:
 | Alert stuck | Click "Resolve" again, or contact support |
 | Missing patient | Contact admin or Implementation Manager |
 
-**Support:** support@hanna.health
+**Support:** support@hanna.care
 
 ---
 

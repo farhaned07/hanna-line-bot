@@ -66,13 +66,38 @@ router.get('/tasks', async (req, res) => {
 // Returns counts for Active Patients, Check-ins (Today), Red Flags (24h)
 router.get('/stats', async (req, res) => {
     try {
-        const activeRes = await db.query(`SELECT count(*) FROM chronic_patients WHERE enrollment_status = 'active'`);
-        const pendingRes = await db.query(`SELECT count(*) FROM chronic_patients WHERE enrollment_status = 'pending_verification'`);
-        const checkinsRes = await db.query(`SELECT count(*) FROM check_ins WHERE check_in_time >= CURRENT_DATE`);
+        const tenantId = req.tenant?.id;
+        const tenantFilter = tenantId ? 'AND tenant_id = $1' : '';
+        const params = tenantId ? [tenantId] : [];
+
+        const activeRes = await db.query(
+            `SELECT count(*) FROM chronic_patients WHERE enrollment_status = 'active' ${tenantFilter}`,
+            params
+        );
+        const pendingRes = await db.query(
+            `SELECT count(*) FROM chronic_patients WHERE enrollment_status = 'pending_verification' ${tenantFilter}`,
+            params
+        );
+        const checkinsRes = await db.query(
+            `SELECT count(*) FROM check_ins ci 
+             JOIN chronic_patients cp ON ci.line_user_id = cp.line_user_id
+             WHERE ci.check_in_time >= CURRENT_DATE ${tenantFilter.replace('tenant_id', 'cp.tenant_id')}`,
+            params
+        );
         // Count PENDING tasks as "Red Flags" / "Action Items" for the dashboard
-        const alertsRes = await db.query(`SELECT count(*) FROM nurse_tasks WHERE status = 'pending'`);
+        const alertsRes = await db.query(
+            `SELECT count(*) FROM nurse_tasks nt
+             JOIN chronic_patients cp ON nt.patient_id = cp.id
+             WHERE nt.status = 'pending' ${tenantFilter.replace('tenant_id', 'cp.tenant_id')}`,
+            params
+        );
         // Count RESOLVED tasks today as "Clinician Actions Today"
-        const resolutionsRes = await db.query(`SELECT count(*) FROM nurse_tasks WHERE status = 'completed' AND completed_at >= CURRENT_DATE`);
+        const resolutionsRes = await db.query(
+            `SELECT count(*) FROM nurse_tasks nt
+             JOIN chronic_patients cp ON nt.patient_id = cp.id
+             WHERE nt.status = 'completed' AND nt.completed_at >= CURRENT_DATE ${tenantFilter.replace('tenant_id', 'cp.tenant_id')}`,
+            params
+        );
 
         // Calculate capacity multiplier (patients per nurse action needed)
         const activePatients = parseInt(activeRes.rows[0].count);
@@ -105,7 +130,8 @@ router.get('/stats', async (req, res) => {
 // Returns all patients with their current monitoring status for the patient grid
 router.get('/monitoring-status', async (req, res) => {
     try {
-        const result = await db.query(`
+        const tenantId = req.tenant?.id;
+        let query = `
             SELECT 
                 cp.id,
                 CONCAT(SUBSTRING(cp.name, 1, 1), SUBSTRING(cp.name, POSITION(' ' IN cp.name) + 1, 1)) as initials,
@@ -116,8 +142,17 @@ router.get('/monitoring-status', async (req, res) => {
             FROM chronic_patients cp
             LEFT JOIN patient_state ps ON cp.id = ps.patient_id
             WHERE cp.enrollment_status IN ('active', 'trial', 'onboarding')
-            ORDER BY COALESCE(ps.current_risk_score, 0) DESC
-        `);
+        `;
+        const params = [];
+
+        if (tenantId) {
+            query += ` AND cp.tenant_id = $1`;
+            params.push(tenantId);
+        }
+
+        query += ` ORDER BY COALESCE(ps.current_risk_score, 0) DESC`;
+
+        const result = await db.query(query, params);
 
         // Calculate summary counts
         const summary = {
@@ -353,14 +388,78 @@ router.get('/trends', async (req, res) => {
 });
 
 // GET /api/nurse/patients
-// Returns full list of patients
+// Returns full list of patients with search, filter, pagination
 router.get('/patients', async (req, res) => {
     try {
-        const result = await db.query(`
-            SELECT * FROM chronic_patients 
-            ORDER BY created_at DESC
-        `);
-        res.json(result.rows);
+        const tenantId = req.tenant?.id;
+        const { search, condition, risk_level, status, page = 1, limit = 50, sort = 'created_at', order = 'DESC' } = req.query;
+
+        let query = `
+            SELECT cp.*, ps.current_risk_score, ps.risk_level
+            FROM chronic_patients cp
+            LEFT JOIN patient_state ps ON cp.id = ps.patient_id
+            WHERE 1=1
+        `;
+        const params = [];
+        let paramIndex = 1;
+
+        // Tenant filter
+        if (tenantId) {
+            query += ` AND cp.tenant_id = $${paramIndex++}`;
+            params.push(tenantId);
+        }
+
+        // Search filter
+        if (search) {
+            query += ` AND (cp.name ILIKE $${paramIndex} OR cp.line_user_id ILIKE $${paramIndex} OR cp.phone_number ILIKE $${paramIndex})`;
+            params.push(`%${search}%`);
+            paramIndex++;
+        }
+
+        // Condition filter
+        if (condition) {
+            query += ` AND cp.condition = $${paramIndex++}`;
+            params.push(condition);
+        }
+
+        // Risk level filter
+        if (risk_level) {
+            query += ` AND ps.risk_level = $${paramIndex++}`;
+            params.push(risk_level);
+        }
+
+        // Status filter
+        if (status) {
+            query += ` AND cp.enrollment_status = $${paramIndex++}`;
+            params.push(status);
+        }
+
+        // Sorting (whitelist allowed columns)
+        const allowedSorts = ['created_at', 'name', 'current_risk_score', 'last_checkin_at'];
+        const sortCol = allowedSorts.includes(sort) ? sort : 'created_at';
+        const sortOrder = order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+
+        // Count total for pagination
+        const countQuery = query.replace('SELECT cp.*, ps.current_risk_score, ps.risk_level', 'SELECT count(*)');
+        const countRes = await db.query(countQuery, params);
+        const total = parseInt(countRes.rows[0].count);
+
+        // Add sorting and pagination
+        query += ` ORDER BY ${sortCol === 'current_risk_score' ? 'ps.' + sortCol : 'cp.' + sortCol} ${sortOrder} NULLS LAST`;
+        query += ` LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
+        params.push(parseInt(limit), (parseInt(page) - 1) * parseInt(limit));
+
+        const result = await db.query(query, params);
+
+        res.json({
+            patients: result.rows,
+            pagination: {
+                page: parseInt(page),
+                limit: parseInt(limit),
+                total,
+                pages: Math.ceil(total / parseInt(limit))
+            }
+        });
     } catch (error) {
         console.error('Error fetching patients:', error);
         res.status(500).json({ error: 'Database Error' });
@@ -372,7 +471,18 @@ router.get('/patients', async (req, res) => {
 router.get('/patients/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const patientRes = await db.query(`SELECT * FROM chronic_patients WHERE id = $1`, [id]);
+        const tenantId = req.tenant?.id;
+
+        // Verify patient belongs to tenant
+        let query = 'SELECT * FROM chronic_patients WHERE id = $1';
+        const params = [id];
+
+        if (tenantId) {
+            query += ' AND tenant_id = $2';
+            params.push(tenantId);
+        }
+
+        const patientRes = await db.query(query, params);
 
         if (patientRes.rows.length === 0) {
             return res.status(404).json({ error: 'Patient not found' });
@@ -396,8 +506,15 @@ router.get('/patients/:id', async (req, res) => {
             LIMIT 10
         `, [id]);
 
+        // Fetch patient state
+        const stateRes = await db.query(
+            'SELECT * FROM patient_state WHERE patient_id = $1',
+            [id]
+        );
+
         res.json({
-            ...patientRes.rows[0],
+            ...patient,
+            state: stateRes.rows[0] || null,
             history: checkinsRes.rows,
             tasks: tasksRes.rows
         });
