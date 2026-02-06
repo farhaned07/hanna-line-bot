@@ -7,213 +7,389 @@
     <title>Call Hanna</title>
     <!-- LIFF SDK -->
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+    <!-- Fonts: Inter (English) + Prompt (Thai) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Prompt:wght@300;400;600&display=swap"
+        rel="stylesheet">
+
     <style>
+        :root {
+            --primary-glow: #06C755;
+            --primary-dim: #04883b;
+            --bg-dark: #020617;
+            --bg-light: #0f172a;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
         * {
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            color: #fff;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: radial-gradient(circle at 50% 30%, #1e293b 0%, #020617 100%);
+            color: #ffffff;
+            font-family: 'Prompt', 'Inter', sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
         }
 
-        .avatar-container {
-            position: relative;
-            width: 220px;
-            height: 220px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .avatar-circle {
-            width: 160px;
-            height: 160px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #06C755 0%, #00a347 100%);
-            position: absolute;
-            z-index: 2;
-            box-shadow: 0 8px 32px rgba(6, 199, 85, 0.4);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 80px;
-        }
-
-        .avatar-circle::after {
-            content: '🩺';
-        }
-
-        /* Pulse Animation */
-        .pulse-ring {
-            position: absolute;
-            width: 160px;
-            height: 160px;
-            border-radius: 50%;
-            background: rgba(6, 199, 85, 0.25);
-            z-index: 1;
-            transform: scale(1);
-        }
-
-        .pulsing .pulse-ring {
-            animation: pulse-animation 2s infinite;
-        }
-
-        @keyframes pulse-animation {
+        /* --- Animations --- */
+        @keyframes float {
             0% {
-                transform: scale(1);
-                opacity: 0.7;
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
             }
 
             100% {
-                transform: scale(2);
+                transform: translateY(0px);
+            }
+        }
+
+        @keyframes breathe {
+            0% {
+                transform: scale(1);
+                opacity: 0.6;
+                box-shadow: 0 0 40px var(--primary-dim);
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.9;
+                box-shadow: 0 0 80px var(--primary-glow);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 0.6;
+                box-shadow: 0 0 40px var(--primary-dim);
+            }
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(0.8);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(2.5);
                 opacity: 0;
             }
         }
 
-        .brand-name {
-            margin-top: 20px;
-            font-size: 32px;
-            font-weight: 700;
-            color: #06C755;
-            letter-spacing: 2px;
-        }
-
-        .status-text {
-            margin-top: 16px;
-            font-size: 22px;
-            font-weight: 500;
-            color: #eee;
-            text-align: center;
-        }
-
-        .subtitles {
-            margin-top: 24px;
-            font-size: 16px;
-            color: rgba(255, 255, 255, 0.75);
-            text-align: center;
-            padding: 16px 24px;
-            min-height: 60px;
-            max-width: 320px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
-            backdrop-filter: blur(10px);
-        }
-
-        .controls {
-            margin-top: 48px;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-        }
-
-        .btn-end {
-            background: linear-gradient(135deg, #ff4757 0%, #ff3b30 100%);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            padding: 16px 48px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 8px 24px rgba(255, 59, 48, 0.35);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .btn-end:active {
-            transform: scale(0.95);
-        }
-
-        .btn-start {
-            background: linear-gradient(135deg, #06C755 0%, #00a347 100%);
-            color: white;
-            padding: 20px 60px;
-            border-radius: 50px;
-            font-size: 20px;
-            font-weight: 600;
-            border: none;
-            display: none;
-            box-shadow: 0 8px 32px rgba(6, 199, 85, 0.4);
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .btn-start:active {
-            transform: scale(0.95);
-        }
-
+        /* --- Landing Screen --- */
         #start-screen {
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: space-between;
+            height: 100%;
+            padding: 60px 24px 40px;
+            width: 100%;
+            max-width: 400px;
         }
 
-        #start-screen p {
-            margin-top: 20px;
-            color: rgba(255, 255, 255, 0.6);
+        .logo-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 40px;
+        }
+
+        .brand-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-glow), var(--primary-dim));
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            box-shadow: 0 20px 40px rgba(6, 199, 85, 0.3);
+            margin-bottom: 24px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .brand-title {
+            font-size: 24px;
+            font-weight: 300;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .welcome-text {
+            font-size: 16px;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        .btn-start {
+            width: 100%;
+            padding: 22px;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .btn-start:active {
+            transform: scale(0.98);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .mic-icon {
+            width: 24px;
+            height: 24px;
+            background: var(--primary-glow);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 14px;
         }
 
-        /* Hidden initially */
+        /* --- Call UI --- */
         #call-ui {
             display: none;
+            /* Hidden by default */
             flex-direction: column;
             align-items: center;
+            justify-content: space-between;
+            height: 100%;
+            padding: 60px 24px 40px;
+            width: 100%;
+            position: relative;
         }
 
-        .error-text {
-            color: #ff4757;
+        /* The AI Orb */
+        .orb-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 40px;
+        }
+
+        .orb-core {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), var(--primary-glow));
+            box-shadow: 0 0 50px var(--primary-dim);
+            z-index: 10;
+        }
+
+        /* Breathing Effect when AI is thinking/speaking */
+        .pulsing .orb-core {
+            animation: breathe 3s ease-in-out infinite;
+        }
+
+        .pulsing .ripple {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 1px solid rgba(6, 199, 85, 0.5);
+            animation: ripple 2s linear infinite;
+        }
+
+        .ripple:nth-child(2) {
+            animation-delay: 0.6s;
+        }
+
+        .ripple:nth-child(3) {
+            animation-delay: 1.2s;
+        }
+
+        .status-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ai-name {
+            font-size: 14px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .status-text {
+            font-size: 20px;
+            font-weight: 500;
+            color: #fff;
+            min-height: 30px;
+            text-align: center;
+        }
+
+        /* Glassmorphism Transcript */
+        .transcript-box {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 24px;
+            width: 100%;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Controls */
+        .controls-area {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding-bottom: 20px;
+        }
+
+        .btn-end {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: #ef4444;
+            /* Red-500 */
+            border: none;
+            color: white;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn-end:active {
+            transform: scale(0.9);
+            background: #dc2626;
+            /* Red-600 */
+        }
+
+        /* Fallback Input */
+        #text-input-container {
+            width: 100%;
+            margin-top: 10px;
+            display: none;
+        }
+
+        #text-input {
+            width: 100%;
+            padding: 16px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            font-family: inherit;
+            outline: none;
+        }
+
+        #send-btn {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            border-radius: 12px;
+            background: var(--primary-glow);
+            color: white;
+            border: none;
+            font-family: inherit;
+            font-weight: 600;
         }
     </style>
 </head>
 
 <body>
 
-    <!-- Start Screen -->
+    <!-- START SCREEN -->
     <div id="start-screen">
-        <div class="avatar-container">
-            <div class="avatar-circle"></div>
+        <div class="logo-area">
+            <div class="brand-icon">🩺</div>
+            <div class="brand-title">HANNA</div>
+            <div class="welcome-text">Premium Care Assistant</div>
         </div>
-        <div class="brand-name">HANNA</div>
-        <button id="btn-connect" class="btn-start" style="display:block; margin-top: 40px;">คุยกับฮันนา</button>
-        <p style="margin-top:20px; color:#aaa">แตะเพื่อเริ่มสนทนา</p>
+
+        <button id="btn-connect" class="btn-start">
+            <div class="mic-icon">🎤</div>
+            <span>Tap to Speak</span>
+        </button>
     </div>
 
-    <!-- Call UI -->
+    <!-- CALL UI -->
     <div id="call-ui">
-        <div class="avatar-container">
-            <div class="pulse-ring"></div>
-            <div class="pulse-ring" style="animation-delay: 1s;"></div>
-            <div class="avatar-circle"></div>
+        <div class="ai-name">Voice Connected</div>
+
+        <!-- The Breathing Orb -->
+        <div class="orb-container">
+            <div class="ripple"></div>
+            <div class="ripple"></div>
+            <div class="orb-core"></div>
         </div>
 
-        <div class="status-text" id="status">กำลังเชื่อมต่อ...</div>
-        <div class="subtitles" id="transcript"></div>
-
-        <!-- Text Input Fallback (shown when speech not available) -->
-        <div id="text-input-container" style="display: none; margin-top: 24px; width: 100%; max-width: 320px;">
-            <input type="text" id="text-input" placeholder="พิมพ์ข้อความ..." style="width: 100%; padding: 16px; border-radius: 25px; border: none; 
-                       font-size: 16px; background: rgba(255,255,255,0.9); color: #333;">
-            <button id="send-btn" onclick="sendTextMessage()" style="margin-top: 12px; width: 100%; padding: 14px; border-radius: 25px; 
-                       border: none; background: linear-gradient(135deg, #06C755 0%, #00a347 100%); 
-                       color: white; font-size: 16px; font-weight: 600; cursor: pointer;">
-                ส่งข้อความ
-            </button>
+        <div class="status-area">
+            <div class="status-text" id="status">Connecting...</div>
         </div>
 
-        <div class="controls">
-            <button class="btn-end" onclick="endCall()">วางสาย</button>
+        <div class="transcript-box" id="transcript">
+            "Hello, how are you feeling today?"
+        </div>
+
+        <!-- Text Input Fallback -->
+        <div id="text-input-container">
+            <input type="text" id="text-input" placeholder="Type a message...">
+            <button id="send-btn" onclick="sendTextMessage()">Send</button>
+        </div>
+
+        <div class="controls-area">
+            <button class="btn-end" onclick="endCall()">Phone Off</button>
+            <!-- Icon for hangup -->
+            <!-- Using text/emoji for simplicity in demo, css handles circle shape -->
         </div>
     </div>
 
+    <!-- 
+        LOGIC SCRIPT 
+        (Strictly Preserved from original file)
+    -->
     <script>
         let recognition;
         let isSpeaking = false;
@@ -245,21 +421,22 @@
         async function startCall() {
             document.getElementById('start-screen').style.display = 'none';
             document.getElementById('call-ui').style.display = 'flex';
-            document.getElementById('status').innerText = "กำลังเชื่อมต่อ...";
+            document.getElementById('status').innerText = "Connecting...";
 
             try {
                 // Check for Web Speech API support
                 if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-                    throw new Error("เบราว์เซอร์ไม่รองรับ Speech API");
+                    throw new Error("Browser does not support Speech API");
                 }
 
                 // Start voice interface
                 setupVoice();
-                document.getElementById('status').innerText = "พูดได้เลยค่ะ";
+                document.getElementById('status').innerText = "Listening...";
+                document.getElementById('transcript').innerText = ""; // Clear placeholder
 
             } catch (err) {
                 console.error(err);
-                document.getElementById('status').innerText = "เกิดข้อผิดพลาด: " + err.message;
+                document.getElementById('status').innerText = "Error: " + err.message;
             }
         }
 
@@ -283,7 +460,7 @@
 
             if (!SpeechRecognition) {
                 // Show text input fallback
-                document.getElementById('status').innerText = "พิมพ์ข้อความแทนได้ค่ะ";
+                document.getElementById('status').innerText = "Please type instead.";
                 document.getElementById('text-input-container').style.display = 'block';
                 return;
             }
@@ -296,7 +473,7 @@
             recognition.onstart = () => {
                 console.log('Recognition started');
                 if (!isSpeaking) {
-                    document.getElementById('status').innerText = "กำลังฟัง...";
+                    document.getElementById('status').innerText = "Listening...";
                     document.body.classList.remove('pulsing');
                 }
             };
@@ -323,7 +500,7 @@
                 const text = event.results[resultIndex][0].transcript;
 
                 if (text.trim() && !isSpeaking) {
-                    document.getElementById('transcript').innerText = `คุณ: ${text}`;
+                    document.getElementById('transcript').innerText = `You: ${text}`;
                     // Process the message (don't await - let recognition continue)
                     processUserAudio(text);
                 }
@@ -338,7 +515,7 @@
 
             isSpeaking = true;
 
-            document.getElementById('status').innerText = "กำลังคิด...";
+            document.getElementById('status').innerText = "Thinking...";
             document.body.classList.add('pulsing');
 
             try {
@@ -350,8 +527,8 @@
 
                 const data = await res.json();
 
-                document.getElementById('transcript').innerText = `ฮันนา: ${data.text}`;
-                document.getElementById('status').innerText = "กำลังพูด...";
+                document.getElementById('transcript').innerText = `Hanna: ${data.text}`;
+                document.getElementById('status').innerText = "Speaking...";
 
                 // Play Audio
                 if (data.audio) {
@@ -360,27 +537,27 @@
                     audio.onended = () => {
                         isSpeaking = false;
                         document.body.classList.remove('pulsing');
-                        document.getElementById('status').innerText = "กำลังฟัง...";
+                        document.getElementById('status').innerText = "Listening...";
                     };
 
                     audio.onerror = () => {
                         isSpeaking = false;
                         document.body.classList.remove('pulsing');
-                        document.getElementById('status').innerText = "กำลังฟัง...";
+                        document.getElementById('status').innerText = "Listening...";
                     };
 
                     await audio.play();
                 } else {
                     isSpeaking = false;
                     document.body.classList.remove('pulsing');
-                    document.getElementById('status').innerText = "กำลังฟัง...";
+                    document.getElementById('status').innerText = "Listening...";
                 }
 
             } catch (e) {
                 console.error("AI Error", e);
                 isSpeaking = false;
                 document.body.classList.remove('pulsing');
-                document.getElementById('status').innerText = "กำลังฟัง...";
+                document.getElementById('status').innerText = "Listening...";
             }
         }
 
@@ -391,7 +568,7 @@
             if (!text) return;
 
             input.value = '';
-            document.getElementById('transcript').innerText = `คุณ: ${text}`;
+            document.getElementById('transcript').innerText = `You: ${text}`;
             await processUserAudio(text);
         }
 

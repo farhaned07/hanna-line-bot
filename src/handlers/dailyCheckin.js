@@ -76,11 +76,15 @@ const getRandomMessage = (messages, name = '') => {
  * Start daily check-in flow
  * Called by scheduler or manually
  */
+// ... (Top of file remains same) ...
+
+/**
+ * START CHECK-IN (Premium Design)
+ */
 const startCheckIn = async (userId, userName) => {
     const period = getGreetingPeriod();
     const greeting = getRandomMessage(GREETINGS[period], userName);
 
-    // Update state
     await db.query(
         `UPDATE chronic_patients 
          SET current_checkin_state = 'greeting' 
@@ -93,56 +97,63 @@ const startCheckIn = async (userId, userName) => {
         altText: greeting,
         contents: {
             type: 'bubble',
+            size: 'giga', // Max width
             body: {
                 type: 'box',
                 layout: 'vertical',
+                paddingAll: '20px',
                 contents: [
+                    {
+                        type: 'text',
+                        text: 'Daily Check-in',
+                        weight: 'bold',
+                        color: '#06C755', // Emerald
+                        size: 'xs',
+                        align: 'start'
+                    },
                     {
                         type: 'text',
                         text: greeting,
                         weight: 'bold',
-                        size: 'lg',
+                        size: 'xxl', // Big Hero Text
+                        margin: 'md',
                         wrap: true,
-                        color: '#06C755'
+                        color: '#1e293b' // Dark Slate
+                    },
+                    {
+                        type: 'text',
+                        text: 'How are you feeling right now?',
+                        size: 'md',
+                        color: '#64748b', // Muted text
+                        margin: 'sm'
                     }
                 ]
             },
             footer: {
                 type: 'box',
-                layout: 'horizontal',
-                spacing: 'sm',
+                layout: 'vertical',
+                spacing: 'md',
+                paddingAll: '20px',
                 contents: [
                     {
                         type: 'button',
                         style: 'primary',
                         color: '#06C755',
-                        action: {
-                            type: 'postback',
-                            label: 'ดี 😊',
-                            data: 'action=checkin_mood&value=good'
-                        },
-                        flex: 1
+                        height: 'md',
+                        action: { type: 'postback', label: 'Great 😊', data: 'action=checkin_mood&value=good' }
                     },
                     {
                         type: 'button',
                         style: 'secondary',
-                        action: {
-                            type: 'postback',
-                            label: 'ปกติ 😐',
-                            data: 'action=checkin_mood&value=ok'
-                        },
-                        flex: 1
+                        height: 'md',
+                        action: { type: 'postback', label: 'Normal 😐', data: 'action=checkin_mood&value=ok' }
                     },
                     {
                         type: 'button',
-                        style: 'secondary',
-                        color: '#FF6B6B',
-                        action: {
-                            type: 'postback',
-                            label: 'ไม่ดี 😟',
-                            data: 'action=checkin_mood&value=bad'
-                        },
-                        flex: 1
+                        style: 'linked', // Looks like danger link
+                        color: '#ef4444',
+                        height: 'md',
+                        action: { type: 'postback', label: 'Not Good 😟', data: 'action=checkin_mood&value=bad' }
                     }
                 ]
             }
@@ -152,296 +163,168 @@ const startCheckIn = async (userId, userName) => {
     return line.pushMessage(userId, message);
 };
 
+
 /**
- * Handle check-in postback
+ * HANDLE POSTBACK (Premium Design)
  */
 const handleCheckInPostback = async (event, user) => {
     const userId = user.line_user_id;
     const data = new URLSearchParams(event.postback.data);
     const action = data.get('action');
     const value = data.get('value');
-    const state = user.current_checkin_state;
 
-    console.log(`[DailyCheckIn] User ${userId} state: ${state}, action: ${action}, value: ${value}`);
+    console.log(`[DailyCheckIn] User ${userId}, Action: ${action}, Value: ${value}`);
 
-    // ================================================================
-    // STEP 1: Mood Response → Medication Question
-    // ================================================================
+    // --- STEP 1: MOOD -> MEDS ---
     if (action === 'checkin_mood') {
-        // Log mood
-        await db.query(
-            `INSERT INTO check_ins (patient_id, mood, check_in_time) 
-             VALUES ((SELECT id FROM chronic_patients WHERE line_user_id = $1), $2, NOW())
-             ON CONFLICT DO NOTHING`,
-            [userId, value]
-        );
-
-        // Update state
-        await db.query(
-            `UPDATE chronic_patients 
-             SET current_checkin_state = 'medication', last_response_date = CURRENT_DATE 
-             WHERE line_user_id = $1`,
-            [userId]
-        );
-
-        // If bad mood, trigger OneBrain alert
+        // ... (DB Logic Same) ...
+        await db.query(`INSERT INTO check_ins (patient_id, mood, check_in_time) VALUES ((SELECT id FROM chronic_patients WHERE line_user_id = $1), $2, NOW()) ON CONFLICT DO NOTHING`, [userId, value]);
+        await db.query(`UPDATE chronic_patients SET current_checkin_state = 'medication', last_response_date = CURRENT_DATE WHERE line_user_id = $1`, [userId]);
         if (value === 'bad') {
-            const patientRes = await db.query('SELECT id FROM chronic_patients WHERE line_user_id = $1', [userId]);
-            if (patientRes.rows[0]) {
-                OneBrain.analyzePatient(patientRes.rows[0].id, 'mood_bad');
-            }
-        }
-
-        // Response based on mood
-        let moodResponse = '';
-        if (value === 'good') {
-            moodResponse = 'ยอดเยี่ยม! 💪\n\n';
-        } else if (value === 'ok') {
-            moodResponse = 'เข้าใจค่ะ 👍\n\n';
-        } else {
-            moodResponse = 'เสียใจด้วยค่ะ 😟 เราจะดูแลคุณนะ\n\n';
+            const p = await db.query('SELECT id FROM chronic_patients WHERE line_user_id = $1', [userId]);
+            if (p.rows[0]) OneBrain.analyzePatient(p.rows[0].id, 'mood_bad');
         }
 
         const medQuestion = getRandomMessage(MEDICATION_MESSAGES);
 
         return line.replyMessage(event.replyToken, {
             type: 'flex',
-            altText: moodResponse + medQuestion,
+            altText: medQuestion,
             contents: {
                 type: 'bubble',
+                size: 'giga',
                 body: {
                     type: 'box',
                     layout: 'vertical',
+                    paddingAll: '20px',
                     contents: [
-                        { type: 'text', text: moodResponse.trim(), size: 'md', wrap: true },
-                        { type: 'text', text: medQuestion, weight: 'bold', size: 'lg', margin: 'md', color: '#06C755' }
+                        { type: 'text', text: 'Step 2 of 3', weight: 'bold', color: '#06C755', size: 'xs' },
+                        { type: 'text', text: medQuestion, weight: 'bold', size: 'xl', margin: 'md', wrap: true, color: '#1e293b' },
+                        { type: 'text', text: 'Did you take your prescribed pills?', size: 'md', color: '#64748b', margin: 'sm' }
                     ]
                 },
                 footer: {
                     type: 'box',
                     layout: 'vertical',
-                    spacing: 'sm',
+                    spacing: 'md',
+                    paddingAll: '20px',
                     contents: [
+                        { type: 'button', style: 'primary', color: '#06C755', height: 'md', action: { type: 'postback', label: 'Yes, All ✅', data: 'action=checkin_med&value=full' } },
                         {
-                            type: 'button',
-                            style: 'primary',
-                            color: '#06C755',
-                            action: {
-                                type: 'postback',
-                                label: 'ได้ ครบ ✅',
-                                data: 'action=checkin_med&value=full'
-                            }
+                            type: 'box',
+                            layout: 'horizontal',
+                            spacing: 'md',
+                            contents: [
+                                { type: 'button', style: 'secondary', height: 'md', action: { type: 'postback', label: 'Some', data: 'action=checkin_med&value=partial' } },
+                                { type: 'button', style: 'secondary', height: 'md', action: { type: 'postback', label: 'None', data: 'action=checkin_med&value=none' } }
+                            ]
                         },
-                        {
-                            type: 'button',
-                            style: 'secondary',
-                            action: {
-                                type: 'postback',
-                                label: 'บางส่วน',
-                                data: 'action=checkin_med&value=partial'
-                            }
-                        },
-                        {
-                            type: 'button',
-                            style: 'secondary',
-                            action: {
-                                type: 'postback',
-                                label: 'ไม่ได้เลย',
-                                data: 'action=checkin_med&value=none'
-                            }
-                        },
-                        {
-                            type: 'button',
-                            style: 'link',
-                            action: {
-                                type: 'postback',
-                                label: 'ลืม',
-                                data: 'action=checkin_med&value=forgot'
-                            }
-                        }
+                        { type: 'button', style: 'link', height: 'sm', color: '#94a3b8', action: { type: 'postback', label: 'I Forgot', data: 'action=checkin_med&value=forgot' } }
                     ]
                 }
             }
         });
     }
 
-    // ================================================================
-    // STEP 2: Medication Response → Symptom Question
-    // ================================================================
+    // --- STEP 2: MEDS -> SYMPTOMS ---
     if (action === 'checkin_med') {
-        // Log medication
+        // ... (DB Logic Same) ...
         const taken = value === 'full';
-        const partial = value === 'partial';
-
-        // Update today's check-in with medication data
-        await db.query(
-            `UPDATE check_ins 
-             SET medication_taken = $2, medication_notes = $3
-             WHERE patient_id = (SELECT id FROM chronic_patients WHERE line_user_id = $1)
-             AND DATE(check_in_time) = CURRENT_DATE`,
-            [userId, taken, value]
-        );
-
-        // Update state
-        await db.query(
-            `UPDATE chronic_patients SET current_checkin_state = 'symptoms' WHERE line_user_id = $1`,
-            [userId]
-        );
-
-        // If no medication, trigger alert
+        await db.query(`UPDATE check_ins SET medication_taken = $2, medication_notes = $3 WHERE patient_id = (SELECT id FROM chronic_patients WHERE line_user_id = $1) AND DATE(check_in_time) = CURRENT_DATE`, [userId, taken, value]);
+        await db.query(`UPDATE chronic_patients SET current_checkin_state = 'symptoms' WHERE line_user_id = $1`, [userId]);
         if (value === 'none') {
-            const patientRes = await db.query('SELECT id FROM chronic_patients WHERE line_user_id = $1', [userId]);
-            if (patientRes.rows[0]) {
-                OneBrain.analyzePatient(patientRes.rows[0].id, 'missed_medication');
-            }
-        }
-
-        // Response based on medication
-        let medResponse = '';
-        if (taken) {
-            medResponse = 'ยอดเยี่ยมมม! 🎉 ต่อเนื่องนะคะ\n\n';
-        } else if (partial) {
-            medResponse = 'ไม่เป็นไรค่ะ 👍 พยายามกินให้ครบนะ\n\n';
-        } else if (value === 'forgot') {
-            medResponse = 'ไม่เป็นไรค่ะ 😊 อย่าลืมกินในมื้อถัดไปนะ\n\n';
-        } else {
-            medResponse = 'ไม่เป็นไรค่ะ 😟 บอกเราได้ถ้ามีปัญหานะ\n\n';
+            const p = await db.query('SELECT id FROM chronic_patients WHERE line_user_id = $1', [userId]);
+            if (p.rows[0]) OneBrain.analyzePatient(p.rows[0].id, 'missed_medication');
         }
 
         const symptomQuestion = getRandomMessage(SYMPTOM_MESSAGES);
 
         return line.replyMessage(event.replyToken, {
             type: 'flex',
-            altText: medResponse + symptomQuestion,
+            altText: symptomQuestion,
             contents: {
                 type: 'bubble',
+                size: 'giga',
                 body: {
                     type: 'box',
                     layout: 'vertical',
+                    paddingAll: '20px',
                     contents: [
-                        { type: 'text', text: medResponse.trim(), size: 'md', wrap: true },
-                        { type: 'text', text: symptomQuestion, weight: 'bold', size: 'lg', margin: 'md', color: '#06C755' }
+                        { type: 'text', text: 'Final Step', weight: 'bold', color: '#06C755', size: 'xs' },
+                        { type: 'text', text: symptomQuestion, weight: 'bold', size: 'xl', margin: 'md', wrap: true, color: '#1e293b' },
+                        { type: 'text', text: 'Any discomfort or pain today?', size: 'md', color: '#64748b', margin: 'sm' }
                     ]
                 },
                 footer: {
                     type: 'box',
-                    layout: 'horizontal',
-                    spacing: 'sm',
+                    layout: 'vertical',
+                    spacing: 'md',
+                    paddingAll: '20px',
                     contents: [
-                        {
-                            type: 'button',
-                            style: 'primary',
-                            color: '#06C755',
-                            action: {
-                                type: 'postback',
-                                label: 'ไม่ มีแต่เรื่องดี 👍',
-                                data: 'action=checkin_symptom&value=none'
-                            },
-                            flex: 1
-                        },
-                        {
-                            type: 'button',
-                            style: 'secondary',
-                            color: '#FF6B6B',
-                            action: {
-                                type: 'postback',
-                                label: 'มีอาการบ้าง 😟',
-                                data: 'action=checkin_symptom&value=has'
-                            },
-                            flex: 1
-                        }
+                        { type: 'button', style: 'primary', color: '#06C755', height: 'md', action: { type: 'postback', label: 'No, I feel good 👍', data: 'action=checkin_symptom&value=none' } },
+                        { type: 'button', style: 'secondary', color: '#ef4444', height: 'md', action: { type: 'postback', label: 'Yes, I have symptoms', data: 'action=checkin_symptom&value=has' } }
                     ]
                 }
             }
         });
     }
 
-    // ================================================================
-    // STEP 3: Symptom Response → Complete or Symptom Picker
-    // ================================================================
+    // --- STEP 3: SYMPTOMS -> PICKER ---
     if (action === 'checkin_symptom') {
         if (value === 'none') {
-            // No symptoms - complete check-in
-            await db.query(
-                `UPDATE chronic_patients SET current_checkin_state = NULL WHERE line_user_id = $1`,
-                [userId]
-            );
-
-            // Check for streak
+            // COMPLETE
+            await db.query(`UPDATE chronic_patients SET current_checkin_state = NULL WHERE line_user_id = $1`, [userId]);
             const streakMsg = await getStreakMessage(userId);
 
             return line.replyMessage(event.replyToken, {
                 type: 'flex',
-                altText: 'ยอดเยี่ยม! 🌟',
+                altText: 'Check-in Complete',
                 contents: {
                     type: 'bubble',
+                    size: 'kilo',
                     body: {
                         type: 'box',
                         layout: 'vertical',
+                        paddingAll: '20px',
                         contents: [
-                            { type: 'text', text: 'ยอดเยี่ยม! 🌟', weight: 'bold', size: 'xl', color: '#06C755' },
-                            { type: 'text', text: 'ขอบคุณที่ตอบคำถามของเราค่ะ 💕', margin: 'md', wrap: true },
-                            { type: 'text', text: 'วันนี้คุณดูแลตัวเองได้ดีมากค่ะ', margin: 'sm', size: 'sm', color: '#666666' },
-                            ...(streakMsg ? [{ type: 'text', text: streakMsg, margin: 'md', weight: 'bold', color: '#FF6B00' }] : []),
-                            { type: 'separator', margin: 'lg' },
-                            { type: 'text', text: 'พบกันพรุ่งนี้นะคะ! 👋', margin: 'md', align: 'center', size: 'sm' }
+                            { type: 'text', text: 'All Done! 🌟', weight: 'bold', size: 'xl', color: '#06C755', align: 'center' },
+                            { type: 'text', text: 'Thanks for updating your health status.', margin: 'md', align: 'center', color: '#64748b', size: 'sm', wrap: true },
+                            ...(streakMsg ? [{ type: 'text', text: streakMsg, margin: 'lg', align: 'center', weight: 'bold', color: '#f59e0b' }] : [])
                         ]
                     }
                 }
             });
         } else {
-            // Has symptoms - show symptom picker
-            await db.query(
-                `UPDATE chronic_patients SET current_checkin_state = 'symptom_picker' WHERE line_user_id = $1`,
-                [userId]
-            );
+            // PICKER
+            await db.query(`UPDATE chronic_patients SET current_checkin_state = 'symptom_picker' WHERE line_user_id = $1`, [userId]);
+
+            // Helper for symptom button
+            const symBtn = (label, val) => ({
+                type: 'button', style: 'secondary', height: 'sm',
+                action: { type: 'postback', label: label, data: `action=checkin_symptom_select&value=${val}` },
+                flex: 1, margin: 'xs'
+            });
 
             return line.replyMessage(event.replyToken, {
                 type: 'flex',
-                altText: 'มีอาการอะไรบ้างคะ?',
+                altText: 'Select Symptoms',
                 contents: {
                     type: 'bubble',
-                    body: {
-                        type: 'box',
-                        layout: 'vertical',
+                    size: 'giga',
+                    header: {
+                        type: 'box', layout: 'vertical', backgroundColor: '#fef2f2', paddingAll: '20px', // Light Red BG
                         contents: [
-                            { type: 'text', text: 'มีอาการอะไรบ้างคะ? 🩺', weight: 'bold', size: 'lg', color: '#06C755' },
-                            { type: 'text', text: 'เลือกอาการที่ตรงกับคุณค่ะ', margin: 'sm', size: 'xs', color: '#888888' }
+                            { type: 'text', text: 'Tell us more', weight: 'bold', color: '#ef4444', size: 'lg' },
+                            { type: 'text', text: 'Select all that apply', size: 'xs', color: '#ef4444' }
                         ]
                     },
-                    footer: {
-                        type: 'box',
-                        layout: 'vertical',
-                        spacing: 'sm',
+                    body: {
+                        type: 'box', layout: 'vertical', paddingAll: '20px', spacing: 'md',
                         contents: [
-                            {
-                                type: 'box',
-                                layout: 'horizontal',
-                                spacing: 'sm',
-                                contents: [
-                                    { type: 'button', style: 'secondary', action: { type: 'postback', label: 'มีไข้ 🌡️', data: 'action=checkin_symptom_select&value=fever' }, flex: 1 },
-                                    { type: 'button', style: 'secondary', action: { type: 'postback', label: 'ปวดศีรษะ', data: 'action=checkin_symptom_select&value=headache' }, flex: 1 }
-                                ]
-                            },
-                            {
-                                type: 'box',
-                                layout: 'horizontal',
-                                spacing: 'sm',
-                                contents: [
-                                    { type: 'button', style: 'secondary', action: { type: 'postback', label: 'คลื่นไส้', data: 'action=checkin_symptom_select&value=nausea' }, flex: 1 },
-                                    { type: 'button', style: 'secondary', action: { type: 'postback', label: 'หอบเหนื่อย', data: 'action=checkin_symptom_select&value=sob' }, flex: 1 }
-                                ]
-                            },
-                            {
-                                type: 'box',
-                                layout: 'horizontal',
-                                spacing: 'sm',
-                                contents: [
-                                    { type: 'button', style: 'secondary', action: { type: 'postback', label: 'ปวด/บวม', data: 'action=checkin_symptom_select&value=pain' }, flex: 1 },
-                                    { type: 'button', style: 'secondary', action: { type: 'postback', label: 'เหนื่อยล้า', data: 'action=checkin_symptom_select&value=fatigue' }, flex: 1 }
-                                ]
-                            },
-                            { type: 'button', style: 'link', action: { type: 'postback', label: 'อื่นๆ...', data: 'action=checkin_symptom_select&value=other' } }
+                            { type: 'box', layout: 'horizontal', contents: [symBtn('Fever 🌡️', 'fever'), symBtn('Headache', 'headache')] },
+                            { type: 'box', layout: 'horizontal', contents: [symBtn('Nausea', 'nausea'), symBtn('Breathless', 'sob')] },
+                            { type: 'box', layout: 'horizontal', contents: [symBtn('Pain/Swelling', 'pain'), symBtn('Fatigue', 'fatigue')] },
+                            { type: 'button', style: 'link', action: { type: 'postback', label: 'Other...', data: 'action=checkin_symptom_select&value=other' } }
                         ]
                     }
                 }
@@ -449,75 +332,36 @@ const handleCheckInPostback = async (event, user) => {
         }
     }
 
-    // ================================================================
-    // STEP 4: Symptom Selection → Complete with Alert
-    // ================================================================
+    // --- STEP 4: SELECTION -> ALERT ---
     if (action === 'checkin_symptom_select') {
-        const symptomLabels = {
-            'fever': 'มีไข้',
-            'headache': 'ปวดศีรษะ',
-            'nausea': 'คลื่นไส้',
-            'sob': 'หอบเหนื่อย',
-            'pain': 'ปวด/บวม',
-            'fatigue': 'เหนื่อยล้า',
-            'other': 'อื่นๆ'
-        };
-
+        const symptomLabels = { 'fever': 'Fever', 'headache': 'Headache', 'nausea': 'Nausea', 'sob': 'Short of Breath', 'pain': 'Pain', 'fatigue': 'Fatigue', 'other': 'Other' };
         const symptom = symptomLabels[value] || value;
 
-        // Update check-in with symptom
-        await db.query(
-            `UPDATE check_ins 
-             SET symptoms = $2
-             WHERE patient_id = (SELECT id FROM chronic_patients WHERE line_user_id = $1)
-             AND DATE(check_in_time) = CURRENT_DATE`,
-            [userId, symptom]
-        );
+        await db.query(`UPDATE check_ins SET symptoms = $2 WHERE patient_id = (SELECT id FROM chronic_patients WHERE line_user_id = $1) AND DATE(check_in_time) = CURRENT_DATE`, [userId, symptom]);
+        await db.query(`UPDATE chronic_patients SET current_checkin_state = NULL WHERE line_user_id = $1`, [userId]);
 
-        // Clear state
-        await db.query(
-            `UPDATE chronic_patients SET current_checkin_state = NULL WHERE line_user_id = $1`,
-            [userId]
-        );
-
-        // Trigger OneBrain for symptom alert
-        const patientRes = await db.query('SELECT id FROM chronic_patients WHERE line_user_id = $1', [userId]);
-        if (patientRes.rows[0]) {
-            OneBrain.analyzePatient(patientRes.rows[0].id, `symptom:${symptom}`);
-
-            // Track recurring symptoms (3-day escalation)
-            const recurringResult = await engagement.trackRecurringSymptom(patientRes.rows[0].id, symptom);
-            if (recurringResult.recurring) {
-                console.log(`🚨 [Recurring Symptom] ${symptom} for ${recurringResult.days} days - created urgent task`);
-            }
+        const p = await db.query('SELECT id FROM chronic_patients WHERE line_user_id = $1', [userId]);
+        if (p.rows[0]) {
+            OneBrain.analyzePatient(p.rows[0].id, `symptom:${symptom}`);
+            engagement.trackRecurringSymptom(p.rows[0].id, symptom);
         }
 
         return line.replyMessage(event.replyToken, {
             type: 'flex',
-            altText: 'รับทราบแล้วค่ะ',
+            altText: 'Recorded',
             contents: {
                 type: 'bubble',
+                size: 'kilo',
                 body: {
                     type: 'box',
                     layout: 'vertical',
+                    paddingAll: '20px',
                     contents: [
-                        { type: 'text', text: 'รับทราบแล้วค่ะ 📝', weight: 'bold', size: 'lg', color: '#06C755' },
-                        { type: 'text', text: `คุณแจ้งอาการ: ${symptom}`, margin: 'md', wrap: true },
-                        { type: 'separator', margin: 'md' },
-                        { type: 'text', text: 'ฮันนาแจ้งพยาบาลแล้วค่ะ', margin: 'md', size: 'sm', color: '#666666' },
-                        { type: 'text', text: 'ถ้าอาการหนักขึ้น บอกเราได้ตลอดนะคะ', margin: 'sm', size: 'sm', color: '#666666' }
-                    ]
-                },
-                footer: {
-                    type: 'box',
-                    layout: 'vertical',
-                    contents: [
-                        {
-                            type: 'button',
-                            style: 'primary',
-                            color: '#06C755',
-                            action: { type: 'message', label: 'ไปหน้าแรก 🏠', text: 'ช่วยเหลือ' }
-                        }
+                        { type: 'text', text: 'Recorded 📝', weight: 'bold', size: 'lg', color: '#1e293b' },
+                        { type: 'text', text: `Symptom: ${symptom}`, margin: 'md', color: '#ef4444', weight: 'bold' },
+                        { type: 'separator', margin: 'lg' },
+                        { type: 'text', text: 'Nurse notified.', margin: 'md', size: 'xs', color: '#94a3b8' },
+                        { type: 'button', style: 'primary', color: '#1e293b', margin: 'lg', action: { type: 'message', label: 'Request Help', text: 'HELP' } }
                     ]
                 }
             }
@@ -526,6 +370,7 @@ const handleCheckInPostback = async (event, user) => {
 
     return null;
 };
+
 
 /**
  * Get streak celebration message (if applicable)

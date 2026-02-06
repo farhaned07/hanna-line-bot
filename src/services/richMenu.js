@@ -18,50 +18,32 @@ const createRichMenu = async () => {
         name: 'Hanna Main Menu v2',
         chatBarText: 'เมนู',
         areas: [
-            // Top row: Call, Check Health, Log Vitals
-            {
-                bounds: { x: 0, y: 0, width: 833, height: 843 },
-                action: {
-                    type: 'uri',
-                    label: 'โทรหาฮันนา',
-                    uri: `https://liff.line.me/${process.env.LIFF_ID}`
-                }
+            // --- ROW 1 (Large Buttons: 1250x843) ---
+            { // Button 1: Daily Vitals (Left)
+                bounds: { x: 0, y: 0, width: 1250, height: 843 },
+                action: { type: 'message', text: 'บันทึกค่าสุขภาพ' } // checkin keyword
             },
-            {
-                bounds: { x: 833, y: 0, width: 834, height: 843 },
-                action: {
-                    type: 'message',
-                    text: 'ตรวจสุขภาพ'
-                }
+            { // Button 2: Voice AI Nurse (Right)
+                bounds: { x: 1250, y: 0, width: 1250, height: 843 },
+                action: { type: 'uri', uri: `https://liff.line.me/${process.env.LIFF_ID}` } // call.html
             },
-            {
-                bounds: { x: 1667, y: 0, width: 833, height: 843 },
-                action: {
-                    type: 'message',
-                    text: 'บันทึกค่าสุขภาพ'
-                }
+
+            // --- ROW 2 (Small Buttons: 625x843) ---
+            { // Slot 1: Meds
+                bounds: { x: 0, y: 843, width: 625, height: 843 },
+                action: { type: 'message', text: 'ยาของฉัน' }
             },
-            // Bottom row: Log Meds, Profile, Help
-            {
-                bounds: { x: 0, y: 843, width: 833, height: 843 },
-                action: {
-                    type: 'message',
-                    text: 'บันทึกยา'
-                }
+            { // Slot 2: History
+                bounds: { x: 625, y: 843, width: 625, height: 843 },
+                action: { type: 'message', text: 'ประวัติ' }
             },
-            {
-                bounds: { x: 833, y: 843, width: 834, height: 843 },
-                action: {
-                    type: 'message',
-                    text: 'ข้อมูลส่วนตัว'
-                }
+            { // Slot 3: Profile
+                bounds: { x: 1250, y: 843, width: 625, height: 843 },
+                action: { type: 'message', text: 'ข้อมูลส่วนตัว' }
             },
-            {
-                bounds: { x: 1667, y: 843, width: 833, height: 843 },
-                action: {
-                    type: 'message',
-                    text: 'ช่วยเหลือ'
-                }
+            { // Slot 4: SOS (Rightmost)
+                bounds: { x: 1875, y: 843, width: 625, height: 843 },
+                action: { type: 'message', text: 'SOS' } // Triggers SOS flow
             }
         ]
     };
