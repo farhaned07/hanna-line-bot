@@ -82,10 +82,8 @@ router.get('/force-setup-richmenu', async (req, res) => {
     }
 });
 
-// Protect all other routes
-router.use(checkAdminAuth);
-
-router.post('/notify-activation', async (req, res) => {
+// Legacy route - protected by checkAdminAuth (system admin only)
+router.post('/notify-activation', checkAdminAuth, async (req, res) => {
     const { userId, name } = req.body;
 
     if (!userId) {

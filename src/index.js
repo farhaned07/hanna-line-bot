@@ -44,7 +44,7 @@ const rateLimitMiddleware = (req, res, next) => {
 app.use('/api', rateLimitMiddleware);
 
 // Admin API Routes
-app.use('/api/admin', require('./routes/admin'));
+app.use('/api/admin', express.json(), require('./routes/admin'));
 app.use('/api/auth', express.json(), require('./routes/auth'));
 app.use('/api/nurse', express.json(), require('./routes/nurse'));
 app.use('/api/analytics', express.json(), require('./routes/analytics'));
