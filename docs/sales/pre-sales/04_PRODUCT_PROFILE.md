@@ -1,25 +1,26 @@
 # Hanna Product Profile
-**Care That Scales Without Burning Out Nurses**
+**The Financial Risk Engine for Capitation-Based NCD Clinics**
 
 ---
 
 ## Executive Overview
-Hanna is a **supervised care intelligence platform** designed to solve the critical "post-discharge gap" in chronic disease management. By combining automated patient engagement with clinical risk scoring, Hanna allows a single nurse to safely monitor 500+ patients—transforming invisible home recovery into visible, actionable care.
+Hanna is a **financial risk engine** that closes the 90-day gap between clinic visits for chronic patients. By continuously monitoring patients via LINE and flagging deterioration before it becomes a complication, Hanna converts unmanaged diabetes risk into measurable cost avoidance — protecting hospitals from the financial exposure of capitation.
 
 ---
 
 ## The Challenge
-**Thailand faces a shortage of 50,000+ nurses.** Hospitals are overwhelmed, leading to:
-1.  **Reactive Care** — Problems are only caught when patients return to the ER.
-2.  **Nurse Burnout** — Clinical staff spend 40% of their time on administrative follow-up calls.
-3.  **Invisible Decline** — No data on patient adherence or symptoms between visits.
+**Under capitation (SSS/UCS), your hospital bears 100% of the financial risk for complications.**
 
-**The Result:** Readmissions, complications, and exhausted staff.
+1.  **The 90-Day Black Hole** — Between clinic visits, zero data on whether patients are adherent or deteriorating.
+2.  **Reactive Detection** — Problems are only caught when patients return to the ER with DKA, hypertensive crisis, or worse.
+3.  **Preventable Costs** — Each complication costs ฿175,000+. Under capitation, your hospital absorbs the loss.
+
+**The Result:** Preventable admissions that destroy capitation margins.
 
 ---
 
 ## The Solution: Hanna
-Hanna acts as a **force multiplier** for your nursing team. It does not replace nurses; it protects their time by automating routine monitoring and surfacing only clinically significant risks.
+Hanna acts as a **financial protection layer** between clinic visits. It monitors patients daily and flags deterioration before it becomes a complication.
 
 ### 1. Patient Interface (LINE Bot)
 *   **Zero-Friction Access**: Operates entirely within LINE. No new apps to download or learn.
@@ -30,7 +31,7 @@ Hanna acts as a **force multiplier** for your nursing team. It does not replace 
 ### 2. Clinical Risk Engine (OneBrain™)
 *   **Real-Time Scoring**: Every patient interaction is scored (0-10) based on vitals, symptoms, adherence, and behavioral patterns.
 *   **Escalation Protocols**: Emergency keywords (e.g., "chest pain") trigger immediate "CRITICAL" alerts.
-*   **Trend Detection**: Identifies deteriorating conditions (e.g., 3 days of rising blood pressure) before they become acute.
+*   **Trend Detection**: Identifies deteriorating conditions (e.g., 3 days of rising blood pressure) before they become complications.
 
 ### 3. Nurse Command Center (Dashboard)
 *   **Exception-Based Workflow**: Nurses see a prioritized queue of "At-Risk" patients only.
@@ -43,11 +44,11 @@ Hanna acts as a **force multiplier** for your nursing team. It does not replace 
 
 | Feature | Competitor Chatbots | Hanna |
 | :--- | :--- | :--- |
-| **Model** | Unsupervised Automation | **Supervised Care Infrastructure** |
+| **Model** | Unsupervised Automation | **Supervised Risk Engine** |
+| **Value Prop** | "Efficiency" | **Financial Protection (Cost Avoidance)** |
 | **Clinical Safety** | Often acts autonomously | **Nurses Make All Clinical Decisions** |
 | **User Interface** | Text-heavy, complex | **Voice & Simple Buttons (Elderly Friendly)** |
 | **Risk Logic** | Basic keyword matching | **Multi-factor Risk Scoring (OneBrain™)** |
-| **Nurse Impact** | Often adds "alert fatigue" | **Reduces workload by filtering noise** |
 
 ---
 
@@ -61,17 +62,19 @@ Hanna acts as a **force multiplier** for your nursing team. It does not replace 
 ---
 
 ## Pilot Program Offer
-We propose a **90-Day Pilot** to demonstrate measurable value in your hospital.
+We propose a **90-Day Pilot** to demonstrate measurable financial protection.
 
 *   **Scope**: Up to 1,000 chronic patients (Diabetes/Hypertension).
-*   **Goal**: Prove 10x nurse capacity and reduce routine follow-up time.
-*   **Investment**: **฿79,000 / month** (Total ฿237,000 for 3 months).
+*   **Goal**: Detect deterioration early, prevent ≥1 complication/month, prove cost avoidance.
+*   **Investment**: **฿60,000/month** pilot rate (Total ฿180,000 for 3 months).
+*   **Performance Credit**: ฿30,000 credited back if pilot hits agreed metrics.
+*   **Post-Pilot**: ฿50,000/month (annual contract).
 *   **Includes**: Full setup, staff training, dedicated success manager, and final ROI report.
 
 ---
 
 ## About Archangel Co., Ltd.
-Archangel is a health-tech company focused on **building the hospital of the future without walls**. We believe technology should serve clinicians, not replace them. Our mission is to extend the reach of every nurse, ensuring no patient is left behind simply because the system is too busy.
+Archangel is a health-tech company focused on **building financial protection infrastructure for capitation-based healthcare**. We believe technology should protect hospital margins while improving patient outcomes.
 
 ---
 

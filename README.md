@@ -1,42 +1,44 @@
-# Hanna: 10x Nurse Capacity through Supervised AI
+# Hanna: The Financial Risk Engine for Capitation-Based Hospitals
 
-**Hanna is the supervised care assistant that lets one nurse safely manage 500+ chronic patients.**
+**Hanna continuously monitors chronic patients via LINE, predicts deterioration before it becomes a complication, and converts unmanaged diabetes risk into measurable cost avoidance.**
 
 [![Status](https://img.shields.io/badge/Status-Production-green)]()
-[![System](https://img.shields.io/badge/Type-Supervised_Infrastructure-blue)]()
+[![System](https://img.shields.io/badge/Type-Financial_Risk_Engine-blue)]()
 
 ---
 
-## The Problem: The Nurse Shortage
+## The Problem: The 90-Day Black Hole
 
-Thailand faces a shortage of **35,000 nurses**. Hospitals cannot hire their way out of this crisis. The result is burnout, missed follow-ups, and readmissions.
+Under capitation (SSS/UCS), your hospital bears the financial risk for chronic patients. When a diabetic patient leaves your NCD clinic, they enter a **90-day black hole** — no data, no visibility, no intervention — until they return sicker and more expensive.
 
-## The Solution: Nurse Force Multiplication
+**Each preventable complication costs ฿175,000+. Hanna stops that.**
 
-Hanna gives each nurse **10x capacity** by:
-1.  **Handling Routine Follow-up**: Automated daily check-ins for vitals, meds, and symptoms via LINE & Voice.
-2.  **Surfacing Exceptions**: OneBrain™ engine detects risks and prioritizes them for human review.
-3.  **Supervised Control**: Nurses oversee everything through the Command Center. AI never makes clinical decisions alone.
+## The Solution: Continuous Risk Monitoring
 
-> **"We don't replace nurses. We give them superpowers."**
+Hanna closes the gap between clinic visits by:
+1.  **Monitoring daily** via LINE: Automated check-ins for vitals, meds, and symptoms.
+2.  **Detecting deterioration early**: OneBrain™ engine scores risk and flags patients before they become expensive.
+3.  **Surfacing exceptions**: Nurses see only the patients who need intervention — not the ones who are fine.
+
+> **"We don't just follow up. We predict complications before they happen."**
 
 ---
 
 ## Core Capabilities
 
-### 1. Automated Patient Coverage (The "Eyes")
-- **LINE Bot**: Daily health logging and medication reminders.
-- **Gemini Live Voice**: Thai-speaking voice assistant for elderly friendly check-ins.
-- **100% Reach**: Reaches patients where they are, 24/7.
+### 1. Daily Patient Monitoring (LINE + Voice)
+- **LINE Bot**: Structured daily check-ins for vitals and medication adherence.
+- **Thai Voice AI**: Voice-first check-ins for elderly patients.
+- **100% Reach**: Patients respond on an app they already use, 24/7.
 
-### 2. OneBrain™ Intelligence (The "Brain")
+### 2. OneBrain™ Risk Engine
 - **Risk Scoring**: Real-time 0-10 risk score for every patient.
-- **Exception Detection**: Flags "Red" (Critical) and "Amber" (Drifting) patients.
-- **Safeguards**: Clinical caps and rule-based escalation.
+- **Deterioration Detection**: Flags worsening trends before they become complications.
+- **Clinical Safeguards**: Rule-based escalation with zero autonomous clinical decisions.
 
-### 3. Nurse Command Center (the "Hands")
+### 3. Nurse Command Center
 - **Triage Queue**: Prioritized list of who needs a call *right now*.
-- **Capacity Meter**: Real-time view of nurse bandwidth and patient load.
+- **Risk Distribution**: Real-time view of cohort health and financial exposure.
 - **One-Click Action**: Efficient workflow to close loops fast.
 
 ---
@@ -45,13 +47,13 @@ Hanna gives each nurse **10x capacity** by:
 
 ```mermaid
 graph LR
-    P[Patient] <-->|LINE/Voice| AI[Hanna AI Layer]
+    P[Patient] <-->|LINE/Voice| AI[Hanna Risk Engine]
     AI -->|Surfaces Exceptions| N[Nurse Command Center]
     N -->|Clinical Decision| P
     N -.->|Supervision| AI
 ```
 
-Hanna acts as the **infrastructure layer** between the patient and the clinical team.
+Hanna acts as the **financial protection layer** between the patient and the clinical team.
 
 ---
 
@@ -89,5 +91,4 @@ npm start
 
 ---
 
-**Built for Hospitals. Powered by Supervised AI.**
-
+**Built for Capitation. Powered by Supervised AI.**

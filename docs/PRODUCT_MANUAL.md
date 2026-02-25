@@ -34,13 +34,13 @@ Healthcare systems in Thailand face a critical constraint: **nurse scarcity**. W
 
 ### What Hanna Is
 
-Hanna is a **nurse force multiplier** — a hybrid intelligence system that:
+Hanna is a **financial risk engine** — a supervised intelligence system that:
 
 1. **Collects data systematically** from patients via LINE chat and voice
 2. **Assesses risk deterministically** using a transparent scoring formula
 3. **Prioritizes exceptions** so nurses see only what requires human judgment
 
-Hanna enables one nurse to effectively monitor 10x more patients by surfacing only the patients who need attention, with full context for immediate action.
+Hanna enables hospitals to detect deterioration between clinic visits and prevent expensive complications under capitation, with full context for immediate action.
 
 ### What Hanna Is NOT
 
@@ -658,7 +658,7 @@ Currently, there is **one environment: Production**.
 
 ### Key Concepts
 
-**Force Multiplication**: Enabling one nurse to effectively monitor 100+ patients by surfacing only exceptions.
+**Financial Risk Engine**: Detecting deterioration between visits and converting unmanaged chronic disease risk into measurable cost avoidance.
 
 **Exception-Based**: Don't show everything; show only what requires human judgment.
 
@@ -678,7 +678,7 @@ Currently, there is **one environment: Production**.
 >
 > The nurse never sees "Patient X said hello." They only see "Patient X reported chest pain" — with full context, pre-analyzed, ready for action.
 >
-> **Hanna amplifies nurse capacity. It does not replace nurse judgment.**
+> **Hanna protects hospital margins by preventing complications before they happen.**
 
 ---
 

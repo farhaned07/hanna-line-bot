@@ -1,177 +1,105 @@
-# Hanna Pilot Proposal
+# Pilot Proposal: Financial Risk Engine for NCD Management
 
-**[Hospital Name]**
-
----
-
-## Executive Summary
-
-Hanna is a supervised care intelligence platform designed to support safe scale in chronic disease management. This proposal outlines a 90-day pilot program to demonstrate improvements in patient engagement, medication adherence, and nurse efficiency—without changing existing clinical authority or workflows.
-
-**Pilot Cost:** ฿79,000/month × 3 months = ฿237,000  
-**Duration:** 90 days (12 weeks)  
-**Patient Cohort:** Up to 1,000 chronic patients (phased enrollment)
+**Prepared for:** [Hospital Name]
+**Date:** [Date]
 
 ---
 
-## 1. The Opportunity
+## Executive Summary: Closing the 90-Day Black Hole
 
-Chronic care follow-up today relies heavily on manual phone calls and ad-hoc LINE messages. This creates three persistent constraints:
+Currently, when a chronic patient leaves your NCD clinic, they enter a **90-day visibility gap**.
+- **Risk:** Deterioration happens here, unseen.
+- **Cost:** Complications (foot ulcers, CKD, strokes) develop here.
+- **Impact:** Under capitation, your hospital pays for these preventable events.
 
-- **High nurse workload** spent on routine follow-ups
-- **Inconsistent patient coverage** between visits
-- **Late detection of issues** once patients return to clinic
-
-As patient volumes grow, this model does not scale.
-
-Hanna is designed to work with your existing nurses and workflows—supporting continuity of care without adding staff or disrupting delivery.
+**Hanna is the financial risk engine that closes this gap.**
+We provide daily, supervised monitoring via LINE to detect deterioration *before* it becomes a complication.
 
 ---
 
-## 2. What Hanna Delivers
+## The Pilot: Prove the Value
 
-### For Patients
+This 90-day pilot is designed to demonstrate one thing: **Financial Protection.**
 
-- Daily check-ins via LINE (no new app required)
-- Natural Thai voice and chat interactions, suitable for elderly patients
-- Medication reminders and daily encouragement
-- Simple symptom and vitals reporting outside clinic hours
+### Core Objectives
+1.  **Visibility:** Achieve >60% daily patient response rate.
+2.  **Detection:** Identify at-risk patients *before* their next scheduled visit.
+3.  **Prevention:** Enable early nurse intervention for identified risks.
 
-### For Nurses
-
-- A single dashboard showing only patients who need attention
-- Risk prioritization to guide outreach
-- One-click call or message with full patient context
-- Less routine chasing, more clinical focus
-
-### For Hospital Leadership
-
-- Visibility into patient care between visits
-- Clear operational metrics (engagement, adherence, interventions)
-- Evidence to support scale-up decisions
+### Pilot Scope
+- **Duration:** 3 Months (Auto-converts to annual if targets met)
+- **Cohort:** Up to 500 patients (Diabetes/Hypertension)
+- **Technology:** Hanna LINE Bot + Nurse Exception Dashboard
+- **Staffing:** Your existing NCD nurse team (handling <5-10 exceptions/day)
 
 ---
 
-## 3. Pilot Scope
+## Investment & Structure
 
-| Component | Details |
-|-----------|---------|
-| **Patient Cohort** | Up to 1,000 chronic patients (phased enrollment) |
-| **Conditions** | Diabetes, hypertension, or mixed cohort |
-| **Duration** | 90 days (Weeks 1–12) |
-| **Staff Involved** | CNO, 2–5 nurses, 1 admin / IT liaison |
-| **Systems** | LINE bot + Nurse Dashboard (no EMR integration required for pilot) |
+### Financials
 
-### Timeline
+| Item | Cost |
+|------|------|
+| **Pilot Fee (3 Months)** | **฿60,000 / month** |
+| **Setup & Training** | Included |
+| **Total Pilot Cost** | **฿180,000** |
 
-| Week | Activity |
-|------|----------|
-| **Week 0** | Kickoff call, implementation materials delivered |
-| **Week 1** | Staff training (nurses, admin) |
-| **Week 2** | Patient cohort confirmed, enrollment begins |
-| **Week 3–4** | Go-live and initial patient check-ins |
-| **Week 5–10** | Ongoing operations, weekly check-ins |
-| **Week 11–12** | Data review and pilot report preparation |
-| **Week 12** | Pilot review and scale discussion |
+> **Performance Guarantee:** If you sign an annual contract at the end of the pilot, the full pilot fee (฿180,000) is credited toward your first year.
+
+### Annual Pricing (Post-Pilot)
+- **Fee:** ฿50,000 / month / clinic
+- **Capacity:** Up to 500 active patients
+- **Overage:** ฿100 / patient / month
 
 ---
 
-## 4. Success Metrics
+## ROI: The Cost of Doing Nothing
 
-| Metric | Target Range | Measurement |
-|--------|--------------|-------------|
-| **Patient engagement** | ~70–80% | Response rate to daily check-ins |
-| **Medication adherence** | Improvement vs baseline | Self-reported adherence |
-| **Early interventions** | 10+ cases | Patients flagged and contacted early |
-| **Nurse time impact** | Meaningful reduction | Comparison vs baseline workflow |
-| **Patient satisfaction** | ≥8/10 | End-of-pilot survey |
+Why invest ฿180,000 in a pilot? **To save millions in capitation losses.**
 
----
+| Scenario | Cost to Hospital |
+|----------|------------------|
+| **1 Preventable Foot Ulcer (Admitted)** | ~฿175,000 |
+| **1 Stroke Rehab Case** | ~฿300,000 |
+| **1 CKD Progression (Dialysis start)** | ~฿500,000+/year |
 
-## 5. Pilot Cost
-
-### ฿79,000/month × 3 months = ฿237,000
-
-**Includes:**
-
-- Full platform access for pilot duration
-- Implementation and staff training
-- Dedicated implementation manager
-- Weekly progress summaries
-- 90-day performance report with operational impact summary
-- Transition planning for full deployment (if successful)
-
-**Not included:**
-
-- EMR integration
-- Custom development beyond standard platform
+**If Hanna helps you prevent just ONE of these events during the pilot, the system has paid for itself.**
 
 ---
 
-## 6. Clinical Governance
+## Implementation Plan
 
-Hanna operates under a supervised care model:
+**Phase 1: Discovery (Week 0)**
+- Map current NCD workflow & pain points.
+- Select patient cohort criteria (e.g., uncontrolled HbA1c > 8).
 
-- All clinical decisions remain with licensed hospital staff
-- Patients are informed they are interacting with an AI assistant
-- Defined escalation rules trigger nurse alerts and emergency referral (1669)
-- Full audit trail for all patient interactions
-- Clinical responsibility remains with the hospital
+**Phase 2: Launch (Week 1-2)**
+- Nurse training (1 hour).
+- Patient onboarding (QR Code at clinic).
 
-*Clinical Governance Manual available upon request.*
+**Phase 3: Operation (Week 3-12)**
+- Daily automated monitoring acts as the "safety net."
+- Weekly data review: "What did we catch?"
 
----
-
-## 7. Support Model
-
-| Support Type | Details |
-|--------------|---------|
-| **Implementation Manager** | Dedicated contact during pilot |
-| **Clinical Support** | Advisor available for workflow questions |
-| **Technical Support** | Email + phone (8am–5pm), critical issues prioritized |
-| **Training Materials** | Videos, handbooks, quick-reference guides |
+**Phase 4: Review (Week 12)**
+- Operational Report: Engagement %, Interventions made.
+- ROI Calculation: Estimated costs avoided.
+- Decision: Scale or Stop.
 
 ---
 
-## 8. Post-Pilot Path
+## Next Steps
 
-If pilot outcomes meet agreed targets, Hanna can be expanded across programs.
-
-### Full Deployment Pricing
-
-| Tier | Patients | Monthly Fee |
-|------|----------|-------------|
-| **Growth** | Up to 2,000 | ฿149,000/month |
-| **Scale** | Up to 8,000 | ฿199,000/month |
-| **Enterprise** | 8,000+ | Custom |
-
-**Full deployment includes:**
-
-- Unlimited nurses
-- Multi-condition programs
-- EMR integration support
-- Priority support and quarterly reviews
+1.  **Discovery Session:** 30 minutes to look at your "black hole" data.
+2.  **Cohort Selection:** Pick the 500 patients causing the most sleep loss.
+3.  **Green Light:** Sign pilot agreement & begin protection.
 
 ---
 
-## 9. Next Steps
+**Hanna**
+*Financial protection for capitation-based care.*
 
-1. Internal review with nursing and leadership teams
-2. 30-minute live demo
-3. Confirm pilot cohort
-4. Sign pilot agreement
-5. Kickoff and launch
-
----
-
-## Contact
-
-**Hanna** — *Care doesn't stop after the visit.*
-
-Farhan Sabbir  
-farhan@hanna.care  
+**Contact:**
+Farhan Sabbir
 092-686-7042
-
----
-
-*Hanna is a product of Archangel Co., Ltd.*
+farhan@hanna.care

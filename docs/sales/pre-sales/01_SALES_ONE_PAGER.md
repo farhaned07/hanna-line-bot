@@ -1,107 +1,81 @@
-# Hanna — Care That Scales Without Burning Out Nurses
+# Hanna — The Risk Engine for Capitation-Based Follow-Up
 
 ---
 
-## The Problem
+## The Economics of the "Black Hole"
 
-Thailand is facing a growing nurse shortage. Hospitals cannot hire their way out of it.
+Under capitation (SSS/UCS), your hospital bears the financial risk for chronic patients.
 
-**What this looks like on the ground:**
+When a diabetic patient leaves your NCD clinic, they enter a **90-day black hole**.
+- **54%** come back uncontrolled.
+- **10-15%** develop silent complications (foot ulcers, CKD progression) between visits.
+- **Control is lost.** You only find out when they return—often too late.
 
-- Nurses overwhelmed with follow-ups, calls, and admin work
-- Patients going silent between visits
-- Missed medication, unmanaged symptoms
-- No visibility into patient health once they leave the hospital
-
-**Care stops after the visit. Problems show up too late.**
-
----
-
-## The Solution
-
-Hanna is supervised care infrastructure that helps nurses care for many more patients safely, without increasing workload.
-
-> **Hanna handles daily patient follow-up.**  
-> **Nurses focus only on what needs human attention.**
-
-| What Hanna Does | How It Works |
-|-----------------|--------------|
-| **Daily patient check-ins** | Automated follow-ups via LINE (no app needed) |
-| **Medication reminders** | Simple, consistent prompts patients actually respond to |
-| **Symptom monitoring** | Patients report vitals and symptoms every day |
-| **Risk detection** | Hanna flags early warning signs automatically |
-| **Nurse command center** | Nurses see a prioritized list of patients who need attention |
-| **Human-in-the-loop** | AI assists. Nurses decide and act. |
-
-*We don't replace nurses. We protect their time and attention.*
+**The Cost:** A single preventable foot ulcer or dialysis admission costs **฿175,000+**.
+Under capitation, **you pay this bill.**
 
 ---
 
-## Why Hospitals Trust Hanna
+## The Solution: Financial Protection via Continuous Monitoring
 
-**AI assists, never decides**  
-All clinical decisions remain with licensed staff.
+Hanna is **supervised automated follow-up infrastructure** that closes the 90-day gap.
 
-**Clear escalation rules**  
-Risk signals trigger nurse alerts and emergency referral when needed.
+> **We check in daily. You catch complications early. You save the capitation loss.**
 
-**Full audit trail**  
-Every interaction is logged for governance and review.
+### How It Works (No App Required)
 
-**Supervised care infrastructure**  
-Hanna supports care delivery — it does not act autonomously.
+1.  **Daily LINE Check-in**: Hanna asks patients about vitals, symptoms, and meds via LINE.
+2.  **Risk Scoring AI**: We analyze every answer for deterioration signals.
+3.  **Exception Dashboard**: Your nurses see a **red list** of only the 5-10 patients who need help today.
+4.  **Early Intervention**: Nurses call *before* the patient crashes.
 
 ---
 
-## The Pilot Program
+## The Math: Protection vs. Cost
 
-A simple, low-risk way to see real impact.
+**Hanna costs ฿50,000 per month per clinic.**
+
+If Hanna helps you prevent just **ONE** major complication (e.g., infected foot ulcer requiring debridement/admission) every 3 months:
+
+| Item | Cost / Value |
+|------|--------------|
+| **Cost of Complication (Avoided)** | **+฿175,000** |
+| Cost of Hanna (3 Months) | -฿150,000 |
+| **Net Financial Gain** | **+฿25,000** |
+
+*And that's just avoiding ONE case. What if you avoid five?*
+
+---
+
+## What We Are NOT
+
+- ❌ **Not a replacement for nurses.** We help them prioritize the right patients.
+- ❌ **Not "Telemedicine."** This is monitoring, not consultation.
+- ❌ **Not an EMR.** We don't store medical records, we track risk.
+
+---
+
+## The Pilot: Prove the Protection
+
+**90 Days to Validate Risk Reduction.**
 
 | Element | Details |
 |---------|---------|
-| **Duration** | 90 days |
-| **Patient cohort** | 500–1,000 chronic patients (e.g. diabetes, hypertension) |
-| **Monthly fee** | ฿79,000 |
-| **Pilot cost** | ฿237,000 (3 months) |
-| **Includes** | Setup, staff training, weekly support, final report |
-| **Measured outcomes** | Patient engagement, medication adherence, early interventions, nurse time saved |
-
----
-
-## Who Hanna Is For
-
-### Patients
-- Simple LINE messages
-- Friendly Thai voice
-- Daily guidance and reminders
-
-### Nurses
-- No constant calling or chasing
-- Only exceptions surface
-- Full context when action is needed
-
-### Clinical Leaders
-- Visibility into care outside the hospital
-- Clear operational metrics
-- Confidence care is not slipping between visits
+| **Duration** | 90 days (auto-converts to annual if successful) |
+| **Cohort** | Up to 500 chronic patients (Diabetes/Hypertension) |
+| **Nurse Load** | <20 mins/day (handling exceptions only) |
+| **Fee** | **฿60,000 / month** (credited back on annual contract) |
+| **Goal** | >60% daily visibility, early detection of 5+ at-risk patients |
 
 ---
 
 ## Next Steps
 
-1. **Discovery call** — 30 minutes to understand your care workflow
-2. **Live demo** — See real patient scenarios
-3. **Pilot proposal** — Scoped for your hospital
+1.  **Discovery Call (30 min)**: We map your specific NCD workflow.
+2.  **Workflow Audit**: We identify your "black hole" risk points.
+3.  **Pilot Launch**: We protect your first 500 patients.
 
 ---
 
-**Hanna**  
-*Care doesn't stop after the visit.*
-
-Farhan Sabbir  
-farhan@hanna.care  
-092-686-7042
-
----
-
-*Hanna is a product of Archangel Co., Ltd.*
+**Hanna**
+*Turn unmanaged risk into managed care.*

@@ -120,10 +120,10 @@ export default function Login() {
                             {/* Hero Text */}
                             <div className="mb-4">
                                 <h1 className="text-4xl font-medium leading-[1.15] tracking-tight mb-5 text-white">
-                                    10x nurse capacity<br />through supervised AI
+                                    The financial risk engine<br />for capitation
                                 </h1>
                                 <p className="text-slate-400 text-base leading-relaxed max-w-sm font-light">
-                                    AI-powered patient engagement that surfaces exceptions, so nurses focus on who needs them most.
+                                    Close the 90-day black hole between visits. Detect deterioration early. Prevent expensive complications.
                                 </p>
                             </div>
 

@@ -1,123 +1,70 @@
-# Hanna Pilot ROI Summary
-**Why ฿79K/month is a Strategic Investment, Not a Cost**
+# Why Hanna Pays for Itself: The Financial Protection Case
 
 ---
 
-## The Investment
+## 1. The Cost of the "Black Hole"
 
-| Item | Amount |
-|------|--------|
-| **Monthly Fee** | ฿79,000/month |
-| **Pilot Duration** | 3 months |
-| **Total Pilot Investment** | ฿237,000 |
+Under capitation (SSS/UCS), your hospital is 100% liable for complications.
+When a patient deteriorates between visits, you pay.
 
----
+| Preventable Event | Direct Cost to Hospital | Who Pays? |
+|-------------------|-------------------------|-----------|
+| **Infected Foot Ulcer** (Debridement/Admission) | **฿175,000+** | You |
+| **Stroke (Rehab/Long-term)** | **฿300,000+** | You |
+| **Starting Dialysis** (CKD Progression) | **฿500,000 / year** | You |
+| **Uncontrolled HbA1c** (Medication Adjustment) | **฿5,000 / visit** | You |
 
-## The Return: Nurse Capacity Multiplier
-
-### Current State (Without Hanna)
-
-| Metric | Value |
-|--------|-------|
-| Patients per nurse (active management) | ~50 |
-| Time spent on routine follow-up | ~40% of workday |
-| Missed follow-ups per month | Unknown (no visibility) |
-| Early warnings detected | Reactive (at next visit) |
-
-### With Hanna (Pilot)
-
-| Metric | Target |
-|--------|--------|
-| Patients per nurse | 200-500 |
-| Time spent on routine follow-up | ~10% (AI handles rest) |
-| Coverage rate | 100% (daily check-ins) |
-| Early warnings detected | Real-time (risk scoring) |
+> **One major complication costs more than 3 months of Hanna.**
 
 ---
 
-## Financial Impact Analysis
+## 2. The Solution: Financial Risk Engine
 
-### Scenario: 500-Patient Pilot
+Hanna costs **฿50,000 / month** per clinic (up to 500 patients).
+This is **฿100 / patient / month**.
 
-**Nurse Time Savings:**
-- Current: 2 nurses × 40% time = 0.8 FTE on routine follow-up
-- With Hanna: 2 nurses × 10% time = 0.2 FTE on routine follow-up
-- **Time Freed:** 0.6 FTE for 90 days
+### The Math: Avoiding Just ONE Case
 
-| Calculation | Value |
-|-------------|-------|
-| Nurse monthly cost (fully loaded) | ฿45,000 |
-| 0.6 FTE for 3 months | ฿81,000 |
-| **Pilot investment** | ฿237,000 |
-| **Net cost of pilot** | ฿156,000 |
+If we monitor 500 patients for 3 months (Total cost: ฿150,000) and prevent **ONE** admitted foot ulcer:
 
-**But the real value is what nurses can now DO with that time:**
-- More clinical consultations
-- Better patient relationships
-- Reduced burnout
+- **Cost Avoided:** +฿175,000
+- **Cost of Hanna:** -฿150,000
+- **Net ROI:** **+฿25,000** (Positive loop)
 
-### Prevented Readmissions (Conservative Estimate)
-
-| Calculation | Value |
-|-------------|-------|
-| Readmission rate (chronic patients) | ~15% annually |
-| Cost per readmission | ฿50,000+ |
-| If Hanna prevents 5 readmissions in 90 days | ฿250,000 saved |
-| **Pilot investment** | ฿237,000 |
-| **Net return from prevention alone** | +฿13,000 |
+*And this assumes only 1 event per 500 patients. In reality, 10-15% are at risk.*
 
 ---
 
-## Scaling Economics
+## 3. Pilot Investment Structure
 
-If pilot succeeds, full deployment pricing:
+We structure the pilot to be **zero financial risk** for successful adopters.
 
-| Scale | Patients | Monthly Fee | Cost per Patient |
-|-------|----------|-------------|------------------|
-| Pilot | 500 | ฿79K/month | ฿158/patient/month |
-| Growth | 2,000 | ฿99K/month | ฿50/patient/month |
-| Scale | 8,000 | ฿149K/month | ฿19/patient/month |
+| Item | Cost | Note |
+|------|------|------|
+| **Pilot (3 Months)** | ฿60,000 / month | Total: ฿180,000 |
+| **Annual Contract** | ฿50,000 / month | Total: ฿600,000 |
+| **Performance Credit** | **-฿180,000** | Full pilot fee credited back on annual sign |
 
-**At scale, Hanna costs less than ฿20/patient/month.**
-
----
-
-## Comparison: Hanna vs. Alternatives
-
-| Solution | Monthly Cost | Notes |
-|----------|--------------|-------|
-| Hire more nurses | ฿45,000+/FTE | Not available (shortage) |
-| Outsource call center | ฿30,000+/month | No clinical integration |
-| Do nothing | ฿0 | Readmissions, burnout, liability |
-| **Hanna (at scale)** | ฿19/patient | Supervised AI, full visibility |
+> **If the pilot works and you continue, the pilot was effectively free.**
 
 ---
 
-## The Real ROI Question
+## 4. Why This is Better Than Hiring Nurses
 
-> "What is the cost of NOT having visibility into 500 chronic patients between visits?"
-
-- Missed deterioration → ER/readmission
-- Medication non-adherence → Complications
-- Nurse burnout → Staff turnover
-- No data → No program improvement
-
-**Hanna turns invisible risk into visible, actionable intelligence.**
+| Option | Cost | Effectiveness for continuous monitoring? |
+|--------|------|------------------------------------------|
+| **Hire More Nurses** | ฿45,000 / nurse / month | **Low.** Humans can't call 500 patients daily. |
+| **Call Center** | ฿30,000 / month | **Low.** No clinical context, purely scripted. |
+| **Hanna** | ฿50,000 / month | **High.** 100% daily coverage. Risk-scored. |
 
 ---
 
 ## Summary
 
-| Metric | Value |
-|--------|-------|
-| Monthly Fee | ฿79,000 |
-| Pilot Duration | 3 months |
-| Total Pilot Investment | ฿237,000 |
-| Nurse time freed (90 days) | ~฿81,000 value |
-| Potential readmissions prevented | 5+ (฿250,000+ value) |
-| Scale pricing | ฿19/patient/month |
-| **Payback period** | Within pilot |
+You are already paying for the "black hole" via complication costs.
+**Hanna is simply a cheaper way to pay for that risk.**
 
----
+- Pay ฿175,000 for a complication **after** it happens?
+- Or pay ฿50,000 for Hanna to **prevent** it?
 
-*Hanna is a product of Archangel Co., Ltd.*
+**The choice is financial.**

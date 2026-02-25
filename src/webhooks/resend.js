@@ -2,7 +2,11 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs').promises;
 const path = require('path');
-const logger = require('../../agents/core/logger').createAgentLogger('resend-webhook');
+const logger = {
+    info: (...args) => console.log('[resend-webhook]', ...args),
+    error: (...args) => console.error('[resend-webhook]', ...args),
+    warn: (...args) => console.warn('[resend-webhook]', ...args)
+};
 
 // Handle Resend webhooks
 router.post('/resend', async (req, res) => {

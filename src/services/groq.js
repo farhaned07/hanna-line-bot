@@ -250,4 +250,210 @@ const generateFallbackResponse = (userText, riskProfile = {}) => {
     return 'ขอบคุณที่ส่งข้อความมาค่ะ 💚 ขณะนี้ระบบกำลังปรับปรุง หากต้องการพูดคุยกับพยาบาล กรุณากดปุ่มโทรได้เลยนะคะ';
 };
 
-module.exports = { transcribeAudio, generateChatResponse };
+/**
+ * 📋 Scribe: Generate Clinical Note from Transcript
+ * Takes raw transcript + template type → structured clinical note
+ */
+const generateClinicalNote = async (transcript, templateType, promptTemplate) => {
+    try {
+        console.log(`📋 [Groq] Generating ${templateType} note from transcript...`);
+
+        // Build the prompt from template or use default
+        let prompt;
+        if (promptTemplate) {
+            prompt = promptTemplate.replace('{transcript}', transcript);
+        } else {
+            prompt = `You are a clinical documentation AI. Given this transcript of a patient encounter, generate a structured ${templateType.toUpperCase()} note.
+
+Transcript:
+${transcript}
+
+Generate JSON output with appropriate clinical sections. Return valid JSON only.`;
+        }
+
+        const chatCompletion = await groq.chat.completions.create({
+            messages: [
+                {
+                    role: 'system',
+                    content: 'You are a medical documentation AI assistant. You generate structured clinical notes from patient encounter transcripts. Always output valid JSON only, no markdown, no explanation text.'
+                },
+                {
+                    role: 'user',
+                    content: prompt
+                }
+            ],
+            model: 'llama-3.3-70b-versatile',
+            temperature: 0.3,
+            max_tokens: 2000,
+            response_format: { type: 'json_object' }
+        });
+
+        const responseText = chatCompletion.choices[0]?.message?.content || '{}';
+        console.log(`📋 [Groq] Note generated: ${responseText.substring(0, 100)}...`);
+
+        // Parse JSON response
+        try {
+            return JSON.parse(responseText);
+        } catch (parseErr) {
+            console.error('📋 [Groq] JSON parse error, returning raw:', parseErr);
+            return { text: responseText };
+        }
+    } catch (error) {
+        console.error('❌ [Groq] Clinical note generation error:', error);
+        throw new Error('Failed to generate clinical note');
+    }
+};
+
+/**
+ * 📋 Scribe: Generate Handover Summary from Day's Notes
+ * Combines all notes from a shift into a handover summary
+ */
+const generateHandoverSummary = async (notes) => {
+    try {
+        console.log(`📋 [Groq] Generating handover from ${notes.length} notes...`);
+
+        const noteSummaries = notes.map((n, i) => {
+            const content = typeof n.content === 'string' ? JSON.parse(n.content) : n.content;
+            return `Patient ${i + 1}: ${n.patient_name || 'Unknown'}${n.patient_hn ? ` (HN: ${n.patient_hn})` : ''}
+${n.content_text || JSON.stringify(content)}`;
+        }).join('\n\n---\n\n');
+
+        const chatCompletion = await groq.chat.completions.create({
+            messages: [
+                {
+                    role: 'system',
+                    content: 'You are a clinical documentation AI. Generate a concise shift handover summary from the provided clinical notes. Output valid JSON only.'
+                },
+                {
+                    role: 'user',
+                    content: `Given these clinical notes from today's shift, generate a handover summary.
+
+${noteSummaries}
+
+Generate JSON in this format:
+{
+  "patients": [
+    {
+      "name": "Patient name",
+      "summary": "Brief summary of condition, treatment, and follow-up needed",
+      "urgent": false
+    }
+  ]
+}
+
+Mark patients as "urgent": true if they need immediate attention from the next shift.
+Return valid JSON only.`
+                }
+            ],
+            model: 'llama-3.3-70b-versatile',
+            temperature: 0.3,
+            max_tokens: 2000,
+            response_format: { type: 'json_object' }
+        });
+
+        const responseText = chatCompletion.choices[0]?.message?.content || '{}';
+        console.log(`📋 [Groq] Handover generated: ${responseText.substring(0, 100)}...`);
+
+        try {
+            return JSON.parse(responseText);
+        } catch (parseErr) {
+            console.error('📋 [Groq] Handover JSON parse error:', parseErr);
+            return { patients: [] };
+        }
+    } catch (error) {
+        console.error('❌ [Groq] Handover generation error:', error);
+        throw new Error('Failed to generate handover summary');
+    }
+};
+
+/**
+ * 🔄 Scribe: Regenerate Specific Section
+ * Re-writes one SOAP section based on transcript + instruction
+ */
+const regenerateSection = async (transcript, sectionKey, currentContent, instruction) => {
+    try {
+        console.log(`🔄 [Groq] Regenerating section ${sectionKey}...`);
+
+        const prompt = `You are a clinical documentation AI. 
+The user wants to rewrite the "${sectionKey.toUpperCase()}" section of a clinical note.
+
+Transcript:
+${transcript}
+
+Current Content:
+${currentContent || '(Empty)'}
+
+Instruction: ${instruction || 'Improve accuracy and professional tone.'}
+
+Generate ONLY the new content for the "${sectionKey}" section. 
+Do not include keys, markdown formatting, or explanations. Just the text.`;
+
+        const chatCompletion = await groq.chat.completions.create({
+            messages: [
+                { role: 'system', content: 'You are an expert medical scribe. Output only the requested section text.' },
+                { role: 'user', content: prompt }
+            ],
+            model: 'llama-3.3-70b-versatile',
+            temperature: 0.3,
+            max_tokens: 1000
+        });
+
+        const newContent = chatCompletion.choices[0]?.message?.content || currentContent;
+        console.log(`🔄 [Groq] Section regenerated.`);
+        return newContent;
+
+    } catch (error) {
+        console.error('❌ [Groq] Section regeneration error:', error);
+        throw new Error('Failed to regenerate section');
+    }
+};
+
+/**
+ * 🪄 Scribe: Apply Natural Language Command
+ * Edits the entire note based on user instruction (e.g. "Make it more concise")
+ */
+const applyNoteCommand = async (currentSections, command, transcript) => {
+    try {
+        console.log(`🪄 [Groq] Applying command: "${command}"...`);
+
+        const prompt = `You are a clinical documentation AI.
+Current Note Sections:
+${JSON.stringify(currentSections, null, 2)}
+
+Transcript Context:
+${transcript ? transcript.substring(0, 2000) + '...' : '(No transcript available)'}
+
+User Command: "${command}"
+
+Task: Update the clinical note sections based on the user's command.
+Maintain the JSON structure { "subjective": "...", "objective": "...", "assessment": "...", "plan": "..." }.
+Only modify what is necessary. Return valid JSON only.`;
+
+        const chatCompletion = await groq.chat.completions.create({
+            messages: [
+                { role: 'system', content: 'You are a medical AI. Output valid JSON only. Key names must be lowercase.' },
+                { role: 'user', content: prompt }
+            ],
+            model: 'llama-3.3-70b-versatile',
+            temperature: 0.3,
+            max_tokens: 2000,
+            response_format: { type: 'json_object' }
+        });
+
+        const responseText = chatCompletion.choices[0]?.message?.content || '{}';
+        return JSON.parse(responseText);
+
+    } catch (error) {
+        console.error('❌ [Groq] Command application error:', error);
+        throw new Error('Failed to apply command');
+    }
+};
+
+module.exports = {
+    transcribeAudio,
+    generateChatResponse,
+    generateClinicalNote,
+    generateHandoverSummary,
+    regenerateSection,
+    applyNoteCommand
+};

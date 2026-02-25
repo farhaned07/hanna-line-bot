@@ -8,14 +8,14 @@
 
 ## Overview
 
-Hanna is a **Supervised Care Intelligence System** designed to be a **nurse force multiplier**.
+Hanna is a **Financial Risk Engine** for capitation-based hospitals.
 
-It solves the capacity constraint of human nurses by:
+It solves the cost exposure problem of unmonitored chronic patients by:
 1.  **Automating Data Collection**: Using LINE and Voice AI to gather patient data 24/7.
-2.  **Centralizing Intelligence**: The **OneBrain™** engine assesses risk and detects exceptions.
-3.  **Prioritizing Focus**: The **Nurse Command Center** ensures human nurses only spend time on patients who need it *now*.
+2.  **Centralizing Intelligence**: The **OneBrain™** engine detects deterioration and predicts complications.
+3.  **Prioritizing Intervention**: The **Nurse Command Center** ensures clinical staff act on at-risk patients before they become expensive.
 
-**Strategic Goal**: Allow one nurse to safely manage 500+ chronic patients.
+**Strategic Goal**: Convert unmanaged diabetes risk into measurable cost avoidance for mid-tier Thai NCD clinics.
 
 ---
 

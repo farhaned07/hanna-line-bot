@@ -21,7 +21,8 @@ import {
     Clock,
     Brain,
     ArrowRight,
-    TrendingUp
+    TrendingUp,
+    Shield
 } from 'lucide-react';
 
 /**
@@ -60,12 +61,12 @@ export default function DashboardHome() {
             ) : (
                 <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
                     <MetricCard
-                        label="Capacity Multiplier"
-                        value={`${stats?.capacityMultiplier || 0}:1`}
-                        icon={TrendingUp}
-                        color="purple"
-                        highlight={stats?.capacityMultiplier >= 10}
-                        trend={stats?.capacityMultiplier >= 10 ? "10x goal achieved!" : "Patients per action"}
+                        label="Capitation Shield"
+                        value="Active"
+                        icon={Shield}
+                        color="emerald"
+                        highlight={true}
+                        trend="Daily monitoring on"
                     />
                     <MetricCard
                         label="Active Patients"

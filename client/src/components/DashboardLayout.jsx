@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import {
-    CreditCard,
     Users,
     Activity,
     LogOut,
@@ -32,14 +31,13 @@ export default function DashboardLayout() {
     const userRole = localStorage.getItem('user_role') || 'staff'
     const isAdmin = userRole === 'admin'
 
-    // Navigation items - Payments only visible to admin
+    // Navigation items
     const allNavigation = [
         { name: 'Mission Control', href: '/dashboard', icon: Activity },
         { name: 'Monitoring', href: '/dashboard/monitoring', icon: Eye },
         { name: 'Patients', href: '/dashboard/patients', icon: Users },
         { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
         { name: 'Staff', href: '/dashboard/staff', icon: UserPlus, adminOnly: true },
-        { name: 'Payments', href: '/dashboard/payments', icon: CreditCard, adminOnly: true },
     ]
 
     // Filter navigation based on role

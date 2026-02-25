@@ -6,7 +6,7 @@
 ## About Hanna
 
 ### Q: What exactly is Hanna?
-**A:** Hanna is a supervised care intelligence platform that extends nurse capacity. It handles daily patient check-ins via LINE and voice, detects at-risk patients using our OneBrain™ engine, and surfaces exceptions to nurses through a dashboard. One nurse can effectively monitor 500+ chronic patients with Hanna.
+**A:** Hanna is the financial risk engine for capitation-based hospitals. It continuously monitors chronic patients via LINE and voice between clinic visits, detects deterioration using our OneBrain™ engine, and surfaces at-risk patients to nurses before they become expensive complications.
 
 ### Q: Is Hanna an AI chatbot?
 **A:** Hanna is more than a chatbot—it's care infrastructure. While it uses AI (Groq Llama 3) for natural conversations, the core value is the OneBrain™ risk engine that filters routine interactions and escalates only what matters to nurses.
@@ -15,7 +15,7 @@
 **A:** No. Hanna is a care coordination platform, not a diagnostic tool. It does not diagnose, prescribe, or make clinical decisions. All clinical decisions remain with your licensed staff.
 
 ### Q: Does Hanna replace nurses?
-**A:** Absolutely not. Hanna is a force multiplier. It handles the routine work (check-ins, reminders, data collection) so nurses can focus on patients who need human expertise. We call it "10x nurse capacity through supervised AI."
+**A:** Absolutely not. Hanna is a financial protection tool for your hospital. It handles the routine monitoring (check-ins, reminders, data collection) so nurses can focus on the patients who are actually deteriorating. The goal is preventing expensive complications, not replacing staff.
 
 ---
 
@@ -127,7 +127,7 @@ All training is recorded and available for rewatching.
 ## Pricing
 
 ### Q: What does the pilot cost?
-**A:** ฿237,000 one-time fee for 90 days. Includes full platform access, implementation support, training, weekly check-ins, and the 90-day completion report.
+**A:** ฿180,000 for 90 days (฿60,000/month pilot rate). If the pilot hits agreed metrics, ฿30K is credited back as a Performance Credit. Includes full platform access, implementation support, training, weekly check-ins, and the 90-day completion report.
 
 ### Q: What's included in the pilot fee?
 **A:** Everything needed to run a successful pilot:
@@ -138,16 +138,10 @@ All training is recorded and available for rewatching.
 - 90-day completion report with ROI analysis
 
 ### Q: What does full deployment cost?
-**A:**
-- **Growth (up to 2,000 patients):** ฿99,000/month
-- **Scale (up to 8,000 patients):** ฿149,000/month
-- **Enterprise (8,000+):** Custom pricing
+**A:** ฿50,000/month (annual contract). Covers up to 1,000 patients. Additional cohorts are priced separately.
 
 ### Q: How does pricing compare to alternatives?
-**A:** At scale, Hanna costs ฿19/patient/month. Compare to:
-- Hiring nurses: Not available (shortage)
-- Call centers: ฿30K+/month (no clinical integration)
-- Doing nothing: Readmissions, burnout, liability
+**A:** One prevented complication (DKA, hypertensive crisis) costs ฿175,000+. Hanna costs ฿50,000/month. If Hanna prevents one complication per month, it pays for itself 3.5x over. The alternative — doing nothing — means absorbing that ฿175K+ under capitation.
 
 ---
 
@@ -182,7 +176,7 @@ All training is recorded and available for rewatching.
 **A:** Engagement ramps up over 2 weeks as patients get comfortable. Our target is 80%+ response rate. If someone stops responding, Hanna alerts the nurse (silence is a risk signal).
 
 ### "We don't have budget right now."
-**A:** Consider the cost of not acting: missed deterioration, readmissions (฿50K+ each), nurse burnout. The pilot pays for itself if it prevents 5 readmissions.
+**A:** Consider the cost of not acting: under capitation, one DKA admission costs ฿175K+. Hanna's pilot costs ฿180K total. If it prevents one complication, it's already paid for.
 
 ---
 
@@ -195,7 +189,7 @@ All training is recorded and available for rewatching.
 | **Voice AI** | Microsoft EdgeTTS (Premwadee) |
 | **Response Time** | <2 seconds (message), <1 hour (CRITICAL alert) |
 | **Target Engagement** | 80%+ daily response |
-| **Nurse Capacity** | 10x (50 → 500+ patients) |
+| **Complication Prevention** | Detects deterioration before it becomes expensive |
 
 ---
 

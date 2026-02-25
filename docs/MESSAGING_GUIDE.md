@@ -1,19 +1,19 @@
 # Hanna Messaging Guide
 
-> **Internal Document** — Language standards for all external communications  
-> **Last Updated:** 2025-12-31  
+> **Internal Document** — Language standards for all external communications
+> **Last Updated:** 2026-02-12
 > **Classification:** Strategic / Confidential
 
 ---
 
 ## Core Positioning Statement
 
-**Hanna provides dedicated care coordination capacity that behaves like a digital care team member, always supervised by clinical staff.**
+**Hanna is the financial risk engine for capitation-based hospitals. We provide supervised, automated follow-up that detects patient deterioration before it becomes a costly complication.**
 
 This positions Hanna as:
-- **Infrastructure** (not a practitioner)
-- **Capacity** (not a replacement)
-- **Supervised** (not autonomous)
+- **Financial Protection** (for the hospital)
+- **Supervised Infrastructure** (for the nurses)
+- **Continuous Safety Net** (for the patients)
 
 ---
 
@@ -23,25 +23,19 @@ This positions Hanna as:
 
 | Context | Use This |
 |---------|----------|
-| **What Hanna Is** | "Dedicated care coordination capacity" |
-| | "Supervised digital care team member" |
-| | "AI-powered care infrastructure" |
-| | "Supervised care automation" |
-| **What Hanna Does** | "Supports defined responsibilities under nurse oversight" |
-| | "Augments clinical capacity" |
-| | "Extends your care team's reach" |
-| | "Handles routine patient touchpoints" |
-| **Pricing Anchor** | "Capacity that costs less than a fraction of one FTE" |
-| | "24/7 availability at a fraction of staffing costs" |
-| **Call-to-Action** | "Deploy Hanna in Your Care Team" |
-| | "Add Hanna to Your Care Workflow" |
-| | "Schedule a Deployment Consultation" |
-| **Analytics/Reporting** | "Operational Impact & Performance" |
-| | "Care Capacity Metrics" |
-| | "Workflow Performance Dashboard" |
-| **Relationship to Staff** | "Works alongside your nurses" |
-| | "Nurse-supervised interactions" |
-| | "Augments, never replaces" |
+| **What Hanna Is** | "Financial risk engine for NCDs" |
+| | "Supervised complication prevention system" |
+| | "Continuous monitoring infrastructure" |
+| **What Hanna Does** | "Closes the 90-day visibility gap" |
+| | "Detects deterioration early" |
+| | "Surfaces exceptions to nurses" |
+| | "Converts unmanaged risk into managed care" |
+| **Pricing Anchor** | "Cost of prevention vs. cost of complication" |
+| | "Pays for itself by avoiding 1 event" |
+| **Call-to-Action** | "Start Protecting Your Capitation Risk" |
+| | "Close the 90-Day Gap" |
+| **Relationship to Staff** | "Supervised by your team" |
+| | "Escalates to nurses" |
 
 ---
 
@@ -49,76 +43,37 @@ This positions Hanna as:
 
 | Never Say | Why It's Dangerous |
 |-----------|-------------------|
-| **"Hire Hanna"** | Implies employment relationship, triggers labor/liability questions |
+| **"Hire Hanna"** | Implies employment, low-value labor replacement |
 | **"Your AI Nurse"** | Triggers scope-of-practice scrutiny, suggests independent practice |
-| **"AI Employee"** | Same as above — legal/regulatory landmine |
+| **"10x Nurse Capacity"** | Old positioning. Sounds like "we will fire nurses." |
 | **"Works independently"** | Suggests unsupervised clinical decisions |
-| **"Replaces staff"** | Triggers union concerns, nurse resistance, liability exposure |
-| **"Makes clinical decisions"** | Practice of medicine, liability nightmare |
-| **"Diagnoses"** or **"Prescribes"** | Regulatory violation |
+| **"Diagnoses" / "Prescribes"** | Regulatory violation. Only doctors do this. |
 | **"Autonomous care"** | Implies no human oversight |
-| **"AI Doctor"** or **"AI Physician"** | Absolutely never |
-| **"Better than humans"** | Adversarial positioning destroys nurse adoption |
+| **"Chatbot"** | Sounds cheap and dumb. Hanna is a risk engine. |
 
 ---
 
 ## Messaging by Audience
 
-### Hospital Executives / Operations
+### Hospital Executives (CEO, CFO)
 
-**Key Message:** Hanna delivers operational capacity without headcount.
+**Key Message:** Hanna protects your capitation margin by preventing expensive complications.
 
 **Talking Points:**
-- "Deploy 24/7 patient engagement capacity without adding FTEs"
-- "Reduce no-show rates and improve care continuity"
-- "Free your nursing staff to focus on high-acuity patients"
-- "Measurable ROI within 30 days of deployment"
-
-**Avoid:**
-- Technical jargon (LLMs, RAG, vector databases)
-- Feature lists
-- Comparisons to other software
+- "How much did you lose on diabetic foot ulcers last year?"
+- "We close the 90-day black hole where those costs originate."
+- "The system pays for itself if we prevent just one admission per quarter."
 
 ---
 
-### Clinical Leadership (CNO, Nurse Managers)
+### VP Medical / Nurses
 
-**Key Message:** Hanna supports your nurses, never competes with them.
-
-**Talking Points:**
-- "Hanna handles the routine so your team can focus on what matters"
-- "Every patient interaction is logged and reviewable by clinical staff"
-- "Think of Hanna as a tireless care coordinator, not a replacement nurse"
-- "Your team remains in full control — Hanna escalates, never decides"
-
-**Critical Framing:**
-- Always emphasize **supervision** and **escalation**
-- Never position as autonomous or independent
-- Acknowledge the irreplaceable value of human nurses
-
----
-
-### Insurers / Payers
-
-**Key Message:** Hanna improves outcomes and reduces costs through consistent patient engagement.
+**Key Message:** Hanna gives you visibility without adding work.
 
 **Talking Points:**
-- "Proactive non-clinical care coordination reduces preventable readmissions"
-- "24/7 patient touchpoints improve adherence and satisfaction"
-- "Structured data from every interaction informs care planning"
-- "Demonstrated ROI: reduced claims costs, improved HEDIS scores"
-
----
-
-### IT / Procurement
-
-**Key Message:** Enterprise-grade infrastructure, not a consumer chatbot.
-
-**Talking Points:**
-- "HIPAA-compliant data architecture"
-- "API-first integration with existing systems"
-- "Audit logs for every patient interaction"
-- "No patient data used for model training"
+- "You worry about patients between visits. We watch them for you."
+- "You don't call everyone. You only call the 5 patients who need you today."
+- "Hanna is your safety net, not your replacement."
 
 ---
 
@@ -127,68 +82,35 @@ This positions Hanna as:
 ### Hero Section
 ```
 ❌ "Meet Hanna, Your AI Nurse"
-✅ "Hanna: 24/7 Care Coordination Capacity for Your Team"
+✅ "The Financial Risk Engine for Chronic Care"
 ```
 
-### Features Section
+### Problem Statement
 ```
-❌ "Features"
-✅ "Responsibilities Hanna Supports"
+❌ "Nurses are overworked"
+✅ "The 90-Day Black Hole is Costing You Millions"
 ```
 
 ### CTA Buttons
 ```
-❌ "Sign Up" / "Get Started" / "Hire Hanna"
-✅ "Deploy Hanna" / "Schedule Deployment" / "Add to Your Care Team"
+❌ "Sign Up" / "Hire Hanna"
+✅ "Close the Gap" / "See the Risk Engine"
 ```
-
-### Pricing Section
-```
-❌ "Plans" / "Subscription"
-✅ "Capacity Investment" / "Deployment Options"
-```
-
----
-
-## Pitch Deck Guidelines
-
-### Slide: What Is Hanna?
-
-**Use:**
-> "Hanna is dedicated care coordination infrastructure that provides the capacity of a full-time care coordinator — available 24/7, always supervised by your clinical team."
-
-**Avoid:**
-> "Hanna is an AI nurse that works for your hospital."
-
----
-
-### Slide: ROI
-
-**Frame the comparison as capacity, not software:**
-
-| Investment | Monthly Cost | Availability | Supervision |
-|------------|--------------|--------------|-------------|
-| 1 FTE Care Coordinator | ฿25,000+ | 8 hrs/day | Manager oversight |
-| **Hanna Deployment** | **฿599** | **24/7** | **Nurse-supervised** |
-
-**Never say:** "Cheaper than hiring" (implies replacement)  
-**Say instead:** "Capacity at a fraction of staffing costs"
 
 ---
 
 ## Crisis Response Language
 
-If challenged by regulators, unions, or press:
+If challenged by regulators or press:
 
 **Position Statement:**
-> "Hanna is supervised care infrastructure designed to extend — not replace — clinical staff. Every patient interaction occurs under nurse oversight, and Hanna escalates any situation requiring clinical judgment to human staff immediately. Hanna does not diagnose, prescribe, or make independent clinical decisions."
+> "Hanna is non-clinical infrastructure designed to surface patient data to licensed medical professionals. It does not diagnose, treat, or prescribe. All clinical decisions are made by the hospital's existing medical team. Hanna simply ensures they have the data to make those decisions in time."
 
 ---
 
-## Summary: The Asymmetric Positioning
+## Summary: The Shift
 
-**Buyers think:** "This gives me employee-like capacity at infrastructure prices."  
-**Regulators see:** "This is supervised infrastructure, not a practitioner."  
-**Nurses feel:** "This helps me, doesn't threaten me."
+**Old Pitch:** "We help your nurses do more." (Efficiency)
+**New Pitch:** "We stop you from losing money on complications." (Financial Protection)
 
-That asymmetry is the win.
+**Efficiency is a nice-to-have. Financial protection is a must-have.**

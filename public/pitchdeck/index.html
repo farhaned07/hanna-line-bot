@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hanna — AI Scribe for Healthcare</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0A0A0A;
+            --surface: #141414;
+            --surface-2: #1C1C1E;
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #F5F5F7;
+            --text-secondary: rgba(255, 255, 255, 0.55);
+            --accent: #6C5CE7;
+            --accent-glow: rgba(108, 92, 231, 0.25);
+            --green: #00D2A0;
+            --red: #FF6B6B;
+            --orange: #FFA94D;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-snap-type: y mandatory;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .slide {
+            min-height: 100vh;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide-number {
+            position: absolute;
+            top: 40px;
+            right: 60px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            letter-spacing: 2px;
+        }
+
+        .slide-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            font-size: clamp(48px, 6vw, 80px);
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: -2px;
+            max-width: 900px;
+        }
+
+        h2 {
+            font-size: clamp(36px, 4vw, 56px);
+            font-weight: 700;
+            line-height: 1.15;
+            letter-spacing: -1.5px;
+            max-width: 800px;
+        }
+
+        h3 {
+            font-size: 24px;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .subtitle {
+            font-size: clamp(18px, 2vw, 22px);
+            font-weight: 400;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            max-width: 640px;
+            margin-top: 20px;
+        }
+
+        .big-number {
+            font-size: clamp(56px, 8vw, 96px);
+            font-weight: 900;
+            letter-spacing: -3px;
+            line-height: 1;
+        }
+
+        .accent {
+            color: var(--accent);
+        }
+
+        .green {
+            color: var(--green);
+        }
+
+        .red {
+            color: var(--red);
+        }
+
+        .orange {
+            color: var(--orange);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 48px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 28px;
+            margin-top: 48px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 36px;
+        }
+
+        .card h3 {
+            margin-bottom: 12px;
+        }
+
+        .card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 48px 32px;
+        }
+
+        .stat-card .big-number {
+            margin-bottom: 12px;
+        }
+
+        .stat-card p {
+            font-size: 15px;
+            color: var(--text-secondary);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 36px;
+            font-size: 15px;
+        }
+
+        thead th {
+            text-align: left;
+            padding: 16px 20px;
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        tbody td {
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        tbody td:first-child {
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .tier {
+            border-radius: 20px;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tier-free {
+            background: var(--surface);
+            border: 1px solid var(--border);
+        }
+
+        .tier-pro {
+            background: var(--surface);
+            border: 1px solid var(--accent);
+            box-shadow: 0 0 40px var(--accent-glow);
+        }
+
+        .tier-enterprise {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+        }
+
+        .tier-badge {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+
+        .tier-price {
+            font-size: 36px;
+            font-weight: 800;
+            margin: 8px 0 4px;
+        }
+
+        .tier-unit {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .tier ul {
+            list-style: none;
+            flex: 1;
+        }
+
+        .tier li {
+            padding: 8px 0;
+            font-size: 14px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tier li::before {
+            content: "✓";
+            color: var(--green);
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .flywheel {
+            margin-top: 48px;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .flywheel-step {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            padding: 20px 0;
+        }
+
+        .flywheel-num {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .flywheel-arrow {
+            width: 44px;
+            display: flex;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 18px;
+            flex-shrink: 0;
+            padding: 4px 0;
+        }
+
+        .flywheel-text {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .flywheel-text strong {
+            color: var(--text);
+        }
+
+        .flywheel-text span {
+            color: var(--text-secondary);
+        }
+
+        .timeline {
+            margin-top: 48px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .timeline-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 16px 16px 0 0;
+        }
+
+        .timeline-q {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .timeline-item h3 {
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .timeline-item p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .ask-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            margin-top: 48px;
+        }
+
+        .ask-item {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .ask-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .ask-item h3 {
+            font-size: 17px;
+            margin-bottom: 6px;
+        }
+
+        .ask-item p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .nav-hint {
+            position: fixed;
+            bottom: 28px;
+            right: 40px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+            z-index: 100;
+            opacity: 0.5;
+        }
+
+        .slide-hero::before {
+            content: '';
+            position: absolute;
+            top: -200px;
+            right: -200px;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        @media (max-width: 900px) {
+            .slide {
+                padding: 40px 32px;
+            }
+
+            .grid-2,
+            .grid-3,
+            .timeline,
+            .ask-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media print {
+            .slide {
+                min-height: auto;
+                page-break-after: always;
+                padding: 40px;
+            }
+
+            html {
+                scroll-snap-type: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="nav-hint">SCROLL ↓</div>
+
+    <!-- SLIDE 1: TITLE -->
+    <section class="slide slide-hero">
+        <span class="slide-number">01</span>
+        <h1>Hanna</h1>
+        <p class="subtitle" style="margin-top: 16px; font-size: 28px; color: var(--text); font-weight: 300;">AI scribe
+            for healthcare</p>
+        <p class="subtitle" style="margin-top: 32px; font-size: 16px;">
+            Thailand's first AI scribe for nurses and clinicians.<br>
+            Built on LINE. Powered by ambient AI. Designed for Thai hospitals.
+        </p>
+        <p style="margin-top: 48px; font-size: 14px; color: var(--text-secondary);">
+            hanna.care · February 2026 · Confidential
+        </p>
+    </section>
+
+    <!-- SLIDE 2: PROBLEM -->
+    <section class="slide">
+        <span class="slide-number">02</span>
+        <div class="slide-label">The Problem</div>
+        <h2>Thai nurses spend more time<br>on <span class="red">paperwork</span> than patients.</h2>
+        <div class="grid-3">
+            <div class="card stat-card">
+                <div class="big-number red">40%</div>
+                <p>of a nurse's shift is spent<br>on documentation</p>
+            </div>
+            <div class="card stat-card">
+                <div class="big-number red">1:316</div>
+                <p>national nurse-to-patient<br>ratio (1:500 rural)</p>
+            </div>
+            <div class="card stat-card">
+                <div class="big-number red">250K</div>
+                <p>projected healthcare worker<br>shortage by 2037</p>
+            </div>
+        </div>
+        <p class="subtitle" style="margin-top: 36px;">
+            Nurses are drowning in chart notes, handovers, and EMR data entry.
+            Every hour spent typing is an hour not spent caring.
+        </p>
+    </section>
+
+    <!-- SLIDE 3: SOLUTION -->
+    <section class="slide">
+        <span class="slide-number">03</span>
+        <div class="slide-label">The Solution</div>
+        <h2>Hanna listens. Hanna writes.<br><span class="accent">You care.</span></h2>
+        <p class="subtitle">
+            Hanna is an AI care partner that transcribes patient interactions
+            and generates structured clinical notes — in Thai — automatically.
+        </p>
+        <div class="grid-3" style="margin-top: 48px;">
+            <div class="card">
+                <h3 style="font-size: 32px; margin-bottom: 16px;">🎙️</h3>
+                <h3>Before</h3>
+                <p>Review patient history, vitals, and care plan — summarized in one screen before your shift.</p>
+            </div>
+            <div class="card" style="border-color: var(--accent);">
+                <h3 style="font-size: 32px; margin-bottom: 16px;">📝</h3>
+                <h3>During</h3>
+                <p>Tap once. Hanna listens to your patient interaction and transcribes everything in real time.</p>
+            </div>
+            <div class="card">
+                <h3 style="font-size: 32px; margin-bottom: 16px;">✅</h3>
+                <h3>After</h3>
+                <p>Structured SOAP notes, handovers, and HIS-ready exports — generated instantly. Just review and
+                    confirm.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 4: WHY NOW -->
+    <section class="slide">
+        <span class="slide-number">04</span>
+        <div class="slide-label">Why Now</div>
+        <h2>The market is open.<br><span class="green">No one is here yet.</span></h2>
+        <div class="grid-2">
+            <div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Global AI Scribe</th>
+                            <th>Thai Support</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Heidi ($465M)</td>
+                            <td class="red">Generic multilingual</td>
+                        </tr>
+                        <tr>
+                            <td>Nuance DAX (Microsoft)</td>
+                            <td class="red">English only</td>
+                        </tr>
+                        <tr>
+                            <td>Abridge</td>
+                            <td class="red">English only</td>
+                        </tr>
+                        <tr>
+                            <td>Suki AI</td>
+                            <td class="red">English only</td>
+                        </tr>
+                        <tr>
+                            <td>Freed AI</td>
+                            <td class="red">English only</td>
+                        </tr>
+                        <tr>
+                            <td style="color: var(--accent); font-weight: 700;">Hanna</td>
+                            <td class="green" style="font-weight: 700;">Thai-native ✓</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <div class="card" style="height: 100%; display: flex; flex-direction: column; justify-content: center;">
+                    <div class="big-number accent">$0.17B</div>
+                    <p style="color: var(--text-secondary); margin-top: 12px; font-size: 15px; line-height: 1.6;">
+                        Thailand AI healthcare market by 2030<br>
+                        <strong style="color: var(--text);">45.5% CAGR</strong> · Currently <strong
+                            style="color: var(--text);">zero</strong> Thai AI scribe competitors
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 5: PRODUCT -->
+    <section class="slide">
+        <span class="slide-number">05</span>
+        <div class="slide-label">Product</div>
+        <h2>Two products. One platform.</h2>
+        <div class="grid-2" style="margin-top: 48px;">
+            <div class="card" style="border-left: 3px solid var(--accent);">
+                <div class="tier-badge">Product 1 · PLG</div>
+                <h3 style="font-size: 28px; margin-bottom: 8px;">Hanna Scribe</h3>
+                <p style="color: var(--green); font-weight: 500; margin-bottom: 20px;">AI clinical documentation</p>
+                <ul style="list-style: none;">
+                    <li style="padding: 6px 0; color: var(--text-secondary); font-size: 14px;">✓ &nbsp;Ambient
+                        voice-to-text (Thai medical)</li>
+                    <li style="padding: 6px 0; color: var(--text-secondary); font-size: 14px;">✓ &nbsp;Auto SOAP notes,
+                        handovers</li>
+                    <li style="padding: 6px 0; color: var(--text-secondary); font-size: 14px;">✓ &nbsp;HosXP-compatible
+                        exports</li>
+                    <li style="padding: 6px 0; color: var(--text-secondary); font-size: 14px;">✓ &nbsp;Works on any
+                        phone browser</li>
+                </ul>
+                <p style="margin-top: 20px; font-size: 13px; color: var(--text-secondary);">
+                    <strong style="color: var(--text);">GTM:</strong> Freemium → Self-serve → Bottom-up<br>
+                    <strong style="color: var(--text);">Buyer:</strong> Individual nurse / doctor
+                </p>
+            </div>
+            <div class="card" style="border-left: 3px solid var(--green);">
+                <div class="tier-badge" style="color: var(--green);">Product 2 · Enterprise</div>
+                <h3 style="font-size: 28px; margin-bottom: 8px;">Hanna Intelligence</h3>
+                <p style="color: var(--accent); font-weight: 500; margin-bottom: 20px;">Continuous patient follow-up</p>
+                <ul style="list-style: none;">
+                    <li style="padding: 6px 0; color: var(--text-secondary); font-size: 14px;">✓ &nbsp;OneBrain™ risk
+                        engine</li>
+                    <li style="padding: 6px 0; color: var(--text-secondary); font-size: 14px;">✓ &nbsp;Automated LINE
+                        check-ins</li>
+                    <li style="padding: 6px 0; color: var(--text-secondary); font-size: 14px;">✓ &nbsp;Exception-based
+                        nurse alerts</li>
+                    <li style="padding: 6px 0; color: var(--text-secondary); font-size: 14px;">✓ &nbsp;Mission Control
+                        dashboard</li>
+                </ul>
+                <p style="margin-top: 20px; font-size: 13px; color: var(--text-secondary);">
+                    <strong style="color: var(--text);">GTM:</strong> Sales-led → Pilot → Annual contract<br>
+                    <strong style="color: var(--text);">Buyer:</strong> Hospital VP Medical / CFO
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 6: BUSINESS MODEL -->
+    <section class="slide">
+        <span class="slide-number">06</span>
+        <div class="slide-label">Business Model</div>
+        <h2>Land with free. Expand to enterprise.</h2>
+        <div class="grid-3" style="margin-top: 48px;">
+            <div class="tier tier-free">
+                <div class="tier-badge">Free</div>
+                <div class="tier-price">฿0</div>
+                <div class="tier-unit">forever</div>
+                <ul>
+                    <li>20 notes per month</li>
+                    <li>Standard SOAP templates</li>
+                    <li>Thai medical transcription</li>
+                    <li>Basic export (copy/paste)</li>
+                </ul>
+                <p style="margin-top: 24px; font-size: 13px; color: var(--text-secondary);">
+                    Purpose: <strong style="color: var(--text);">Acquisition</strong>
+                </p>
+            </div>
+            <div class="tier tier-pro">
+                <div class="tier-badge">Pro</div>
+                <div class="tier-price">฿1,490</div>
+                <div class="tier-unit">per clinician / month</div>
+                <ul>
+                    <li>Unlimited notes</li>
+                    <li>Custom templates (NCD, IPD, OPD)</li>
+                    <li>Advanced Thai medical terms</li>
+                    <li>HosXP format export</li>
+                    <li>Handover generation</li>
+                    <li>Priority support</li>
+                </ul>
+                <p style="margin-top: 24px; font-size: 13px; color: var(--text-secondary);">
+                    Purpose: <strong style="color: var(--text);">Revenue (per-seat)</strong>
+                </p>
+            </div>
+            <div class="tier tier-enterprise">
+                <div class="tier-badge" style="color: var(--green);">Enterprise</div>
+                <div class="tier-price">฿50K+</div>
+                <div class="tier-unit">per clinic / month</div>
+                <ul>
+                    <li>Everything in Pro</li>
+                    <li>Hanna Intelligence (OneBrain™)</li>
+                    <li>LINE patient monitoring</li>
+                    <li>Nurse Dashboard</li>
+                    <li>HIS integration</li>
+                    <li>PDPA audit trail</li>
+                    <li>Dedicated support</li>
+                </ul>
+                <p style="margin-top: 24px; font-size: 13px; color: var(--text-secondary);">
+                    Purpose: <strong style="color: var(--text);">Revenue (institutional)</strong>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 7: GTM FLYWHEEL -->
+    <section class="slide">
+        <span class="slide-number">07</span>
+        <div class="slide-label">Go-To-Market</div>
+        <h2>The Flywheel</h2>
+        <p class="subtitle">Every free user is a future enterprise deal.</p>
+        <div class="flywheel">
+            <div class="flywheel-step">
+                <div class="flywheel-num">1</div>
+                <div class="flywheel-text"><strong>Nurse discovers Hanna</strong> <span>— via LINE, Facebook nursing
+                        group, or colleague referral</span></div>
+            </div>
+            <div class="flywheel-step">
+                <div class="flywheel-arrow">↓</div>
+            </div>
+            <div class="flywheel-step">
+                <div class="flywheel-num">2</div>
+                <div class="flywheel-text"><strong>Signs up for Free</strong> <span>— zero friction, no procurement,
+                        works on their phone instantly</span></div>
+            </div>
+            <div class="flywheel-step">
+                <div class="flywheel-arrow">↓</div>
+            </div>
+            <div class="flywheel-step">
+                <div class="flywheel-num">3</div>
+                <div class="flywheel-text"><strong>Hits 20-note limit → Upgrades to Pro</strong> <span>— or hospital
+                        pays for the upgrade</span></div>
+            </div>
+            <div class="flywheel-step">
+                <div class="flywheel-arrow">↓</div>
+            </div>
+            <div class="flywheel-step">
+                <div class="flywheel-num">4</div>
+                <div class="flywheel-text"><strong>10+ nurses at same hospital using Hanna</strong> <span>— organic
+                        internal spread</span></div>
+            </div>
+            <div class="flywheel-step">
+                <div class="flywheel-arrow">↓</div>
+            </div>
+            <div class="flywheel-step">
+                <div class="flywheel-num">5</div>
+                <div class="flywheel-text"><strong>Hospital leadership notices → Enterprise deal</strong> <span>— Scribe
+                        + Intelligence bundle (฿50K+/mo)</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 8: MOAT -->
+    <section class="slide">
+        <span class="slide-number">08</span>
+        <div class="slide-label">Competitive Moat</div>
+        <h2>Four layers of defense.</h2>
+        <div class="grid-2" style="margin-top: 48px;">
+            <div class="card">
+                <h3>🇹🇭 Thai Medical NLP</h3>
+                <p>Purpose-built for Thai clinical language — mixed Thai/English medical terms, hospital abbreviations,
+                    and regional dialects. No Western competitor has this.</p>
+            </div>
+            <div class="card">
+                <h3>💬 LINE-Native Distribution</h3>
+                <p>LINE is Thailand's universal messenger (~90% penetration). Our patient-facing product lives inside
+                    LINE — a channel no international competitor can replicate.</p>
+            </div>
+            <div class="card">
+                <h3>📊 Scribe → Intelligence Pipeline</h3>
+                <p>Heidi only does documentation. We do documentation AND continuous monitoring. Every Scribe user
+                    generates data that powers Intelligence. Two products, one data flywheel.</p>
+            </div>
+            <div class="card">
+                <h3>🏥 HosXP Ecosystem</h3>
+                <p>90%+ of Thai hospitals run HosXP/BMS. Native export compatibility = instant relevance for any
+                    hospital in the country.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 9: TRACTION -->
+    <section class="slide">
+        <span class="slide-number">09</span>
+        <div class="slide-label">Traction & Progress</div>
+        <h2>We're not starting from zero.</h2>
+        <p class="subtitle">Core infrastructure is live. Scribe is a sprint away.</p>
+        <div class="grid-3" style="margin-top: 48px;">
+            <div class="card stat-card">
+                <div class="big-number green">70%</div>
+                <p>of core infrastructure<br>already built and live</p>
+            </div>
+            <div class="card stat-card">
+                <div class="big-number green">Live</div>
+                <p>LINE Bot, Voice AI, Risk Engine,<br>Nurse Dashboard, STT Pipeline</p>
+            </div>
+            <div class="card stat-card">
+                <div class="big-number accent">6 wk</div>
+                <p>estimated Scribe MVP<br>ship timeline</p>
+            </div>
+        </div>
+        <table style="margin-top: 36px;">
+            <thead>
+                <tr>
+                    <th>Component</th>
+                    <th>Status</th>
+                    <th>Strategic Role</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Whisper Thai STT</td>
+                    <td class="green">Live</td>
+                    <td>Scribe transcription engine</td>
+                </tr>
+                <tr>
+                    <td>Groq Llama 3.3 70B</td>
+                    <td class="green">Live</td>
+                    <td>Note generation + patient AI</td>
+                </tr>
+                <tr>
+                    <td>LINE Bot + LIFF</td>
+                    <td class="green">Live</td>
+                    <td>Distribution + patient channel</td>
+                </tr>
+                <tr>
+                    <td>OneBrain™ Risk Engine</td>
+                    <td class="green">Live</td>
+                    <td>Intelligence product (Enterprise)</td>
+                </tr>
+                <tr>
+                    <td>Nurse Dashboard</td>
+                    <td class="green">Live</td>
+                    <td>Enterprise control plane</td>
+                </tr>
+                <tr>
+                    <td>Scribe Frontend</td>
+                    <td class="orange">Building</td>
+                    <td>Scribe product UI</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- SLIDE 10: ROADMAP -->
+    <section class="slide">
+        <span class="slide-number">10</span>
+        <div class="slide-label">Roadmap</div>
+        <h2>12-month execution plan</h2>
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-q">Q1 · Now</div>
+                <h3>Ship Scribe</h3>
+                <p>Launch Scribe MVP. Get into hands of 500 nurses. Validate Thai medical STT accuracy. Iterate on
+                    templates.</p>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-q">Q2</div>
+                <h3>Grow</h3>
+                <p>Hit 2,000 free users. 100 Pro conversions. Build presence in nursing communities. First enterprise
+                    leads.</p>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-q">Q3</div>
+                <h3>Enterprise Pilot</h3>
+                <p>2 hospital Intelligence pilots. Prove Scribe → Intelligence upsell. Begin HIS integration with HosXP.
+                </p>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-q">Q4</div>
+                <h3>Scale</h3>
+                <p>5,000 free users. 300 Pro. 3-5 enterprise contracts. Series Seed ready.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 11: MARKET SIZE -->
+    <section class="slide">
+        <span class="slide-number">11</span>
+        <div class="slide-label">Market Size</div>
+        <h2>The numbers</h2>
+        <div class="grid-3" style="margin-top: 48px;">
+            <div class="card stat-card">
+                <div class="big-number" style="font-size: 48px;">$100B+</div>
+                <p>Global AI medical<br>transcription market (2026)</p>
+            </div>
+            <div class="card stat-card">
+                <div class="big-number" style="font-size: 48px;">$170M</div>
+                <p>Thailand AI healthcare<br>market by 2030</p>
+            </div>
+            <div class="card stat-card">
+                <div class="big-number" style="font-size: 48px;">200K+</div>
+                <p>Registered nurses<br>in Thailand</p>
+            </div>
+        </div>
+        <div class="grid-2" style="margin-top: 28px;">
+            <div class="card">
+                <h3>SAM: Thai Clinical Documentation</h3>
+                <p style="margin-top: 8px;">200,000 nurses × ฿1,490/mo Pro = <strong
+                        style="color: var(--accent);">฿298M/mo TAM</strong><br>
+                    At 5% penetration = <strong style="color: var(--green);">฿179M ARR</strong> (~$5M)</p>
+            </div>
+            <div class="card">
+                <h3>Enterprise Upside</h3>
+                <p style="margin-top: 8px;">1,400+ hospitals × ฿50K/mo = <strong style="color: var(--accent);">฿840M/mo
+                        TAM</strong><br>
+                    At 2% penetration = <strong style="color: var(--green);">฿201M ARR</strong> (~$5.6M)</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 12: ASK -->
+    <section class="slide">
+        <span class="slide-number">12</span>
+        <div class="slide-label">The Ask</div>
+        <h2>Join us.</h2>
+        <p class="subtitle">
+            We're building the care infrastructure for Thai healthcare.
+            The market is empty. The tech is ready. The nurses are waiting.
+        </p>
+        <div class="ask-grid">
+            <div class="ask-item">
+                <div class="ask-icon">💰</div>
+                <div>
+                    <h3>Raising</h3>
+                    <p>Pre-Seed / Seed round to accelerate Scribe launch and scale to 5,000+ users within 12 months.</p>
+                </div>
+            </div>
+            <div class="ask-item">
+                <div class="ask-icon">🎯</div>
+                <div>
+                    <h3>Use of Funds</h3>
+                    <p>60% Engineering (Scribe UI, Thai NLP), 25% Growth (acquisition, nursing communities), 15% Ops.
+                    </p>
+                </div>
+            </div>
+            <div class="ask-item">
+                <div class="ask-icon">🤝</div>
+                <div>
+                    <h3>Looking For</h3>
+                    <p>Investors with healthcare SaaS or Southeast Asia expertise. Strategic partners in Thai hospital
+                        networks.</p>
+                </div>
+            </div>
+            <div class="ask-item">
+                <div class="ask-icon">📧</div>
+                <div>
+                    <h3>Contact</h3>
+                    <p>hanna.care<br>Archangel Co., Ltd.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 13: CLOSE -->
+    <section class="slide slide-hero" style="text-align: center; align-items: center;">
+        <h1 style="max-width: 100%;">Hanna</h1>
+        <p class="subtitle"
+            style="text-align: center; max-width: 500px; margin-top: 16px; font-size: 24px; color: var(--text); font-weight: 300;">
+            AI scribe for healthcare
+        </p>
+        <p style="margin-top: 40px; font-size: 16px; color: var(--text-secondary);">
+            hanna.care
+        </p>
+    </section>
+
+    <script>
+        let scrolled = false;
+        window.addEventListener('scroll', () => {
+            if (!scrolled) { scrolled = true; document.querySelector('.nav-hint').style.opacity = '0'; }
+        });
+    </script>
+
+</body>
+
+</html>

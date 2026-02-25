@@ -315,33 +315,3 @@ export const useRiskSummary = () => {
     return { summary, loading, error, refresh: fetchData };
 };
 
-/**
- * Hook to fetch Agent Metrics (Revenue, Replies, Health)
- */
-export const useAgentMetrics = () => {
-    const [data, setData] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    const fetchData = useCallback(async () => {
-        try {
-            setLoading(true);
-            const res = await api.get('/api/agents/metrics');
-            setData(res.data);
-            setError(null);
-        } catch (err) {
-            console.error("Failed to fetch agent metrics", err);
-            setError(err);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    useEffect(() => {
-        fetchData();
-        const interval = setInterval(fetchData, 60000); // 60s refresh
-        return () => clearInterval(interval);
-    }, [fetchData]);
-
-    return { data, loading, error, refresh: fetchData };
-};
