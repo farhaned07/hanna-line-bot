@@ -70,7 +70,7 @@ export default function Login() {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            background: '#F5F5F5',
+            background: '#FAFAFA',
             padding: '24px 20px',
             position: 'relative',
         }}>
@@ -83,10 +83,10 @@ export default function Login() {
                     top: 'max(env(safe-area-inset-top, 16px), 16px)',
                     right: 20,
                     background: '#fff',
-                    border: '1px solid rgba(0,0,0,0.06)',
+                    border: '1px solid #F0F0F0',
                     borderRadius: 20,
                     padding: '6px 14px',
-                    color: '#999',
+                    color: '#9CA3AF',
                     fontSize: 12,
                     fontWeight: 600,
                     cursor: 'pointer',
@@ -103,8 +103,8 @@ export default function Login() {
                 transition={{ duration: 0.8, ease: 'easeOut' }}
                 style={{
                     width: 64, height: 64, borderRadius: '50%',
-                    background: 'radial-gradient(circle at 35% 35%, #5A9BFF, #3478F6 60%, #2563EB)',
-                    boxShadow: '0 4px 24px rgba(52,120,246,0.25)',
+                    background: 'radial-gradient(circle at 35% 35%, #A5B4FC, #6366F1 60%, #4F46E5)',
+                    boxShadow: '0 4px 24px rgba(99,102,241,0.3)',
                     marginBottom: 24,
                     animation: 'login-breathe 4s ease-in-out infinite',
                 }}
@@ -119,12 +119,11 @@ export default function Login() {
             >
                 <h1 style={{
                     fontSize: 34, fontWeight: 800, letterSpacing: '-1.5px',
-                    color: '#1A1A1A',
-                }}>
-                    hanna<span style={{ color: '#3478F6' }}>·</span>
+                    color: '#111827',
+                }}>                    hanna<span style={{ color: '#6366F1' }}>·</span>
                 </h1>
                 <p style={{
-                    fontSize: 14, color: '#999',
+                    fontSize: 14, color: '#9CA3AF',
                     fontWeight: 400, marginTop: 4, letterSpacing: '0.3px',
                 }}>
                     {t('login.subtitle')}
@@ -140,7 +139,7 @@ export default function Login() {
                 style={{
                     width: '100%', maxWidth: 380,
                     background: '#FFFFFF',
-                    border: '1px solid rgba(0,0,0,0.06)',
+                    border: '1px solid #F0F0F0',
                     borderRadius: 20, padding: '28px 24px',
                     boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
                 }}
@@ -207,23 +206,23 @@ export default function Login() {
                                     textAlign: 'center',
                                     fontSize: 20, fontWeight: 700,
                                     borderRadius: 12,
-                                    border: `1.5px solid ${error ? 'rgba(255,69,58,0.4)' : digit ? 'rgba(52,120,246,0.4)' : 'rgba(0,0,0,0.08)'}`,
-                                    background: digit ? 'rgba(52,120,246,0.04)' : '#F5F5F5',
-                                    color: '#1A1A1A',
+                                    border: `1.5px solid ${error ? 'rgba(239,68,68,0.4)' : digit ? 'rgba(99,102,241,0.4)' : '#F0F0F0'}`,
+                                    background: digit ? 'rgba(99,102,241,0.04)' : '#F3F4F6',
+                                    color: '#111827',
                                     outline: 'none',
                                     transition: 'all 0.2s ease',
-                                    boxShadow: digit ? '0 0 0 3px rgba(52,120,246,0.08)' : 'none',
+                                    boxShadow: digit ? '0 0 0 3px rgba(99,102,241,0.08)' : 'none',
                                 }}
                                 onFocus={(e) => {
-                                    e.target.style.borderColor = 'rgba(52,120,246,0.5)'
-                                    e.target.style.boxShadow = '0 0 0 3px rgba(52,120,246,0.1)'
+                                    e.target.style.borderColor = 'rgba(99,102,241,0.5)'
+                                    e.target.style.boxShadow = '0 0 0 3px rgba(99,102,241,0.1)'
                                     e.target.style.background = '#fff'
                                 }}
                                 onBlur={(e) => {
                                     if (!digit) {
-                                        e.target.style.borderColor = error ? 'rgba(255,69,58,0.4)' : 'rgba(0,0,0,0.08)'
+                                        e.target.style.borderColor = error ? 'rgba(239,68,68,0.4)' : '#F0F0F0'
                                         e.target.style.boxShadow = 'none'
-                                        e.target.style.background = '#F5F5F5'
+                                        e.target.style.background = '#F3F4F6'
                                     }
                                 }}
                             />
@@ -238,7 +237,7 @@ export default function Login() {
                         {[0, 1, 2, 3, 4, 5].map(i => (
                             <div key={i} style={{
                                 width: 5, height: 5, borderRadius: 3,
-                                background: i < pinFilled ? '#3478F6' : 'rgba(0,0,0,0.08)',
+                                background: i < pinFilled ? '#6366F1' : '#F0F0F0',
                                 transition: 'all 0.2s ease',
                                 transform: i < pinFilled ? 'scale(1.3)' : 'scale(1)',
                             }} />
@@ -254,7 +253,7 @@ export default function Login() {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0 }}
                             style={{
-                                color: '#FF453A', fontSize: 13, textAlign: 'center',
+                                color: '#EF4444', fontSize: 13, textAlign: 'center',
                                 marginBottom: 14, fontWeight: 500,
                             }}
                         >
@@ -271,12 +270,12 @@ export default function Login() {
                     style={{
                         width: '100%', padding: '14px 0',
                         borderRadius: 12, border: 'none',
-                        background: canSubmit ? '#3478F6' : 'rgba(0,0,0,0.04)',
+                        background: canSubmit ? 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)' : 'rgba(0,0,0,0.04)',
                         color: canSubmit ? '#fff' : '#ccc',
                         fontWeight: 600, fontSize: 15,
                         cursor: canSubmit ? 'pointer' : 'not-allowed',
                         transition: 'all 0.25s ease',
-                        boxShadow: canSubmit ? '0 2px 10px rgba(52,120,246,0.25)' : 'none',
+                        boxShadow: canSubmit ? '0 2px 10px rgba(99,102,241,0.3)' : 'none',
                         letterSpacing: '-0.2px',
                     }}
                 >
@@ -303,7 +302,7 @@ export default function Login() {
                             onClick={() => { setIsRegister(!isRegister); setError(null) }}
                             style={{
                                 background: 'none', border: 'none',
-                                color: '#3478F6', fontWeight: 600,
+                                color: '#6366F1', fontWeight: 600,
                                 cursor: 'pointer', fontSize: 13,
                             }}
                         >
@@ -329,8 +328,8 @@ export default function Login() {
 
             <style>{`
                 @keyframes login-breathe {
-                    0%, 100% { transform: scale(1); box-shadow: 0 4px 24px rgba(52,120,246,0.25); }
-                    50% { transform: scale(1.06); box-shadow: 0 6px 32px rgba(52,120,246,0.3); }
+                    0%, 100% { transform: scale(1); box-shadow: 0 4px 24px rgba(99,102,241,0.25); }
+                    50% { transform: scale(1.06); box-shadow: 0 6px 32px rgba(99,102,241,0.35); }
                 }
                 @keyframes spin { to { transform: rotate(360deg); } }
             `}</style>
@@ -341,7 +340,7 @@ export default function Login() {
 const labelStyle = {
     display: 'block',
     fontSize: 11, fontWeight: 600,
-    color: '#999',
+    color: '#9CA3AF',
     marginBottom: 6,
     textTransform: 'uppercase',
     letterSpacing: '0.8px',
@@ -351,9 +350,9 @@ const inputStyle = {
     width: '100%',
     padding: '13px 16px',
     borderRadius: 12,
-    background: '#F5F5F5',
-    border: '1px solid rgba(0,0,0,0.06)',
-    color: '#1A1A1A',
+    background: '#F3F4F6',
+    border: '1px solid #F0F0F0',
+    color: '#111827',
     fontSize: 15,
     outline: 'none',
     transition: 'border-color 0.2s, box-shadow 0.2s',

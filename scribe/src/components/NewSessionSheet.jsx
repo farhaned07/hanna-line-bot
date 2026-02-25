@@ -42,8 +42,8 @@ export default function NewSessionSheet({ onClose, onCreated }) {
                 onClick={onClose}
                 style={{
                     position: 'fixed', inset: 0,
-                    background: 'rgba(0,0,0,0.35)',
-                    backdropFilter: 'blur(8px)',
+                    background: 'rgba(0,0,0,0.4)',
+                    backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
                     zIndex: 50
                 }}
             />
@@ -162,7 +162,10 @@ export default function NewSessionSheet({ onClose, onCreated }) {
                     </div>
 
                     {/* Start Button */}
-                    <button onClick={handleStart} disabled={loading} className="btn-primary">
+                    <button onClick={handleStart} disabled={loading} className="btn-primary" style={{
+                        background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
+                        boxShadow: '0 4px 14px rgba(99,102,241,0.3)',
+                    }}>
                         {loading ? (
                             <Loader2 size={18} className="ai-sparkle-rotate" />
                         ) : (

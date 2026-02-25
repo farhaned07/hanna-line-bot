@@ -1,23 +1,19 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { User, ChevronRight, HelpCircle, LogOut } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
-import { t, setLanguage, getLanguage, setNoteLanguage, getNoteLanguage } from '../i18n'
-import TabBar from '../components/TabBar'
 import { api } from '../api/client'
-import { useEffect } from 'react'
+import { t, getLocale, setLocale } from '../i18n'
+import TabBar from '../components/TabBar'
 import UpgradeModal from '../components/UpgradeModal'
+import { User, ChevronRight, Globe, FileText, Zap, Info, HelpCircle, LogOut } from 'lucide-react'
 
 export default function Settings() {
     const { user, logout } = useAuth()
-    const navigate = useNavigate()
-    const [appLang, setAppLang] = useState(getLanguage())
-    const [noteLang, setNoteLang] = useState(getNoteLanguage())
-    const [defaultTemplate, setDefaultTemplate] = useState('soap')
-    const [autoFinalize, setAutoFinalize] = useState(false)
-    const [billingStats, setBillingStats] = useState(null)
+    const [lang, setLang] = useState(getLocale())
+    const [noteLang, setNoteLang] = useState(localStorage.getItem('scribe_note_lang') || 'en')
+    const [autoFinalize, setAutoFinalize] = useState(localStorage.getItem('scribe_auto_finalize') === 'true')
     const [showUpgradeModal, setShowUpgradeModal] = useState(false)
+    const [billingStats, setBillingStats] = useState(null)
 
     useEffect(() => {
         loadBilling()
@@ -27,208 +23,256 @@ export default function Settings() {
         try {
             const data = await api.getBillingStatus()
             setBillingStats(data)
-        } catch (err) {
-            console.error('Failed to load billing status', err)
-        }
+        } catch (err) { }
     }
 
-    const handleAppLang = (lang) => {
-        setAppLang(lang)
-        setLanguage(lang)
+    const toggleLang = (newLang) => {
+        setLang(newLang)
+        setLocale(newLang)
     }
 
-    const handleNoteLang = (lang) => {
-        setNoteLang(lang)
-        setNoteLanguage(lang)
+    const toggleNoteLang = (newLang) => {
+        setNoteLang(newLang)
+        localStorage.setItem('scribe_note_lang', newLang)
     }
+
+    const toggleAutoFinalize = () => {
+        const next = !autoFinalize
+        setAutoFinalize(next)
+        localStorage.setItem('scribe_auto_finalize', next.toString())
+    }
+
+    const isPro = billingStats?.plan && billingStats.plan !== 'free'
+
+    const anim = (delay) => ({
+        initial: { opacity: 0, y: 10 },
+        animate: { opacity: 1, y: 0 },
+        transition: { delay, ease: [0.25, 0.46, 0.45, 0.94] }
+    })
 
     return (
-        <div style={{ minHeight: '100dvh', background: '#F5F5F5', paddingBottom: 90 }}>
-            <div className="safe-top" style={{ padding: '0 20px 20px' }}>
-                <h1 style={{ fontSize: 30, fontWeight: 800, color: 'var(--color-ink)', letterSpacing: '-0.8px' }}>
-                    {t('settings.title')}
+        <div style={{ minHeight: '100dvh', background: '#FAFAFA', paddingBottom: 90 }}>
+            <div className="safe-top" style={{ padding: '0 20px 24px' }}>
+                <h1 style={{ fontSize: 30, fontWeight: 800, color: '#111827', letterSpacing: '-1px' }}>
+                    Settings
                 </h1>
             </div>
 
             <div style={{ padding: '0 20px' }}>
-                {/* Profile Card */}
-                <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    style={{
-                        display: 'flex', alignItems: 'center', gap: 14,
-                        padding: '16px 18px', borderRadius: 18,
-                        background: '#fff',
-                        border: '1px solid rgba(0,0,0,0.06)',
-                        marginBottom: 32, cursor: 'pointer',
-                        boxShadow: '0 1px 4px rgba(0,0,0,0.04)'
-                    }}
-                >
+                {/* Profile */}
+                <motion.div {...anim(0)}>
                     <div style={{
-                        width: 48, height: 48, borderRadius: 16,
-                        background: 'linear-gradient(135deg, #E8F2FC 0%, #D4E8FC 100%)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        flexShrink: 0
+                        background: '#fff', borderRadius: 16, padding: '16px',
+                        border: '1px solid #F0F0F0', boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                        display: 'flex', alignItems: 'center', gap: 14, marginBottom: 28
                     }}>
-                        <User size={22} style={{ color: 'var(--color-accent)' }} />
+                        <div style={{
+                            width: 48, height: 48, borderRadius: 14,
+                            background: 'linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(139,92,246,0.12) 100%)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center'
+                        }}>
+                            <User size={22} color="#6366F1" />
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{ fontWeight: 700, fontSize: 16, color: '#111827', letterSpacing: '-0.2px' }}>
+                                {user?.display_name || 'Doctor'}
+                            </p>
+                            <p style={{ fontSize: 13, color: '#9CA3AF', marginTop: 1 }}>
+                                {user?.email}
+                            </p>
+                        </div>
+                        <ChevronRight size={16} color="#D1D5DB" />
                     </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ fontWeight: 700, fontSize: 16, color: 'var(--color-ink)', letterSpacing: '-0.2px' }}>
-                            {user?.display_name || 'Doctor'}
-                        </p>
-                        <p style={{ fontSize: 13, color: 'var(--color-ink3)', marginTop: 1 }}>
-                            {user?.email || 'demo@hanna.care'}
-                        </p>
-                    </div>
-                    <ChevronRight size={16} style={{ color: 'var(--color-ink3)', opacity: 0.5, flexShrink: 0 }} />
                 </motion.div>
 
-                {/* Billing Section */}
-                <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.02 }}
-                >
-                    <p className="section-label">Subscription</p>
-                    <div style={{ background: '#fff', borderRadius: 16, padding: '16px', marginBottom: 28, border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                {/* Subscription */}
+                <motion.div {...anim(0.05)}>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 8, paddingLeft: 2 }}>
+                        Subscription
+                    </p>
+                    <div style={{
+                        background: '#fff', borderRadius: 16, padding: '16px',
+                        border: '1px solid #F0F0F0', boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                        marginBottom: 28
+                    }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: isPro ? 0 : 14 }}>
                             <div>
-                                <p style={{ fontWeight: 600, fontSize: 15, color: 'var(--color-ink)' }}>
+                                <p style={{ fontWeight: 700, fontSize: 16, color: '#111827', letterSpacing: '-0.2px' }}>
                                     Hanna {billingStats?.plan ? billingStats.plan.charAt(0).toUpperCase() + billingStats.plan.slice(1) : 'Free'}
                                 </p>
-                                <p style={{ fontSize: 13, color: 'var(--color-ink3)', marginTop: 2 }}>
-                                    {billingStats?.plan === 'free' ? 'Basic limits apply' : 'Unlimited Notes'}
+                                <p style={{ fontSize: 13, color: '#9CA3AF', marginTop: 2 }}>
+                                    {isPro ? 'Unlimited Notes' : 'Basic limits apply'}
                                 </p>
                             </div>
-                            <div className={`badge ${billingStats?.plan === 'free' ? 'badge-orange' : 'badge-green'}`}>
-                                {billingStats?.plan === 'free' ? 'Free' : 'Pro'}
-                            </div>
+                            <span style={{
+                                fontSize: 11, fontWeight: 700,
+                                padding: '4px 10px', borderRadius: 8,
+                                background: isPro
+                                    ? 'linear-gradient(135deg, rgba(16,185,129,0.1) 0%, rgba(52,211,153,0.15) 100%)'
+                                    : 'linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(139,92,246,0.12) 100%)',
+                                color: isPro ? '#059669' : '#6366F1',
+                                letterSpacing: '0.5px'
+                            }}>
+                                {isPro ? 'PRO' : 'FREE'}
+                            </span>
                         </div>
 
-                        {billingStats?.plan === 'free' && (
+                        {!isPro && (
                             <>
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, fontSize: 13 }}>
-                                    <span style={{ color: 'var(--color-ink2)' }}>{billingStats?.notes_count_this_month || 0} / 10 Notes generated</span>
-                                    <span style={{ color: 'var(--color-ink)' }}>{10 - (billingStats?.notes_count_this_month || 0)} left</span>
+                                    <span style={{ color: '#6B7280' }}>{billingStats?.notes_count_this_month || 0} / 10 notes</span>
+                                    <span style={{ color: '#111827', fontWeight: 600 }}>{10 - (billingStats?.notes_count_this_month || 0)} left</span>
                                 </div>
-                                <div style={{ width: '100%', height: 6, background: 'rgba(0,0,0,0.05)', borderRadius: 3, marginBottom: 16, overflow: 'hidden' }}>
+                                <div style={{ width: '100%', height: 6, background: '#F3F4F6', borderRadius: 3, marginBottom: 16, overflow: 'hidden' }}>
                                     <div style={{
                                         width: `${Math.min(((billingStats?.notes_count_this_month || 0) / 10) * 100, 100)}%`,
                                         height: '100%',
-                                        background: 'var(--color-accent)',
-                                        borderRadius: 3
+                                        background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
+                                        borderRadius: 3, transition: 'width 0.5s ease'
                                     }} />
                                 </div>
-                                <button
+                                <motion.button
+                                    whileTap={{ scale: 0.97 }}
                                     onClick={() => setShowUpgradeModal(true)}
                                     style={{
-                                        width: '100%', padding: '10px 0', borderRadius: 10,
-                                        background: 'var(--color-accent)', color: '#fff',
-                                        border: 'none', fontWeight: 600, fontSize: 14, cursor: 'pointer'
+                                        width: '100%', padding: '12px 0', borderRadius: 12,
+                                        background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
+                                        color: '#fff', border: 'none', fontWeight: 700, fontSize: 14,
+                                        cursor: 'pointer',
+                                        boxShadow: '0 4px 14px rgba(99,102,241,0.3)'
                                     }}
                                 >
                                     Upgrade to Pro
-                                </button>
+                                </motion.button>
                             </>
                         )}
                     </div>
                 </motion.div>
 
-                {/* Language Section */}
-                <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.05 }}
-                >
-                    <p className="section-label">{t('settings.language')}</p>
-                    <div style={{ background: '#fff', borderRadius: 16, padding: '4px 16px', marginBottom: 28, border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                        <div className="settings-row">
-                            <label>{t('settings.appLanguage')}</label>
-                            <div className="toggle-pill">
-                                <button className={appLang === 'th' ? 'active' : ''} onClick={() => handleAppLang('th')}>TH</button>
-                                <button className={appLang === 'en' ? 'active' : ''} onClick={() => handleAppLang('en')}>EN</button>
+                {/* Language */}
+                <motion.div {...anim(0.1)}>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 8, paddingLeft: 2 }}>
+                        {t('settings.language')}
+                    </p>
+                    <div style={{
+                        background: '#fff', borderRadius: 16, padding: '0',
+                        border: '1px solid #F0F0F0', boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                        marginBottom: 28, overflow: 'hidden'
+                    }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px' }}>
+                            <span style={{ fontSize: 15, color: '#111827', fontWeight: 500 }}>{t('settings.appLang')}</span>
+                            <div style={{ display: 'flex', borderRadius: 10, background: '#F3F4F6', padding: 3, gap: 2 }}>
+                                {['TH', 'EN'].map(l => (
+                                    <button key={l} onClick={() => toggleLang(l.toLowerCase())}
+                                        style={{
+                                            padding: '6px 14px', borderRadius: 8, border: 'none',
+                                            fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                                            letterSpacing: '0.5px',
+                                            background: lang === l.toLowerCase() ? 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)' : 'transparent',
+                                            color: lang === l.toLowerCase() ? '#fff' : '#9CA3AF',
+                                            boxShadow: lang === l.toLowerCase() ? '0 2px 8px rgba(99,102,241,0.25)' : 'none',
+                                            transition: 'all 0.2s'
+                                        }}
+                                    >{l}</button>
+                                ))}
                             </div>
                         </div>
-                        <div className="settings-row" style={{ borderBottom: 'none' }}>
-                            <label>{t('settings.noteOutput')}</label>
-                            <div className="toggle-pill">
-                                <button className={noteLang === 'en' ? 'active' : ''} onClick={() => handleNoteLang('en')}>EN</button>
-                                <button className={noteLang === 'th' ? 'active' : ''} onClick={() => handleNoteLang('th')}>TH</button>
+                        <div style={{ height: 1, background: '#F3F4F6', margin: '0 16px' }} />
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px' }}>
+                            <span style={{ fontSize: 15, color: '#111827', fontWeight: 500 }}>{t('settings.noteLang')}</span>
+                            <div style={{ display: 'flex', borderRadius: 10, background: '#F3F4F6', padding: 3, gap: 2 }}>
+                                {['EN', 'TH'].map(l => (
+                                    <button key={l} onClick={() => toggleNoteLang(l.toLowerCase())}
+                                        style={{
+                                            padding: '6px 14px', borderRadius: 8, border: 'none',
+                                            fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                                            letterSpacing: '0.5px',
+                                            background: noteLang === l.toLowerCase() ? 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)' : 'transparent',
+                                            color: noteLang === l.toLowerCase() ? '#fff' : '#9CA3AF',
+                                            boxShadow: noteLang === l.toLowerCase() ? '0 2px 8px rgba(99,102,241,0.25)' : 'none',
+                                            transition: 'all 0.2s'
+                                        }}
+                                    >{l}</button>
+                                ))}
                             </div>
                         </div>
                     </div>
                 </motion.div>
 
-                {/* Defaults Section */}
-                <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                >
-                    <p className="section-label">{t('settings.defaults')}</p>
-                    <div style={{ background: '#fff', borderRadius: 16, padding: '4px 16px', marginBottom: 28, border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                        <div className="settings-row">
-                            <label>{t('settings.defaultTemplate')}</label>
-                            <span className="badge badge-blue">{defaultTemplate.toUpperCase()}</span>
+                {/* Defaults */}
+                <motion.div {...anim(0.15)}>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 8, paddingLeft: 2 }}>
+                        {t('settings.defaults')}
+                    </p>
+                    <div style={{
+                        background: '#fff', borderRadius: 16, padding: '0',
+                        border: '1px solid #F0F0F0', boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                        marginBottom: 28, overflow: 'hidden'
+                    }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px' }}>
+                            <span style={{ fontSize: 15, color: '#111827', fontWeight: 500 }}>{t('settings.defaultTemplate')}</span>
+                            <span style={{
+                                fontSize: 12, fontWeight: 700, color: '#6366F1',
+                                background: 'rgba(99,102,241,0.08)', padding: '4px 10px', borderRadius: 8,
+                                letterSpacing: '0.5px'
+                            }}>SOAP</span>
                         </div>
-                        <div className="settings-row" style={{ borderBottom: 'none' }}>
-                            <label>{t('settings.autoFinalize')}</label>
+                        <div style={{ height: 1, background: '#F3F4F6', margin: '0 16px' }} />
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px' }}>
+                            <span style={{ fontSize: 15, color: '#111827', fontWeight: 500 }}>{t('settings.autoFinalize')}</span>
                             <button
+                                onClick={toggleAutoFinalize}
                                 className={`ios-toggle ${autoFinalize ? 'on' : ''}`}
-                                onClick={() => setAutoFinalize(!autoFinalize)}
-                                aria-label="Auto-finalize toggle"
+                                style={{ background: autoFinalize ? 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)' : '#E5E7EB' }}
                             />
                         </div>
                     </div>
                 </motion.div>
 
-                {/* About Section */}
-                <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.15 }}
-                >
-                    <p className="section-label">{t('settings.about')}</p>
-                    <div style={{ background: '#fff', borderRadius: 16, padding: '4px 16px', marginBottom: 28, border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                        <div className="settings-row">
-                            <label>{t('settings.version')}</label>
-                            <span style={{ fontSize: 14, color: 'var(--color-ink3)', fontVariantNumeric: 'tabular-nums' }}>1.0.0</span>
+                {/* About */}
+                <motion.div {...anim(0.2)}>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 8, paddingLeft: 2 }}>
+                        {t('settings.about')}
+                    </p>
+                    <div style={{
+                        background: '#fff', borderRadius: 16, padding: '0',
+                        border: '1px solid #F0F0F0', boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                        marginBottom: 28, overflow: 'hidden'
+                    }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px' }}>
+                            <span style={{ fontSize: 15, color: '#111827', fontWeight: 500 }}>{t('settings.version')}</span>
+                            <span style={{ fontSize: 13, color: '#9CA3AF', fontWeight: 500 }}>1.2.0</span>
                         </div>
-                        <div className="settings-row" style={{ borderBottom: 'none', cursor: 'pointer' }}>
-                            <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <HelpCircle size={16} style={{ color: 'var(--color-ink3)' }} />
-                                {t('settings.help')}
-                            </label>
-                            <ChevronRight size={16} style={{ color: 'var(--color-ink3)', opacity: 0.5 }} />
-                        </div>
+                        <div style={{ height: 1, background: '#F3F4F6', margin: '0 16px' }} />
+                        <button style={{
+                            width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                            padding: '14px 16px', background: 'none', border: 'none', cursor: 'pointer'
+                        }}>
+                            <span style={{ fontSize: 15, color: '#111827', fontWeight: 500 }}>{t('settings.help')}</span>
+                            <ChevronRight size={16} color="#D1D5DB" />
+                        </button>
                     </div>
                 </motion.div>
 
                 {/* Sign Out */}
-                <motion.button
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => { logout(); navigate('/login', { replace: true }) }}
-                    style={{
-                        width: '100%', padding: 16, borderRadius: 14,
-                        background: 'rgba(255, 69, 58, 0.08)',
-                        color: 'var(--color-red)', fontWeight: 600, fontSize: 15,
-                        border: 'none', cursor: 'pointer',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                        transition: 'background 0.2s'
-                    }}
-                >
-                    <LogOut size={16} />
-                    {t('settings.signOut')}
-                </motion.button>
+                <motion.div {...anim(0.25)}>
+                    <motion.button
+                        whileTap={{ scale: 0.97 }}
+                        onClick={logout}
+                        style={{
+                            width: '100%', padding: '14px', borderRadius: 14,
+                            background: '#fff', border: '1px solid #F0F0F0',
+                            color: '#EF4444', fontWeight: 600, fontSize: 15,
+                            cursor: 'pointer', marginBottom: 20,
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                        }}
+                    >
+                        {t('settings.signOut')}
+                    </motion.button>
+                </motion.div>
             </div>
 
-            {showUpgradeModal && (
-                <UpgradeModal onClose={() => setShowUpgradeModal(false)} />
-            )}
-
+            {showUpgradeModal && <UpgradeModal onClose={() => setShowUpgradeModal(false)} />}
             <TabBar />
         </div>
     )
