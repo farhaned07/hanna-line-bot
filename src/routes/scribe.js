@@ -5,7 +5,12 @@ const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const db = require('../services/db');
 const { transcribeAudio, generateClinicalNote, generateHandoverSummary } = require('../services/groq');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+let stripe = null;
+if (process.env.STRIPE_SECRET_KEY) {
+    stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+} else {
+    console.warn('⚠️ STRIPE_SECRET_KEY not set — billing features disabled');
+}
 
 const JWT_SECRET = process.env.JWT_SECRET || process.env.LINE_CHANNEL_SECRET || 'scribe-dev-secret';
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 * 1024 * 1024 } });
