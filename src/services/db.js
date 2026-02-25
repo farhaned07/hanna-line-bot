@@ -251,14 +251,23 @@ function createMockDB() {
 
 // ─── Real PostgreSQL Connection ───
 function createRealDB() {
+    const connStr = process.env.DATABASE_URL;
+    // Log the host (not credentials) for debugging
+    try {
+        const url = new URL(connStr);
+        console.log(`🔌 Connecting to PostgreSQL at ${url.hostname}:${url.port || 5432}/${url.pathname.slice(1)}`);
+    } catch (e) {
+        console.log('🔌 Connecting to PostgreSQL...');
+    }
+
     const pool = new Pool({
-        connectionString: process.env.DATABASE_URL,
-        ssl: { rejectUnauthorized: false },
-        connectionTimeoutMillis: 5000
+        connectionString: connStr,
+        ssl: connStr.includes('sslmode=disable') ? false : { rejectUnauthorized: false },
+        connectionTimeoutMillis: 10000
     });
 
     pool.on('connect', () => console.log('✅ Connected to PostgreSQL'));
-    pool.on('error', (err) => console.error('❌ DB error:', err.message));
+    pool.on('error', (err) => console.error('❌ DB pool error:', err.message));
 
     return {
         query: (text, params) => pool.query(text, params),
@@ -272,19 +281,28 @@ let db;
 if (!process.env.DATABASE_URL) {
     db = createMockDB();
 } else {
-    // Try connecting. If it fails within 5s, switch to mock.
+    // Try connecting. If it fails, switch to mock with periodic retry.
     const realDB = createRealDB();
     db = realDB;
 
-    // Test connection asynchronously
-    realDB.query('SELECT 1').then(() => {
-        console.log('✅ Database connection verified');
-    }).catch((err) => {
-        console.warn(`⚠️ Database unreachable (${err.code || err.message}) — switching to MockDB`);
-        const mock = createMockDB();
-        db.query = mock.query;
-        db.pool = null;
-    });
+    const attemptConnection = () => {
+        realDB.pool.query('SELECT 1').then(() => {
+            console.log('✅ Database connection verified');
+            // Restore real DB if we were on mock
+            db.query = realDB.query.bind(realDB);
+            db.pool = realDB.pool;
+        }).catch((err) => {
+            console.warn(`⚠️ Database unreachable (${err.code || err.message}) — switching to MockDB`);
+            const mock = createMockDB();
+            db.query = mock.query;
+            db.pool = null;
+        });
+    };
+
+    attemptConnection();
+    // Retry every 30 seconds if DB is down
+    setInterval(attemptConnection, 30000);
 }
 
 module.exports = db;
+
