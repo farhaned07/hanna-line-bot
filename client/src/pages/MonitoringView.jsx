@@ -39,25 +39,25 @@ export default function MonitoringView() {
     return (
         <div className="min-h-screen">
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
                 <div>
-                    <h1 className="text-2xl font-bold text-white flex items-center gap-3">
-                        <Eye className="w-7 h-7 text-blue-400" />
+                    <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-3">
+                        <Eye className="w-6 h-6 sm:w-7 sm:h-7 text-blue-400" />
                         Patient Monitoring — Live
                     </h1>
                     <p className="text-slate-400 text-sm mt-1">
                         Real-time view of all monitored patients
                     </p>
                 </div>
-                <div className="flex items-center gap-4">
-                    <span className="text-slate-500 text-sm">
+                <div className="flex items-center gap-3">
+                    <span className="text-slate-500 text-xs sm:text-sm">
                         Last update: {monitoringData?.lastUpdated
                             ? new Date(monitoringData.lastUpdated).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
                             : '--:--:--'}
                     </span>
                     <button
                         onClick={refreshMonitoring}
-                        className="flex items-center gap-2 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition-colors text-sm"
+                        className="flex items-center gap-2 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition-colors text-sm shrink-0"
                     >
                         <RefreshCw className="w-4 h-4" />
                         Refresh
@@ -110,13 +110,13 @@ export default function MonitoringView() {
             ) : null}
 
             {/* Patient Grid */}
-            <div className="bg-[#13151A] rounded-2xl border border-white/5 p-6 mb-6 shadow-xl">
-                <div className="flex items-center justify-between mb-6">
+            <div className="bg-[#13151A] rounded-2xl border border-white/5 p-4 sm:p-6 mb-6 shadow-xl">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
                     <h2 className="text-lg font-bold text-white flex items-center gap-2">
                         <Users className="w-5 h-5 text-indigo-400" />
                         Patient Grid
                     </h2>
-                    <div className="flex items-center gap-4 text-xs font-medium text-slate-400 bg-black/20 p-2 rounded-lg border border-white/5">
+                    <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-slate-400 bg-black/20 p-2 rounded-lg border border-white/5">
                         <span className="flex items-center gap-1.5">
                             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]"></span>
                             Stable
@@ -145,7 +145,7 @@ export default function MonitoringView() {
                     />
                 ) : (
                     <div className="relative">
-                        <div className="grid grid-cols-10 sm:grid-cols-12 md:grid-cols-15 lg:grid-cols-20 gap-3">
+                        <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-12 lg:grid-cols-16 xl:grid-cols-20 gap-2 sm:gap-3">
                             {monitoringData?.patients?.map(patient => (
                                 <PatientDot
                                     key={patient.id}
@@ -209,12 +209,12 @@ export default function MonitoringView() {
                 {/* Nurse Capacity Bar */}
                 {infraData?.nurseCapacity && (
                     <div className="mt-6 p-4 bg-[#0B0D12] rounded-xl border border-white/5">
-                        <div className="flex items-center justify-between text-sm mb-3">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between text-sm mb-3 gap-1">
                             <span className="text-slate-400 font-medium">Nurse Bandwidth</span>
                             <span className="text-slate-300 font-mono text-xs">
                                 Active: {infraData.nurseCapacity.activeNurses} |
-                                Avg Response: {infraData.nurseCapacity.avgResponseMinutes} min |
-                                Queue: {infraData.nurseCapacity.currentQueueSize} tasks
+                                Avg: {infraData.nurseCapacity.avgResponseMinutes}min |
+                                Queue: {infraData.nurseCapacity.currentQueueSize}
                             </span>
                         </div>
                         <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">

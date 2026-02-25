@@ -133,10 +133,10 @@ export default function Patients() {
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                    <h1 className="text-2xl font-bold text-white flex items-center gap-3">
-                        <Users className="w-7 h-7 text-blue-400" />
+                    <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-3">
+                        <Users className="w-6 h-6 sm:w-7 sm:h-7 text-blue-400" />
                         Patients
                     </h1>
                     <p className="text-slate-400 text-sm mt-1">
@@ -145,7 +145,7 @@ export default function Patients() {
                 </div>
                 <button
                     onClick={() => setShowUploadModal(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-medium transition-colors"
+                    className="flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-medium transition-colors shrink-0"
                 >
                     <Upload className="w-4 h-4" />
                     Upload Patients
@@ -153,9 +153,9 @@ export default function Patients() {
             </div>
 
             {/* Filters */}
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                 {/* Search */}
-                <div className="relative flex-1 max-w-md">
+                <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-500" />
                     <input
                         type="text"
@@ -201,67 +201,95 @@ export default function Patients() {
                         )}
                     </div>
                 ) : (
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-white/5">
-                            <thead className="bg-white/[0.02]">
-                                <tr>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                        Patient
-                                    </th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                        Status
-                                    </th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                        Condition
-                                    </th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                        Age
-                                    </th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                        Joined
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-white/5">
-                                {filteredPatients.map((patient) => (
-                                    <tr
-                                        key={patient.id}
-                                        className="hover:bg-white/[0.02] transition-colors"
-                                    >
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <Link
-                                                to={`/dashboard/patients/${patient.id}`}
-                                                className="text-white font-medium hover:text-indigo-400 transition-colors"
-                                            >
-                                                {patient.name}
-                                            </Link>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <StatusBadge status={patient.enrollment_status} />
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-slate-400">
-                                            {patient.condition || '-'}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-slate-400">
-                                            {patient.age || '-'}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-slate-500 text-sm">
-                                            {patient.created_at
-                                                ? new Date(patient.created_at).toLocaleDateString()
-                                                : '-'}
-                                        </td>
+                    <>
+                        {/* Desktop Table */}
+                        <div className="hidden sm:block overflow-x-auto">
+                            <table className="min-w-full divide-y divide-white/5">
+                                <thead className="bg-white/[0.02]">
+                                    <tr>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                            Patient
+                                        </th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                            Status
+                                        </th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                            Condition
+                                        </th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                            Age
+                                        </th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                            Joined
+                                        </th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody className="divide-y divide-white/5">
+                                    {filteredPatients.map((patient) => (
+                                        <tr
+                                            key={patient.id}
+                                            className="hover:bg-white/[0.02] transition-colors"
+                                        >
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <Link
+                                                    to={`/dashboard/patients/${patient.id}`}
+                                                    className="text-white font-medium hover:text-indigo-400 transition-colors"
+                                                >
+                                                    {patient.name}
+                                                </Link>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <StatusBadge status={patient.enrollment_status} />
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-slate-400">
+                                                {patient.condition || '-'}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-slate-400">
+                                                {patient.age || '-'}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-slate-500 text-sm">
+                                                {patient.created_at
+                                                    ? new Date(patient.created_at).toLocaleDateString()
+                                                    : '-'}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Mobile Card List */}
+                        <div className="sm:hidden divide-y divide-white/5">
+                            {filteredPatients.map((patient) => (
+                                <Link
+                                    key={patient.id}
+                                    to={`/dashboard/patients/${patient.id}`}
+                                    className="flex items-center gap-3 px-4 py-3.5 hover:bg-white/[0.03] transition-colors"
+                                >
+                                    <div className="w-10 h-10 rounded-full bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center shrink-0">
+                                        <span className="text-indigo-400 text-sm font-bold">
+                                            {patient.name?.charAt(0) || '?'}
+                                        </span>
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-white font-medium text-sm truncate">{patient.name}</p>
+                                        <p className="text-slate-500 text-xs truncate">{patient.condition || 'No condition'}</p>
+                                    </div>
+                                    <div className="flex flex-col items-end gap-1 shrink-0">
+                                        <StatusBadge status={patient.enrollment_status} />
+                                        <span className="text-slate-600 text-xs">{patient.age ? `${patient.age}y` : ''}</span>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    </>
                 )}
             </div>
 
             {/* Upload Modal */}
             {showUploadModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-                    <div className="bg-[#13151A] rounded-2xl border border-white/10 w-full max-w-lg p-6 shadow-2xl">
+                <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm">
+                    <div className="bg-[#13151A] rounded-t-2xl sm:rounded-2xl border border-white/10 w-full sm:max-w-lg p-5 sm:p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-xl font-bold text-white flex items-center gap-2">
                                 <FileSpreadsheet className="w-5 h-5 text-indigo-400" />
@@ -275,8 +303,8 @@ export default function Patients() {
                         {/* Success/Error Result */}
                         {uploadResult && (
                             <div className={`mb-4 p-4 rounded-lg border ${uploadResult.success
-                                    ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
-                                    : 'bg-red-500/10 border-red-500/20 text-red-400'
+                                ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+                                : 'bg-red-500/10 border-red-500/20 text-red-400'
                                 }`}>
                                 <div className="flex items-start gap-3">
                                     {uploadResult.success ? (
@@ -305,10 +333,10 @@ export default function Patients() {
                         {/* Drop Zone */}
                         <div
                             className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors ${dragActive
-                                    ? 'border-indigo-500 bg-indigo-500/10'
-                                    : uploadFile
-                                        ? 'border-emerald-500/50 bg-emerald-500/5'
-                                        : 'border-white/10 hover:border-white/20'
+                                ? 'border-indigo-500 bg-indigo-500/10'
+                                : uploadFile
+                                    ? 'border-emerald-500/50 bg-emerald-500/5'
+                                    : 'border-white/10 hover:border-white/20'
                                 }`}
                             onDragEnter={handleDrag}
                             onDragLeave={handleDrag}

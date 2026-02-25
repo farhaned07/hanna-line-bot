@@ -92,32 +92,31 @@ export default function PatientDetail() {
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-start gap-3 sm:gap-4">
                 <button
                     onClick={() => navigate(-1)}
-                    className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+                    className="p-2 hover:bg-slate-700 rounded-lg transition-colors shrink-0 mt-0.5"
                 >
-                    <ArrowLeft className="h-6 w-6 text-slate-400" />
+                    <ArrowLeft className="h-5 w-5 sm:h-6 sm:w-6 text-slate-400" />
                 </button>
-                <div className="flex-1">
-                    <div className="flex items-center gap-4">
-                        <h1 className="text-2xl font-bold text-white">{patient.name}</h1>
-                        <span className={`px-3 py-1 rounded-full text-sm font-medium border ${riskStyles}`}>
+                <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                        <h1 className="text-xl sm:text-2xl font-bold text-white">{patient.name}</h1>
+                        <span className={`px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-xs sm:text-sm font-medium border ${riskStyles}`}>
                             {riskLevel.toUpperCase()}
                         </span>
                         {/* Trend Insight Badge */}
-                        <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium border ${trendInsight.color === 'amber' ? 'bg-amber-500/10 border-amber-500/50 text-amber-400' :
+                        <div className={`flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-xs sm:text-sm font-medium border ${trendInsight.color === 'amber' ? 'bg-amber-500/10 border-amber-500/50 text-amber-400' :
                             'bg-slate-700/50 border-slate-600 text-slate-300'
                             }`}>
-                            <trendInsight.icon className="w-3.5 h-3.5" />
+                            <trendInsight.icon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                             {trendInsight.label}
                         </div>
                     </div>
-                    <div className="flex items-center gap-3 text-sm text-slate-400 mt-1">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs sm:text-sm text-slate-400 mt-1.5">
                         <span>Age: {patient.age}</span>
-                        <span>•</span>
+                        <span className="hidden sm:inline">•</span>
                         <span>Condition: {patient.condition}</span>
-                        <span>•</span>
                         <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${patient.enrollment_status === 'active'
                             ? 'bg-green-500/20 text-green-400'
                             : 'bg-amber-500/20 text-amber-400'
@@ -128,16 +127,16 @@ export default function PatientDetail() {
                 </div>
             </div>
 
-            <div className="grid lg:grid-cols-3 gap-6">
+            <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
                 {/* Left Column: Patient Info & Vitals */}
-                <div className="lg:col-span-2 space-y-6">
+                <div className="lg:col-span-2 space-y-4 sm:space-y-6">
                     {/* Vitals Chart */}
-                    <div className="bg-[#13151A] rounded-2xl border border-white/5 p-6 shadow-xl">
-                        <h3 className="text-lg font-bold text-white flex items-center gap-2 mb-6">
+                    <div className="bg-[#13151A] rounded-2xl border border-white/5 p-4 sm:p-6 shadow-xl">
+                        <h3 className="text-base sm:text-lg font-bold text-white flex items-center gap-2 mb-4 sm:mb-6">
                             <Activity className="h-5 w-5 text-indigo-400" />
                             Vitals Trends
                         </h3>
-                        <div className="h-72 w-full">
+                        <div className="h-48 sm:h-72 w-full">
                             {chartData.length > 0 ? (
                                 <ResponsiveContainer width="100%" height="100%">
                                     <LineChart data={chartData}>
@@ -178,8 +177,8 @@ export default function PatientDetail() {
                                 <div className="p-6 text-center text-slate-500">No check-ins recorded</div>
                             ) : (
                                 patient.history.map((log) => (
-                                    <div key={log.id} className="px-6 py-4 hover:bg-white/[0.02] transition-colors">
-                                        <div className="flex justify-between">
+                                    <div key={log.id} className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-white/[0.02] transition-colors">
+                                        <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
                                             <div className="text-sm font-medium text-white">
                                                 {log.symptoms && log.symptoms !== 'none' ? (
                                                     <span className="text-rose-400">{log.symptoms}</span>

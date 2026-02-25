@@ -49,7 +49,7 @@ export default function DashboardHome() {
 
             {/* Page Header */}
             <div>
-                <h1 className="text-2xl font-bold text-white">Mission Control</h1>
+                <h1 className="text-xl sm:text-2xl font-bold text-white">Mission Control</h1>
                 <p className="text-slate-400 text-sm mt-1">
                     Real-time overview of patient care operations
                 </p>
@@ -59,7 +59,7 @@ export default function DashboardHome() {
             {statsLoading ? (
                 <SkeletonMetrics count={5} />
             ) : (
-                <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
                     <MetricCard
                         label="Capitation Shield"
                         value="Active"
@@ -101,7 +101,7 @@ export default function DashboardHome() {
             )}
 
             {/* Two Column Layout */}
-            <div className="grid lg:grid-cols-3 gap-6">
+            <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
                 {/* Left Column: Triage Queue Preview */}
                 <div className="lg:col-span-2 space-y-6">
                     {/* Triage Queue Preview */}
@@ -265,7 +265,7 @@ function MetricCard({ label, value, icon: Icon, color, trend, highlight, onClick
                     <Icon className={`w-5 h-5 ${colorClasses.icon}`} />
                 </div>
             </div>
-            <p className={`text-3xl font-bold mt-3 ${highlight ? colorClasses.text : 'text-white'}`}>
+            <p className={`text-2xl sm:text-3xl font-bold mt-3 ${highlight ? colorClasses.text : 'text-white'}`}>
                 {value}
             </p>
             {trend && (
@@ -298,7 +298,7 @@ function TaskRow({ task }) {
     return (
         <Link
             to={task.patient_id ? `/dashboard/patients/${task.patient_id}` : '#'}
-            className="flex items-center gap-4 px-6 py-4 hover:bg-slate-700/50 transition-colors"
+            className="flex items-center gap-3 sm:gap-4 px-4 sm:px-6 py-3 sm:py-4 hover:bg-slate-700/50 transition-colors"
         >
             <span className={`px-2 py-1 rounded text-xs font-medium uppercase ${priorityStyles[task.priority] || priorityStyles.normal}`}>
                 {task.priority}
@@ -336,7 +336,7 @@ function AILogRow({ log }) {
     };
 
     return (
-        <div className="px-6 py-3 flex items-center gap-3 ai-generated">
+        <div className="px-4 sm:px-6 py-3 flex items-center gap-2 sm:gap-3 ai-generated">
             <span className="text-slate-500 text-sm w-8">{timeAgo(log.timestamp)}</span>
             <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded">
                 {actionLabels[log.action] || log.action}

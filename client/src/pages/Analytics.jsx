@@ -109,9 +109,9 @@ export default function Analytics() {
     return (
         <div className="space-y-8">
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                    <h1 className="text-2xl font-bold text-white">Analytics</h1>
+                    <h1 className="text-xl sm:text-2xl font-bold text-white">Analytics</h1>
                     <p className="text-slate-400 text-sm mt-1">
                         Patient engagement and program performance metrics
                     </p>
@@ -119,7 +119,7 @@ export default function Analytics() {
                 <button
                     onClick={handleExportCSV}
                     disabled={exportingCSV}
-                    className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-lg font-medium transition-colors"
+                    className="flex items-center justify-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-lg font-medium transition-colors shrink-0"
                 >
                     {exportingCSV ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -173,7 +173,7 @@ export default function Analytics() {
             {/* Charts Row */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Engagement Trend */}
-                <div className="bg-[#13151A] rounded-2xl border border-white/5 p-6">
+                <div className="bg-[#13151A] rounded-2xl border border-white/5 p-4 sm:p-6">
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="text-lg font-semibold text-white">Daily Engagement (30 days)</h3>
                         <div className="flex items-center gap-2 text-xs">
@@ -205,7 +205,7 @@ export default function Analytics() {
                 </div>
 
                 {/* Risk Distribution */}
-                <div className="bg-[#13151A] rounded-2xl border border-white/5 p-6">
+                <div className="bg-[#13151A] rounded-2xl border border-white/5 p-4 sm:p-6">
                     <h3 className="text-lg font-semibold text-white mb-6">Risk Distribution</h3>
 
                     <div className="space-y-4">
@@ -279,8 +279,8 @@ export default function Analytics() {
                                 <div key={i} className="flex items-center justify-between p-3 bg-white/[0.02] rounded-lg hover:bg-white/[0.04] transition-colors">
                                     <div className="flex items-center gap-3">
                                         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${patient.risk_level === 'critical' ? 'bg-red-500/20 text-red-400' :
-                                                patient.risk_level === 'high' ? 'bg-orange-500/20 text-orange-400' :
-                                                    'bg-yellow-500/20 text-yellow-400'
+                                            patient.risk_level === 'high' ? 'bg-orange-500/20 text-orange-400' :
+                                                'bg-yellow-500/20 text-yellow-400'
                                             }`}>
                                             {Math.round(patient.current_risk_score || 0)}
                                         </div>
@@ -290,8 +290,8 @@ export default function Analytics() {
                                         </div>
                                     </div>
                                     <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${patient.risk_level === 'critical' ? 'bg-red-500/10 text-red-400' :
-                                            patient.risk_level === 'high' ? 'bg-orange-500/10 text-orange-400' :
-                                                'bg-yellow-500/10 text-yellow-400'
+                                        patient.risk_level === 'high' ? 'bg-orange-500/10 text-orange-400' :
+                                            'bg-yellow-500/10 text-yellow-400'
                                         }`}>
                                         {patient.risk_level}
                                     </span>
