@@ -34,22 +34,14 @@ export default function Processing() {
         try {
             const audioBlob = location.state?.audioBlob
             if (!audioBlob) {
-                // Demo mode: simulate processing
-                for (let i = 0; i < 3; i++) {
-                    setStage(i)
-                    await new Promise(r => setTimeout(r, 1200))
-                }
-                navigate(`/note/demo-${sessionId}`, { replace: true })
+                setError('No audio recording found. Please try recording again.')
                 return
             }
 
-            // Stage 1: Upload + Transcribe
+            // Stage 1: Transcribe
             setStage(0)
-            const formData = new FormData()
-            formData.append('audio', audioBlob, 'recording.webm')
-
             setStage(1)
-            const { text: transcript } = await api.transcribe(formData)
+            const { text: transcript } = await api.transcribe(audioBlob)
 
             // Update session with transcript
             await api.updateSession(sessionId, { transcript, status: 'transcribed' })

@@ -91,8 +91,18 @@ export default function NoteView() {
 
     if (!note) {
         return (
-            <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <p style={{ color: 'var(--color-ink2)' }}>Note not found</p>
+            <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#F5F5F5', gap: 16 }}>
+                <p style={{ color: 'var(--color-ink2)', fontSize: 16 }}>Note not found</p>
+                <button
+                    onClick={() => navigate('/', { replace: true })}
+                    style={{
+                        padding: '12px 28px', borderRadius: 12,
+                        background: 'var(--color-accent)', color: '#fff',
+                        fontWeight: 600, fontSize: 14, border: 'none', cursor: 'pointer',
+                    }}
+                >
+                    Back to Home
+                </button>
             </div>
         )
     }

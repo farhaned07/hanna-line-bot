@@ -5,6 +5,7 @@ export function useRecorder() {
     const [isPaused, setIsPaused] = useState(false)
     const [duration, setDuration] = useState(0)
     const [audioBlob, setAudioBlob] = useState(null)
+    const audioBlobRef = useRef(null)
 
     const mediaRecorderRef = useRef(null)
     const chunksRef = useRef([])
@@ -52,6 +53,7 @@ export function useRecorder() {
 
             recorder.onstop = () => {
                 const blob = new Blob(chunksRef.current, { type: mimeType })
+                audioBlobRef.current = blob
                 setAudioBlob(blob)
             }
 
@@ -61,6 +63,7 @@ export function useRecorder() {
             setIsPaused(false)
             setDuration(0)
             setAudioBlob(null)
+            audioBlobRef.current = null
             startTimer()
         } catch (err) {
             console.error('Microphone access denied:', err)
@@ -101,6 +104,7 @@ export function useRecorder() {
         stop()
         setDuration(0)
         setAudioBlob(null)
+        audioBlobRef.current = null
         chunksRef.current = []
     }, [stop])
 
@@ -124,6 +128,7 @@ export function useRecorder() {
         duration,
         formattedDuration: formatDuration(duration),
         audioBlob,
+        audioBlobRef,
         start,
         pause,
         resume,

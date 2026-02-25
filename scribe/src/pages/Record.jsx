@@ -36,11 +36,22 @@ export default function Record() {
 
     const handleDone = useCallback(async () => {
         recorder.stop()
-        setTimeout(() => {
-            navigate(`/processing/${sessionId}`, {
-                state: { audioBlob: recorder.audioBlob }
-            })
-        }, 300)
+        // Wait for audioBlob to be set by the recorder's onstop callback (via ref)
+        const waitForBlob = () => new Promise((resolve) => {
+            const check = setInterval(() => {
+                if (recorder.audioBlobRef.current) {
+                    clearInterval(check)
+                    resolve(recorder.audioBlobRef.current)
+                }
+            }, 50)
+            // Timeout after 3s
+            setTimeout(() => { clearInterval(check); resolve(null) }, 3000)
+        })
+        const blob = await waitForBlob()
+        navigate(`/processing/${sessionId}`, {
+            state: { audioBlob: blob },
+            replace: true
+        })
     }, [recorder, sessionId, navigate])
 
     const handleDiscard = () => {
