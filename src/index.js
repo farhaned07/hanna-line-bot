@@ -96,15 +96,24 @@ app.use((req, res, next) => {
 app.use(express.static(path.join(__dirname, '../public')));
 
 // LINE Webhook (MUST be before express.json() for raw body signature verification)
-app.post('/webhook', middleware(config.line), (req, res) => {
-    console.log('Webhook received events:', JSON.stringify(req.body.events));
-    Promise.all(req.body.events.map(handleEvent))
-        .then((result) => res.json(result))
-        .catch((err) => {
-            console.error(err);
-            res.status(500).end();
-        });
-});
+// Guard: Only register webhook if LINE credentials are configured
+if (config.line.channelSecret && config.line.channelAccessToken) {
+    app.post('/webhook', middleware(config.line), (req, res) => {
+        console.log('Webhook received events:', JSON.stringify(req.body.events));
+        Promise.all(req.body.events.map(handleEvent))
+            .then((result) => res.json(result))
+            .catch((err) => {
+                console.error(err);
+                res.status(500).end();
+            });
+    });
+    console.log('✅ LINE Webhook registered');
+} else {
+    console.warn('⚠️ LINE credentials missing — webhook route disabled');
+    app.post('/webhook', (req, res) => {
+        res.status(503).json({ error: 'LINE webhook not configured' });
+    });
+}
 
 // Scribe Stripe Webhook (MUST be before express.json() for raw body verification)
 const stripeWebhookHandler = require('./webhooks/stripe');
