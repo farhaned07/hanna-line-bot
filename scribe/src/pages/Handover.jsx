@@ -53,7 +53,7 @@ export default function Handover() {
     const urgentCount = patients.filter(p => p.is_urgent).length
 
     return (
-        <div style={{ minHeight: '100dvh', background: '#F5F5F5', paddingBottom: 90 }}>
+        <div style={{ minHeight: '100dvh', background: '#FAFAFA', paddingBottom: 90 }}>
             <div className="safe-top" style={{ padding: '0 20px 20px' }}>
                 <h1 style={{ fontSize: 30, fontWeight: 800, color: 'var(--color-ink)', letterSpacing: '-0.8px' }}>
                     {t('handover.title')}

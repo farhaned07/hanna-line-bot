@@ -62,13 +62,13 @@ export default function Record() {
     return (
         <div style={{
             minHeight: '100dvh', display: 'flex', flexDirection: 'column',
-            background: 'linear-gradient(180deg, #111128 0%, #1A1A2E 30%, #1E1E38 100%)'
+            background: 'linear-gradient(180deg, #0F0F1A 0%, #131328 30%, #161630 100%)'
         }}>
             {/* Mic Permission Error */}
             {micError && (
                 <div style={{
                     position: 'fixed', inset: 0, zIndex: 100,
-                    background: 'linear-gradient(180deg, #111128, #1A1A2E)',
+                    background: 'linear-gradient(180deg, #0F0F1A, #131328)',
                     display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                     padding: 32, textAlign: 'center'
                 }}>
@@ -82,9 +82,9 @@ export default function Record() {
                     <button
                         onClick={() => { setMicError(false); recorder.start().catch(() => setMicError(true)) }}
                         style={{
-                            padding: '14px 32px', borderRadius: 12, background: 'var(--color-accent)',
+                            padding: '14px 32px', borderRadius: 12, background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
                             color: '#fff', fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer',
-                            marginBottom: 12
+                            marginBottom: 12, boxShadow: '0 4px 14px rgba(99,102,241,0.35)'
                         }}
                     >
                         Try Again
@@ -158,7 +158,7 @@ export default function Record() {
                                 transition={{ duration: 2.5, repeat: Infinity, ease: 'easeOut' }}
                                 style={{
                                     position: 'absolute', inset: -20,
-                                    borderRadius: '50%', border: '1px solid rgba(74,144,217,0.2)'
+                                    borderRadius: '50%', border: '1px solid rgba(99,102,241,0.2)'
                                 }}
                             />
                             <motion.div
@@ -166,7 +166,7 @@ export default function Record() {
                                 transition={{ duration: 2.5, repeat: Infinity, ease: 'easeOut', delay: 0.8 }}
                                 style={{
                                     position: 'absolute', inset: -20,
-                                    borderRadius: '50%', border: '1px solid rgba(74,144,217,0.15)'
+                                    borderRadius: '50%', border: '1px solid rgba(99,102,241,0.15)'
                                 }}
                             />
                         </>
@@ -186,8 +186,8 @@ export default function Record() {
                         style={{
                             width: 140, height: 140, borderRadius: '50%',
                             position: 'relative', zIndex: 10,
-                            background: 'radial-gradient(circle at 38% 35%, #7EC4FF, #4A90D9 45%, #357ABD 70%, #2A5F9E)',
-                            boxShadow: '0 0 80px rgba(74,144,217,0.4), 0 0 160px rgba(74,144,217,0.15), inset 0 0 30px rgba(255,255,255,0.1)'
+                            background: 'radial-gradient(circle at 38% 35%, #A5B4FC, #6366F1 45%, #4F46E5 70%, #4338CA)',
+                            boxShadow: '0 0 80px rgba(99,102,241,0.4), 0 0 160px rgba(99,102,241,0.15), inset 0 0 30px rgba(255,255,255,0.1)'
                         }}
                     />
                 </div>
@@ -242,10 +242,10 @@ export default function Record() {
                     onClick={handleDone}
                     style={{
                         width: 64, height: 64, borderRadius: 32,
-                        background: 'var(--color-accent)', border: 'none',
+                        background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)', border: 'none',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         cursor: 'pointer', color: 'white',
-                        boxShadow: '0 4px 20px rgba(74,144,217,0.4)',
+                        boxShadow: '0 4px 20px rgba(99,102,241,0.4)',
                         transition: 'transform 0.15s'
                     }}
                 >

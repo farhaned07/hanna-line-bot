@@ -2,9 +2,9 @@
 @import "tailwindcss";
 
 /* ─────────────────────────────────────────────
-   Design System: Light #F5F5F5 Theme
-   Text: #1A1A1A (primary), #555 (secondary), #999 (tertiary)
-   Accent: #3478F6  |  Cards: #FFFFFF  |  Surface: #F5F5F5
+   Design System: Light #FAFAFA Theme — 2026
+   Text: #111827 (primary), #6B7280 (secondary), #9CA3AF (tertiary)
+   Accent: #6366F1  |  Cards: #FFFFFF  |  Surface: #FAFAFA
    ───────────────────────────────────────────── */
 @theme {
     --color-ink: #111827;

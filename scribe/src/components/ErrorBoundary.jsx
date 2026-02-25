@@ -20,7 +20,7 @@ export default class ErrorBoundary extends Component {
                 <div style={{
                     minHeight: '100dvh', display: 'flex', flexDirection: 'column',
                     alignItems: 'center', justifyContent: 'center',
-                    background: '#F5F5F5', padding: 32, textAlign: 'center'
+                    background: '#FAFAFA', padding: 32, textAlign: 'center'
                 }}>
                     <div style={{ fontSize: 48, marginBottom: 20 }}>😵</div>
                     <h2 style={{ fontSize: 20, fontWeight: 700, color: '#1A1A2E', marginBottom: 8 }}>
@@ -36,7 +36,7 @@ export default class ErrorBoundary extends Component {
                         }}
                         style={{
                             padding: '14px 32px', borderRadius: 12,
-                            background: '#3478F6', color: '#fff',
+                            background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)', color: '#fff',
                             fontWeight: 600, fontSize: 15, border: 'none',
                             cursor: 'pointer', boxShadow: '0 2px 10px rgba(52,120,246,0.25)'
                         }}

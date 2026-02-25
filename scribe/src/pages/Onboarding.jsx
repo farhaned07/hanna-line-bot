@@ -11,8 +11,8 @@ const slides = [
         titleTh: 'กดแล้วพูด',
         desc: 'Talk to your patient as usual. Hanna listens and captures everything.',
         descTh: 'พูดกับคนไข้ตามปกติ Hanna จะฟังและบันทึกทุกอย่างให้',
-        color: '#3478F6',
-        bg: 'linear-gradient(135deg, #E8F2FC 0%, #D4E8FC 100%)',
+        color: '#6366F1',
+        bg: 'linear-gradient(135deg, rgba(99,102,241,0.1) 0%, rgba(139,92,246,0.15) 100%)',
     },
     {
         icon: FileText,
@@ -20,8 +20,8 @@ const slides = [
         titleTh: 'AI เขียนโน้ตให้',
         desc: 'SOAP note generated in seconds. Review, edit, and finalize.',
         descTh: 'SOAP note สร้างเสร็จภายในไม่กี่วินาที ตรวจสอบ แก้ไข และยืนยัน',
-        color: '#30D158',
-        bg: 'linear-gradient(135deg, #E5F9ED 0%, #C7F2D5 100%)',
+        color: '#10B981',
+        bg: 'linear-gradient(135deg, rgba(16,185,129,0.1) 0%, rgba(52,211,153,0.15) 100%)',
     },
     {
         icon: Download,
@@ -29,8 +29,8 @@ const slides = [
         titleTh: 'บันทึกและส่งออก',
         desc: 'Export as PDF or copy to your system. All notes saved securely.',
         descTh: 'ส่งออกเป็น PDF หรือคัดลอก บันทึกทั้งหมดจัดเก็บอย่างปลอดภัย',
-        color: '#FF9F0A',
-        bg: 'linear-gradient(135deg, #FFF5E0 0%, #FFE8B8 100%)',
+        color: '#F59E0B',
+        bg: 'linear-gradient(135deg, rgba(245,158,11,0.1) 0%, rgba(251,191,36,0.15) 100%)',
     },
 ]
 
@@ -62,7 +62,7 @@ export default function Onboarding() {
             minHeight: '100dvh',
             display: 'flex',
             flexDirection: 'column',
-            background: '#F5F5F5',
+            background: '#FAFAFA',
             padding: '0 24px',
         }}>
             {/* Skip button */}
@@ -201,7 +201,7 @@ export default function Onboarding() {
                         padding: '16px 0',
                         borderRadius: 14,
                         border: 'none',
-                        background: 'var(--color-accent)',
+                        background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
                         color: '#fff',
                         fontSize: 16,
                         fontWeight: 700,
