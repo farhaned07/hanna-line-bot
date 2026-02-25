@@ -123,7 +123,7 @@ export default function Settings() {
                                     onClick={() => setShowUpgradeModal(true)}
                                     style={{
                                         width: '100%', padding: '10px 0', borderRadius: 10,
-                                        background: 'var(--color-ink)', color: '#fff',
+                                        background: 'var(--color-accent)', color: '#fff',
                                         border: 'none', fontWeight: 600, fontSize: 14, cursor: 'pointer'
                                     }}
                                 >
