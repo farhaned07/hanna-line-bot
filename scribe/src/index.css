@@ -1,0 +1,750 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────
+   Design System: Light #F5F5F5 Theme
+   Text: #1A1A1A (primary), #555 (secondary), #999 (tertiary)
+   Accent: #3478F6  |  Cards: #FFFFFF  |  Surface: #F5F5F5
+   ───────────────────────────────────────────── */
+@theme {
+    --color-ink: #1A1A1A;
+    --color-ink2: #555555;
+    --color-ink3: #999999;
+    --color-bg: #F5F5F5;
+    --color-card: #FFFFFF;
+    --color-surface: #EBEBEB;
+    --color-accent: #3478F6;
+    --color-accent-soft: #EBF2FE;
+    --color-accent-glow: rgba(52, 120, 246, 0.18);
+    --color-border: rgba(0, 0, 0, 0.06);
+    --color-green: #30D158;
+    --color-orange: #FF9F0A;
+    --color-red: #FF453A;
+    --color-dark: #1A1A2E;
+    --color-orb: #3478F6;
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.08);
+    --shadow-xl: 0 8px 32px rgba(0, 0, 0, 0.1);
+
+    /* Radii */
+    --radius-sm: 10px;
+    --radius-md: 14px;
+    --radius-lg: 18px;
+    --radius-xl: 24px;
+}
+
+/* ─── Base Reset ─── */
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: var(--color-ink);
+    background: var(--color-bg);
+    font-size: 16px;
+}
+
+body {
+    min-height: 100dvh;
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+    background: var(--color-bg);
+}
+
+input,
+button,
+textarea {
+    font-family: inherit;
+}
+
+/* ─── Utility Classes ─── */
+.safe-top {
+    padding-top: max(env(safe-area-inset-top, 0px), 48px);
+}
+
+.safe-bottom {
+    padding-bottom: max(env(safe-area-inset-bottom, 0px), 20px);
+}
+
+/* ─── Animations ─── */
+@keyframes slide-up {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes scale-in {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-slide-up {
+    animation: slide-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fade-in {
+    animation: fade-in 0.4s ease forwards;
+}
+
+.animate-scale-in {
+    animation: scale-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ─── Card System ─── */
+.scribe-card {
+    background: var(--color-card);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-border);
+}
+
+.glass-card {
+    background: var(--color-card);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-md);
+}
+
+/* ─── Inputs ─── */
+.scribe-input {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: var(--radius-md);
+    background: var(--color-bg);
+    border: 1.5px solid var(--color-border);
+    font-size: 15px;
+    color: var(--color-ink);
+    outline: none;
+    transition: border-color 0.25s, background 0.25s, box-shadow 0.25s;
+}
+
+.scribe-input::placeholder {
+    color: var(--color-ink3);
+}
+
+.scribe-input:focus {
+    border-color: var(--color-accent);
+    background: white;
+    box-shadow: 0 0 0 3px var(--color-accent-glow);
+}
+
+/* ─── Button Primary ─── */
+.btn-primary {
+    width: 100%;
+    padding: 15px;
+    border-radius: var(--radius-md);
+    background: var(--color-accent);
+    color: white;
+    font-weight: 600;
+    font-size: 15px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: opacity 0.2s, transform 0.15s, box-shadow 0.25s;
+    box-shadow: 0 2px 10px rgba(52, 120, 246, 0.25);
+    letter-spacing: -0.2px;
+}
+
+.btn-primary:hover {
+    box-shadow: 0 4px 16px rgba(52, 120, 246, 0.35);
+}
+
+.btn-primary:active {
+    transform: scale(0.97);
+}
+
+.btn-primary:disabled {
+    opacity: 0.35;
+    box-shadow: none;
+}
+
+/* ─── Button Secondary ─── */
+.btn-secondary {
+    flex: 1;
+    padding: 13px 16px;
+    border-radius: var(--radius-md);
+    background: var(--color-bg);
+    color: var(--color-ink2);
+    font-weight: 500;
+    font-size: 14px;
+    border: 1px solid var(--color-border);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: background 0.2s, transform 0.15s;
+}
+
+.btn-secondary:hover {
+    background: var(--color-surface);
+}
+
+.btn-secondary:active {
+    transform: scale(0.97);
+}
+
+/* ─── Toggle Pill ─── */
+.toggle-pill {
+    display: flex;
+    border-radius: var(--radius-sm);
+    background: var(--color-bg);
+    overflow: hidden;
+    padding: 3px;
+    gap: 2px;
+}
+
+.toggle-pill button {
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    color: var(--color-ink3);
+    background: transparent;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 8px;
+}
+
+.toggle-pill button.active {
+    background: var(--color-accent);
+    color: white;
+    box-shadow: 0 2px 8px rgba(52, 120, 246, 0.2);
+}
+
+/* ─── iOS Toggle ─── */
+.ios-toggle {
+    width: 51px;
+    height: 31px;
+    border-radius: 16px;
+    background: var(--color-surface);
+    border: none;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.3s;
+}
+
+.ios-toggle.on {
+    background: var(--color-accent);
+}
+
+.ios-toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 27px;
+    height: 27px;
+    border-radius: 14px;
+    background: white;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.ios-toggle.on::after {
+    transform: translateX(20px);
+}
+
+/* ─── FAB ─── */
+.fab {
+    position: fixed;
+    bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: var(--color-accent);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(52, 120, 246, 0.3);
+    border: none;
+    cursor: pointer;
+    z-index: 50;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.fab:hover {
+    box-shadow: 0 6px 24px rgba(52, 120, 246, 0.4);
+    transform: translateY(-2px);
+}
+
+.fab:active {
+    transform: scale(0.92);
+}
+
+/* ─── Tab Bar ─── */
+.tab-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: calc(64px + env(safe-area-inset-bottom, 0px));
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-around;
+    padding-top: 8px;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    z-index: 40;
+}
+
+.tab-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    border: none;
+    background: none;
+    padding: 4px 20px;
+    text-decoration: none;
+    position: relative;
+    transition: transform 0.2s;
+}
+
+.tab-item:active {
+    transform: scale(0.9);
+}
+
+.tab-item .tab-label {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--color-ink3);
+    transition: color 0.2s;
+}
+
+.tab-item.active .tab-label {
+    color: var(--color-accent);
+    font-weight: 600;
+}
+
+.tab-item.active::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--color-accent);
+}
+
+/* ─── Badge ─── */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+}
+
+.badge-green {
+    background: rgba(48, 209, 88, 0.1);
+    color: #1B8A3E;
+}
+
+.badge-orange {
+    background: rgba(255, 159, 10, 0.1);
+    color: #C47D00;
+}
+
+.badge-red {
+    background: rgba(255, 69, 58, 0.1);
+    color: #D32D22;
+}
+
+.badge-blue {
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+}
+
+/* ─── Settings Row ─── */
+.settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.settings-row label {
+    font-size: 15px;
+    color: var(--color-ink);
+}
+
+/* ─── Section Label ─── */
+.section-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-ink3);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+    padding-left: 2px;
+}
+
+/* ─── Stat Card ─── */
+.stat-card {
+    flex: 1;
+    padding: 16px 12px;
+    border-radius: var(--radius-md);
+    background: var(--color-card);
+    text-align: center;
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
+}
+
+.stat-card .stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--color-ink);
+    letter-spacing: -1px;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.stat-card .stat-label {
+    font-size: 12px;
+    color: var(--color-ink3);
+    font-weight: 500;
+}
+
+.stat-card.urgent .stat-value {
+    color: var(--color-red);
+}
+
+/* ─── Patient Card ─── */
+.patient-card {
+    padding: 16px;
+    border-radius: var(--radius-md);
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    position: relative;
+    transition: box-shadow 0.2s;
+    box-shadow: var(--shadow-sm);
+}
+
+.patient-card:active {
+    box-shadow: var(--shadow-md);
+}
+
+.patient-card.urgent {
+    border-left: 3px solid var(--color-red);
+}
+
+/* ─── Session Card ─── */
+.session-card {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: var(--color-card);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.2s, box-shadow 0.2s;
+    box-shadow: var(--shadow-sm);
+}
+
+.session-card:active {
+    box-shadow: var(--shadow-md);
+    background: #FAFAFA;
+}
+
+/* ─── Orb Animations ─── */
+@keyframes orb-pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.85;
+    }
+
+    50% {
+        transform: scale(1.06);
+        opacity: 1;
+    }
+}
+
+@keyframes orb-ripple {
+    0% {
+        transform: scale(1);
+        opacity: 0.35;
+    }
+
+    100% {
+        transform: scale(2.8);
+        opacity: 0;
+    }
+}
+
+@keyframes orb-breathe {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.08);
+    }
+}
+
+.orb-pulse {
+    animation: orb-pulse 2s ease-in-out infinite;
+}
+
+.orb-ripple {
+    animation: orb-ripple 2s ease-out infinite;
+}
+
+.orb-breathe {
+    animation: orb-breathe 3s ease-in-out infinite;
+}
+
+/* ─── Recording Dot ─── */
+@keyframes blink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.2;
+    }
+}
+
+.recording-dot {
+    animation: blink 1.2s ease-in-out infinite;
+}
+
+/* ─── AI Sparkle ─── */
+@keyframes sparkle {
+
+    0%,
+    100% {
+        opacity: 0.6;
+        transform: scale(0.95);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+}
+
+@keyframes sparkle-rotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.ai-sparkle {
+    animation: sparkle 1.5s ease-in-out infinite;
+}
+
+.ai-sparkle-rotate {
+    animation: sparkle-rotate 3s linear infinite;
+}
+
+/* ─── Urgent Pulse ─── */
+@keyframes urgent-pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.urgent-pulse {
+    animation: urgent-pulse 2s ease-in-out infinite;
+}
+
+/* ─── Tiptap Editor ─── */
+.tiptap-editor .ProseMirror {
+    outline: none;
+    min-height: 60px;
+    padding: 14px 16px;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--color-ink);
+}
+
+.tiptap-editor .ProseMirror p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    float: left;
+    color: var(--color-ink3);
+    pointer-events: none;
+    height: 0;
+}
+
+.tiptap-editor .ProseMirror ul,
+.tiptap-editor .ProseMirror ol {
+    padding-left: 1.5em;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+
+/* ─── Skeleton Loading ─── */
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.skeleton {
+    background: linear-gradient(90deg,
+            var(--color-surface) 25%,
+            rgba(255, 255, 255, 0.8) 50%,
+            var(--color-surface) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+    border-radius: 12px;
+}
+
+/* ─── Hanna Logo Mark ─── */
+.hanna-mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--color-accent);
+    letter-spacing: -0.3px;
+}
+
+.hanna-mark .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    animation: orb-breathe 3s ease-in-out infinite;
+}
+
+/* ─── Empty State ─── */
+.empty-state {
+    text-align: center;
+    padding: 60px 32px 32px;
+}
+
+.empty-state .icon-container {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+    border-radius: 20px;
+    background: var(--color-accent-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.empty-state h3 {
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--color-ink);
+    margin-bottom: 8px;
+    letter-spacing: -0.3px;
+}
+
+.empty-state p {
+    font-size: 14px;
+    color: var(--color-ink3);
+    line-height: 1.5;
+    max-width: 240px;
+    margin: 0 auto;
+}
+
+/* ─── Success Flash ─── */
+@keyframes success-flash {
+    0% {
+        background-color: rgba(48, 209, 88, 0.12);
+    }
+
+    100% {
+        background-color: transparent;
+    }
+}
+
+.success-flash {
+    animation: success-flash 0.6s ease-out;
+}
+
+/* ─── Section Separator ─── */
+.sep {
+    height: 1px;
+    background: var(--color-border);
+    margin: 0;
+    border: none;
+}
