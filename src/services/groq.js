@@ -1,29 +1,30 @@
 const Groq = require('groq-sdk');
+const OpenAI = require('openai');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const db = require('./db'); // Enterprise: For AI response logging
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 /**
- * 👂 Hearing: Transcribe Audio using Whisper (Open Standard)
- * Model: whisper-large-v3 (Multilingual)
+ * 👂 Hearing: Transcribe Audio using OpenAI Whisper
+ * Model: whisper-1 (Multilingual — Thai, Bangla, English)
+ * Note: OpenAI handles transcription only. All LLM tasks use Groq.
  */
 const transcribeAudio = async (audioBuffer) => {
     try {
-        console.log('👂 [Groq] Transcribing audio with Whisper...');
+        console.log('👂 [OpenAI] Transcribing audio with Whisper...');
 
-        // Groq SDK requires a file stream, so we must write to temp first
-        // This is a known nuance of the OpenAI-compatible endpoints
+        // OpenAI SDK requires a file stream
         const tempFilePath = path.join(os.tmpdir(), `audio-${Date.now()}.m4a`);
         fs.writeFileSync(tempFilePath, audioBuffer);
 
-        const transcription = await groq.audio.transcriptions.create({
+        const transcription = await openai.audio.transcriptions.create({
             file: fs.createReadStream(tempFilePath),
-            model: "whisper-large-v3", // Multilingual model
+            model: "whisper-1",
             response_format: "text",
-            language: "th", // Hint: Thai preferred, but it auto-detects
             temperature: 0.0
         });
 
@@ -31,11 +32,11 @@ const transcribeAudio = async (audioBuffer) => {
         fs.unlinkSync(tempFilePath);
 
         const text = transcription.trim();
-        console.log(`👂 [Groq] Transcript: "${text}"`);
+        console.log(`👂 [OpenAI] Transcript: "${text}"`);
         return text;
 
     } catch (error) {
-        console.error('❌ [Groq] STT Error:', error);
+        console.error('❌ [OpenAI] STT Error:', error);
         return null;
     }
 };
