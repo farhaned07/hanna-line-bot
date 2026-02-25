@@ -22,13 +22,6 @@ const SECTION_COLORS = {
     plan: '#AF52DE'
 }
 
-// Mock content for demo
-const MOCK_CONTENT = {
-    subjective: '<p>ผู้ป่วยมาด้วยอาการไข้ 2 วัน ปวดศีรษะ</p>',
-    objective: '<p>T 38.5°C, BP 120/78 mmHg, HR 88 bpm</p>',
-    assessment: '<p>1. Acute febrile illness — likely viral URI</p>',
-    plan: '<p>1. Paracetamol 500mg q6h PRN</p>'
-}
 
 function SectionEditor({ sectionKey, content, onChange, onRegenerate, isRegenerating }) {
     const color = SECTION_COLORS[sectionKey] || 'var(--color-ink2)'
@@ -139,13 +132,8 @@ export default function NoteEditor() {
             const res = await api.regenerateSection(noteId, sectionKey)
             setSections(prev => ({ ...prev, [sectionKey]: res.content }))
         } catch (err) {
-            console.error(err)
-            // If backend fails (e.g. mock mode), just simulate
-            setTimeout(() => {
-                const mockRegen = sections[sectionKey] + ' (AI Improved)'
-                setSections(prev => ({ ...prev, [sectionKey]: mockRegen }))
-                setRegeneratingSection(null)
-            }, 1000)
+            console.error('Regenerate failed:', err)
+            alert('Failed to regenerate section. Please try again.')
         } finally {
             setRegeneratingSection(null)
         }
@@ -160,12 +148,8 @@ export default function NoteEditor() {
             setSections(res.content)
             setHannaCommand('')
         } catch (err) {
-            console.error(err)
-            // Mock mode simulation
-            setTimeout(() => {
-                setHannaCommand('')
-                setProcessingCommand(false)
-            }, 1000)
+            console.error('Hanna command failed:', err)
+            alert('Command failed. Please try again.')
         } finally {
             setProcessingCommand(false)
         }
@@ -183,8 +167,7 @@ export default function NoteEditor() {
                 if (text) contentText.push(`${(SECTION_LABELS[key] || key).toUpperCase()}\n${text}`)
             })
             await api.updateNote(noteId, {
-                content: JSON.stringify(content),
-                content_text: contentText.join('\n\n')
+                content
             })
         } catch (err) {
             console.error('Save failed:', err)

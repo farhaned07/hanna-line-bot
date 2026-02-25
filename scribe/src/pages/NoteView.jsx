@@ -190,12 +190,11 @@ export default function NoteView() {
                                 borderLeft: `3px solid ${SECTION_COLORS[key] || 'var(--color-border)'}`,
                                 paddingLeft: 16
                             }}>
-                                <p style={{
+                                <div style={{
                                     fontSize: 15, color: 'var(--color-ink)', lineHeight: 1.7,
-                                    whiteSpace: 'pre-wrap'
-                                }}>
-                                    {content[key]}
-                                </p>
+                                }}
+                                    dangerouslySetInnerHTML={{ __html: content[key] }}
+                                />
                             </div>
                         </motion.div>
                     )
@@ -204,9 +203,9 @@ export default function NoteView() {
                 {/* Free-form content */}
                 {content.text && (
                     <div style={{ borderLeft: '3px solid var(--color-border)', paddingLeft: 16, marginBottom: 24 }}>
-                        <p style={{ fontSize: 15, color: 'var(--color-ink)', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
-                            {content.text}
-                        </p>
+                        <div style={{ fontSize: 15, color: 'var(--color-ink)', lineHeight: 1.7 }}
+                            dangerouslySetInnerHTML={{ __html: content.text }}
+                        />
                     </div>
                 )}
 

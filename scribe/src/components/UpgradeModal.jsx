@@ -99,7 +99,7 @@ export default function UpgradeModal({ onClose }) {
                             disabled={!!loading}
                             style={{
                                 width: '100%', padding: 12, borderRadius: 12,
-                                background: 'var(--color-ink)', color: '#fff',
+                                background: 'var(--color-accent)', color: '#fff',
                                 fontWeight: 700, fontSize: 14, border: 'none',
                                 cursor: loading ? 'not-allowed' : 'pointer',
                                 opacity: loading ? 0.7 : 1

@@ -136,6 +136,75 @@ router.post('/auth/login', async (req, res) => {
     }
 });
 
+// ──────────────────────────────
+//  STRIPE WEBHOOK (no auth — must be before authMiddleware)
+// ──────────────────────────────
+router.post('/billing/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+    if (!stripe) return res.status(400).json({ error: 'Stripe not configured' });
+
+    const sig = req.headers['stripe-signature'];
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+    let event;
+    try {
+        if (webhookSecret && sig) {
+            event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+        } else {
+            // Dev mode: parse raw body
+            event = JSON.parse(req.body.toString());
+        }
+    } catch (err) {
+        console.error('[Scribe] Webhook signature verification failed:', err.message);
+        return res.status(400).json({ error: 'Webhook signature verification failed' });
+    }
+
+    console.log(`[Scribe] Webhook received: ${event.type}`);
+
+    try {
+        switch (event.type) {
+            case 'checkout.session.completed': {
+                const session = event.data.object;
+                const clinicianId = session.client_reference_id;
+                const planType = session.metadata?.planType || 'pro';
+
+                if (clinicianId) {
+                    await db.query(
+                        `UPDATE clinicians SET plan = $1, stripe_customer_id = $2, updated_at = NOW() WHERE id = $3`,
+                        [planType, session.customer, clinicianId]
+                    );
+                    console.log(`[Scribe] Upgraded clinician ${clinicianId} to ${planType}`);
+                }
+                break;
+            }
+
+            case 'customer.subscription.deleted': {
+                const subscription = event.data.object;
+                const customerId = subscription.customer;
+
+                if (customerId) {
+                    await db.query(
+                        `UPDATE clinicians SET plan = 'free', updated_at = NOW() WHERE stripe_customer_id = $1`,
+                        [customerId]
+                    );
+                    console.log(`[Scribe] Downgraded customer ${customerId} to free`);
+                }
+                break;
+            }
+
+            case 'invoice.payment_failed': {
+                const invoice = event.data.object;
+                console.warn(`[Scribe] Payment failed for customer ${invoice.customer}`);
+                break;
+            }
+        }
+
+        res.json({ received: true });
+    } catch (err) {
+        console.error('[Scribe] Webhook processing error:', err);
+        res.status(500).json({ error: 'Webhook processing error' });
+    }
+});
+
 // ══════════════════════════════
 //  PROTECTED ROUTES
 // ══════════════════════════════
