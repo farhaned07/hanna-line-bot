@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, MoreHorizontal, FileText, ChevronDown, ChevronUp, Check, Copy, Pencil, CheckCheck } from 'lucide-react'
+import { ArrowLeft, Check, Copy, Pencil, CheckCheck, Download, Share2, ChevronDown, ChevronUp, Sparkles } from 'lucide-react'
 import { api } from '../api/client'
 import { t } from '../i18n'
 
@@ -12,11 +12,18 @@ const SECTION_LABELS = {
     plan: 'Plan'
 }
 
-const SECTION_COLORS = {
-    subjective: '#4A90D9',
-    objective: '#34C759',
-    assessment: '#FF9500',
-    plan: '#AF52DE'
+const SECTION_ICONS = {
+    subjective: '💬',
+    objective: '🔬',
+    assessment: '📋',
+    plan: '📌'
+}
+
+const SECTION_GRADIENTS = {
+    subjective: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    objective: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
+    assessment: 'linear-gradient(135deg, #F2994A 0%, #F2C94C 100%)',
+    plan: 'linear-gradient(135deg, #a855f7 0%, #6366f1 100%)'
 }
 
 
@@ -54,7 +61,6 @@ export default function NoteView() {
             await api.finalizeNote(noteId)
             setNote(prev => ({ ...prev, is_final: true, updated_at: new Date().toISOString() }))
         } catch (err) {
-            // Dev mode: just toggle
             setNote(prev => ({ ...prev, is_final: true, updated_at: new Date().toISOString() }))
         }
     }
@@ -77,27 +83,41 @@ export default function NoteView() {
             .join('\n\n')
     }
 
+    const timeAgo = (dateStr) => {
+        const diff = Date.now() - new Date(dateStr).getTime()
+        const mins = Math.floor(diff / 60000)
+        if (mins < 1) return 'just now'
+        if (mins < 60) return `${mins}m ago`
+        const hours = Math.floor(mins / 60)
+        if (hours < 24) return `${hours}h ago`
+        return new Date(dateStr).toLocaleDateString()
+    }
+
     if (loading) {
         return (
-            <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{
-                    width: 28, height: 28, border: '3px solid var(--color-accent)',
-                    borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite'
-                }} />
-                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+            <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#FAFAFA' }}>
+                <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                    style={{
+                        width: 32, height: 32, borderRadius: '50%',
+                        border: '3px solid #E5E7EB', borderTopColor: '#6366F1'
+                    }}
+                />
             </div>
         )
     }
 
     if (!note) {
         return (
-            <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#F5F5F5', gap: 16 }}>
-                <p style={{ color: 'var(--color-ink2)', fontSize: 16 }}>Note not found</p>
+            <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#FAFAFA', gap: 16 }}>
+                <div style={{ fontSize: 48 }}>📄</div>
+                <p style={{ color: '#6B7280', fontSize: 16, fontWeight: 500 }}>Note not found</p>
                 <button
-                    onClick={() => navigate('/', { replace: true })}
+                    onClick={() => navigate('/')}
                     style={{
                         padding: '12px 28px', borderRadius: 12,
-                        background: 'var(--color-accent)', color: '#fff',
+                        background: '#6366F1', color: '#fff',
                         fontWeight: 600, fontSize: 14, border: 'none', cursor: 'pointer',
                     }}
                 >
@@ -110,88 +130,148 @@ export default function NoteView() {
     const content = note.content || {}
 
     return (
-        <div style={{ minHeight: '100dvh', background: '#F5F5F5', paddingBottom: 100 }}>
-            {/* Top Bar */}
+        <div style={{ minHeight: '100dvh', background: '#FAFAFA', paddingBottom: 110 }}>
+            {/* Top Nav Bar */}
             <div className="safe-top" style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: '0 16px 12px'
+                padding: '0 16px 16px'
             }}>
-                <button
+                <motion.button
+                    whileTap={{ scale: 0.9 }}
                     onClick={() => navigate('/')}
                     style={{
-                        width: 36, height: 36, borderRadius: 12,
-                        background: '#fff', border: '1px solid rgba(0,0,0,0.06)',
+                        width: 40, height: 40, borderRadius: 14,
+                        background: '#fff', border: '1px solid #F0F0F0',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        cursor: 'pointer', color: 'var(--color-ink2)',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                        cursor: 'pointer', color: '#374151',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.04)',
                     }}
                 >
                     <ArrowLeft size={18} />
-                </button>
-                <div style={{
-                    display: 'flex', alignItems: 'center', gap: 6,
-                    padding: '6px 12px', borderRadius: 20,
-                    background: note.is_final ? 'rgba(52,199,89,0.1)' : 'rgba(255,149,0,0.1)',
-                    fontSize: 12, fontWeight: 600,
-                    color: note.is_final ? 'var(--color-green)' : 'var(--color-orange)'
-                }}>
+                </motion.button>
+                <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    style={{
+                        display: 'flex', alignItems: 'center', gap: 6,
+                        padding: '6px 14px', borderRadius: 20,
+                        background: note.is_final
+                            ? 'linear-gradient(135deg, rgba(16,185,129,0.1) 0%, rgba(52,211,153,0.15) 100%)'
+                            : 'linear-gradient(135deg, rgba(245,158,11,0.1) 0%, rgba(251,191,36,0.15) 100%)',
+                        fontSize: 12, fontWeight: 600,
+                        border: `1px solid ${note.is_final ? 'rgba(16,185,129,0.2)' : 'rgba(245,158,11,0.2)'}`,
+                        color: note.is_final ? '#059669' : '#D97706'
+                    }}
+                >
                     {note.is_final && <Check size={12} />}
-                    {note.is_final ? t('note.finalized') : t('note.draft')}
-                </div>
+                    {note.is_final ? 'Clinician-reviewed' : 'Draft · Not reviewed'}
+                </motion.div>
             </div>
 
             <div style={{ padding: '0 20px' }}>
-                {/* Attribution */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                {/* AI Attribution */}
+                <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}
+                >
                     <div style={{
-                        width: 22, height: 22, borderRadius: 11,
-                        background: 'var(--color-accent-soft)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center'
+                        width: 28, height: 28, borderRadius: 10,
+                        background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        boxShadow: '0 2px 8px rgba(99,102,241,0.3)'
                     }}>
-                        <div style={{ width: 10, height: 10, borderRadius: 5, background: 'var(--color-accent)' }} />
+                        <Sparkles size={14} color="#fff" />
                     </div>
-                    <span style={{ fontSize: 12, color: 'var(--color-ink3)' }}>
-                        {t('note.generatedBy')} · {timeAgo(note.created_at)}
+                    <span style={{ fontSize: 12, color: '#9CA3AF', fontWeight: 500, letterSpacing: '0.2px' }}>
+                        Generated by Hanna AI · {timeAgo(note.created_at)}
                     </span>
-                </div>
+                </motion.div>
 
-                {/* Patient Info */}
-                <h1 style={{ fontSize: 24, fontWeight: 700, color: 'var(--color-ink)', letterSpacing: '-0.5px' }}>
-                    {session?.patient_name || 'Unknown Patient'}
-                </h1>
-                <p style={{ fontSize: 13, color: 'var(--color-ink3)', marginTop: 4 }}>
-                    {session?.patient_hn ? `HN ${session.patient_hn} · ` : ''}
-                    {new Date(note.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    {' · '}
-                    {note.template_type?.toUpperCase()}
-                </p>
+                {/* Patient Header */}
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.15 }}
+                >
+                    <h1 style={{
+                        fontSize: 26, fontWeight: 800, color: '#111827',
+                        letterSpacing: '-0.8px', lineHeight: 1.15
+                    }}>
+                        {session?.patient_name || 'Patient Note'}
+                    </h1>
+                    <div style={{
+                        display: 'flex', alignItems: 'center', gap: 8, marginTop: 6,
+                        flexWrap: 'wrap'
+                    }}>
+                        {session?.patient_hn && (
+                            <span style={{
+                                fontSize: 12, color: '#6366F1', fontWeight: 600,
+                                background: 'rgba(99,102,241,0.08)', padding: '3px 10px',
+                                borderRadius: 8
+                            }}>
+                                HN {session.patient_hn}
+                            </span>
+                        )}
+                        <span style={{ fontSize: 12, color: '#9CA3AF', fontWeight: 500 }}>
+                            {new Date(note.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                        <span style={{
+                            fontSize: 11, color: '#6366F1', fontWeight: 700,
+                            letterSpacing: '0.5px'
+                        }}>
+                            {note.template_type?.toUpperCase()}
+                        </span>
+                    </div>
+                </motion.div>
 
                 {/* Divider */}
-                <div style={{ height: 1, background: 'var(--color-border)', margin: '20px 0' }} />
+                <div style={{ height: 1, background: 'linear-gradient(90deg, transparent, #E5E7EB 20%, #E5E7EB 80%, transparent)', margin: '20px 0' }} />
 
                 {/* SOAP Sections */}
-                {Object.entries(SECTION_LABELS).map(([key, label]) => {
+                {Object.entries(SECTION_LABELS).map(([key, label], index) => {
                     if (!content[key]) return null
                     return (
                         <motion.div
                             key={key}
-                            initial={{ opacity: 0, y: 8 }}
+                            initial={{ opacity: 0, y: 12 }}
                             animate={{ opacity: 1, y: 0 }}
-                            style={{ marginBottom: 24 }}
+                            transition={{ delay: 0.2 + index * 0.08, ease: [0.25, 0.46, 0.45, 0.94] }}
+                            style={{ marginBottom: 20 }}
                         >
-                            <h3 style={{
-                                fontSize: 11, fontWeight: 700, textTransform: 'uppercase',
-                                letterSpacing: '1px', marginBottom: 10,
-                                color: SECTION_COLORS[key] || 'var(--color-ink2)'
-                            }}>
-                                {label}
-                            </h3>
+                            {/* Section Header */}
                             <div style={{
-                                borderLeft: `3px solid ${SECTION_COLORS[key] || 'var(--color-border)'}`,
-                                paddingLeft: 16
+                                display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10
                             }}>
                                 <div style={{
-                                    fontSize: 15, color: 'var(--color-ink)', lineHeight: 1.7,
+                                    width: 28, height: 28, borderRadius: 8,
+                                    background: SECTION_GRADIENTS[key],
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    fontSize: 14,
+                                    boxShadow: `0 2px 8px ${key === 'subjective' ? 'rgba(102,126,234,0.3)' : key === 'objective' ? 'rgba(17,153,142,0.3)' : key === 'assessment' ? 'rgba(242,153,74,0.3)' : 'rgba(168,85,247,0.3)'}`
+                                }}>
+                                    {SECTION_ICONS[key]}
+                                </div>
+                                <h3 style={{
+                                    fontSize: 13, fontWeight: 700, textTransform: 'uppercase',
+                                    letterSpacing: '1.2px', color: '#374151'
+                                }}>
+                                    {label}
+                                </h3>
+                            </div>
+
+                            {/* Section Content Card */}
+                            <div style={{
+                                background: '#fff',
+                                borderRadius: 16,
+                                padding: '16px 18px',
+                                border: '1px solid #F3F4F6',
+                                boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)',
+                            }}>
+                                <div style={{
+                                    fontSize: 15, color: '#374151', lineHeight: 1.75,
+                                    letterSpacing: '-0.1px'
                                 }}
                                     dangerouslySetInnerHTML={{ __html: content[key] }}
                                 />
@@ -202,102 +282,161 @@ export default function NoteView() {
 
                 {/* Free-form content */}
                 {content.text && (
-                    <div style={{ borderLeft: '3px solid var(--color-border)', paddingLeft: 16, marginBottom: 24 }}>
-                        <div style={{ fontSize: 15, color: 'var(--color-ink)', lineHeight: 1.7 }}
+                    <div style={{
+                        background: '#fff', borderRadius: 16,
+                        padding: '16px 18px', marginBottom: 24,
+                        border: '1px solid #F3F4F6',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)',
+                    }}>
+                        <div style={{ fontSize: 15, color: '#374151', lineHeight: 1.75 }}
                             dangerouslySetInnerHTML={{ __html: content.text }}
                         />
                     </div>
                 )}
 
-                {/* View Transcript */}
+                {/* Transcript Toggle */}
                 {session?.transcript && (
-                    <>
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.5 }}
+                    >
                         <button
                             onClick={() => setShowTranscript(!showTranscript)}
                             style={{
-                                display: 'flex', alignItems: 'center', gap: 8,
-                                padding: '10px 14px', borderRadius: 10,
-                                background: 'var(--color-card)', border: 'none',
-                                cursor: 'pointer', fontSize: 13, color: 'var(--color-ink2)',
-                                fontWeight: 500, marginBottom: 12
+                                width: '100%', padding: '14px 16px',
+                                background: '#fff', borderRadius: 14,
+                                border: '1px solid #F3F4F6', cursor: 'pointer',
+                                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                marginBottom: 16,
+                                boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
                             }}
                         >
-                            <FileText size={14} />
-                            {t('note.viewTranscript')}
-                            {showTranscript ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                            <span style={{ fontSize: 14, color: '#6B7280', fontWeight: 500 }}>
+                                {showTranscript ? 'Hide' : 'View'} transcript
+                            </span>
+                            {showTranscript ? <ChevronUp size={16} color="#9CA3AF" /> : <ChevronDown size={16} color="#9CA3AF" />}
                         </button>
-
                         <AnimatePresence>
                             {showTranscript && (
                                 <motion.div
                                     initial={{ height: 0, opacity: 0 }}
                                     animate={{ height: 'auto', opacity: 1 }}
                                     exit={{ height: 0, opacity: 0 }}
-                                    style={{ overflow: 'hidden', marginBottom: 16 }}
+                                    style={{
+                                        overflow: 'hidden', padding: '16px',
+                                        background: '#F9FAFB', borderRadius: 14,
+                                        marginBottom: 16, border: '1px solid #F3F4F6'
+                                    }}
                                 >
-                                    <div style={{
-                                        padding: 16, borderRadius: 12,
-                                        background: 'var(--color-card)',
-                                        fontSize: 14, color: 'var(--color-ink2)', lineHeight: 1.7
-                                    }}>
+                                    <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
                                         {session.transcript}
-                                    </div>
+                                    </p>
                                 </motion.div>
                             )}
                         </AnimatePresence>
-                    </>
+                    </motion.div>
                 )}
             </div>
 
             {/* Bottom Actions */}
             <div style={{
                 position: 'fixed', bottom: 0, left: 0, right: 0,
-                padding: '12px 20px', paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 12px)',
-                background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(16px)',
-                borderTop: '1px solid rgba(0,0,0,0.06)'
+                padding: '14px 20px',
+                paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 14px)',
+                background: 'rgba(250,250,250,0.85)',
+                backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+                borderTop: '1px solid rgba(0,0,0,0.05)',
             }}>
                 <div style={{ display: 'flex', gap: 8 }}>
-                    {!note.is_final && (
-                        <button
-                            onClick={() => navigate(`/note/${noteId}/edit`)}
-                            className="btn-secondary"
-                        >
-                            <Pencil size={14} />
-                            {t('note.edit')}
-                        </button>
-                    )}
-                    <button onClick={handleDownloadPdf} className="btn-secondary">
-                        <FileText size={14} />
-                        {t('note.pdf')}
-                    </button>
-                    <button onClick={handleCopy} className="btn-secondary">
-                        {copied ? <CheckCheck size={14} /> : <Copy size={14} />}
-                        {copied ? 'Copied' : t('note.copy')}
-                    </button>
-                    {!note.is_final && (
-                        <button
-                            onClick={handleFinalize}
+                    {/* Copy */}
+                    <motion.button
+                        whileTap={{ scale: 0.93 }}
+                        onClick={handleCopy}
+                        style={{
+                            flex: 1, padding: '13px 12px', borderRadius: 14,
+                            background: '#fff', border: '1px solid #E5E7EB',
+                            color: copied ? '#059669' : '#374151',
+                            fontWeight: 600, fontSize: 13, cursor: 'pointer',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                            boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+                            transition: 'all 0.2s'
+                        }}
+                    >
+                        {copied ? <CheckCheck size={15} /> : <Copy size={15} />}
+                        {copied ? 'Copied' : 'Copy'}
+                    </motion.button>
+
+                    {/* PDF */}
+                    <motion.button
+                        whileTap={{ scale: 0.93 }}
+                        onClick={handleDownloadPdf}
+                        style={{
+                            flex: 1, padding: '13px 12px', borderRadius: 14,
+                            background: '#fff', border: '1px solid #E5E7EB',
+                            color: '#374151',
+                            fontWeight: 600, fontSize: 13, cursor: 'pointer',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                            boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+                        }}
+                    >
+                        <Download size={15} />
+                        PDF
+                    </motion.button>
+
+                    {/* Edit or Finalize */}
+                    {!note.is_final ? (
+                        <>
+                            <motion.button
+                                whileTap={{ scale: 0.93 }}
+                                onClick={() => navigate(`/edit/${noteId}`)}
+                                style={{
+                                    flex: 1, padding: '13px 12px', borderRadius: 14,
+                                    background: '#fff', border: '1px solid #E5E7EB',
+                                    color: '#374151',
+                                    fontWeight: 600, fontSize: 13, cursor: 'pointer',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                                    boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+                                }}
+                            >
+                                <Pencil size={14} />
+                                Edit
+                            </motion.button>
+                            <motion.button
+                                whileTap={{ scale: 0.93 }}
+                                onClick={handleFinalize}
+                                style={{
+                                    flex: 1.2, padding: '13px 12px', borderRadius: 14,
+                                    background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
+                                    color: '#fff', border: 'none',
+                                    fontWeight: 600, fontSize: 13, cursor: 'pointer',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                                    boxShadow: '0 4px 14px rgba(99,102,241,0.35)',
+                                }}
+                            >
+                                <Check size={14} />
+                                Finalize
+                            </motion.button>
+                        </>
+                    ) : (
+                        <motion.button
+                            whileTap={{ scale: 0.93 }}
+                            onClick={() => navigate(`/edit/${noteId}`)}
                             style={{
-                                flex: 1, padding: 13, borderRadius: 12,
-                                background: 'var(--color-accent)', color: 'white',
-                                fontWeight: 600, fontSize: 14, border: 'none', cursor: 'pointer',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6
+                                flex: 1, padding: '13px 12px', borderRadius: 14,
+                                background: '#fff', border: '1px solid #E5E7EB',
+                                color: '#374151',
+                                fontWeight: 600, fontSize: 13, cursor: 'pointer',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                                boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
                             }}
                         >
-                            <Check size={14} />
-                            {t('note.finalize')}
-                        </button>
+                            <Pencil size={14} />
+                            Amend
+                        </motion.button>
                     )}
                 </div>
             </div>
         </div>
     )
-}
-
-function timeAgo(dateStr) {
-    const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000)
-    if (seconds < 60) return 'now'
-    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`
-    return `${Math.floor(seconds / 86400)}d ago`
 }
