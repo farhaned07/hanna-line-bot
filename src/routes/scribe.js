@@ -16,13 +16,15 @@ const JWT_SECRET = process.env.JWT_SECRET || process.env.LINE_CHANNEL_SECRET || 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 * 1024 * 1024 } });
 
 // ─── Auth Middleware ───
+const DEMO_USER_ID = '00000000-0000-0000-0000-000000000001';
+
 function authMiddleware(req, res, next) {
     const token = req.headers.authorization?.replace('Bearer ', '');
 
     // Allow requests without tokens (Guest Mode Bypass) or with 'demo' tokens
     if (!token || token === 'demo' || token === 'null') {
-        req.clinicianId = 1;
-        req.clinician = { id: 1, email: 'demo@hanna.care', displayName: 'Dr. Demo (Guest)', plan: 'pro', notes_count_this_month: 0 };
+        req.clinicianId = DEMO_USER_ID;
+        req.clinician = { id: DEMO_USER_ID, email: 'demo@hanna.care', displayName: 'Demo Doctor', plan: 'pro', notes_count_this_month: 0 };
         return next();
     }
 
@@ -33,8 +35,8 @@ function authMiddleware(req, res, next) {
         next();
     } catch (err) {
         // Fallback to guest for demo purposes if invalid token
-        req.clinicianId = 1;
-        req.clinician = { id: 1, email: 'demo@hanna.care', displayName: 'Dr. Demo (Guest)', plan: 'pro', notes_count_this_month: 0 };
+        req.clinicianId = DEMO_USER_ID;
+        req.clinician = { id: DEMO_USER_ID, email: 'demo@hanna.care', displayName: 'Demo Doctor', plan: 'pro', notes_count_this_month: 0 };
         return next();
     }
 }

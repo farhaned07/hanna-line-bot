@@ -129,6 +129,15 @@ export default function NoteView() {
 
     const content = note.content || {}
 
+    // Convert plain text to HTML if needed (AI returns plain text with \n, dangerouslySetInnerHTML ignores \n)
+    const renderContent = (text) => {
+        if (!text) return ''
+        // If it already contains HTML tags, return as-is
+        if (/<[a-z][\s\S]*>/i.test(text)) return text
+        // Convert plain text newlines to <br> tags
+        return text.replace(/\n/g, '<br>')
+    }
+
     return (
         <div style={{ minHeight: '100dvh', background: '#FAFAFA', paddingBottom: 110 }}>
             {/* Top Nav Bar */}
@@ -273,7 +282,7 @@ export default function NoteView() {
                                     fontSize: 15, color: '#374151', lineHeight: 1.75,
                                     letterSpacing: '-0.1px'
                                 }}
-                                    dangerouslySetInnerHTML={{ __html: content[key] }}
+                                    dangerouslySetInnerHTML={{ __html: renderContent(content[key]) }}
                                 />
                             </div>
                         </motion.div>
@@ -289,7 +298,7 @@ export default function NoteView() {
                         boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)',
                     }}>
                         <div style={{ fontSize: 15, color: '#374151', lineHeight: 1.75 }}
-                            dangerouslySetInnerHTML={{ __html: content.text }}
+                            dangerouslySetInnerHTML={{ __html: renderContent(content.text) }}
                         />
                     </div>
                 )}
@@ -389,7 +398,7 @@ export default function NoteView() {
                         <>
                             <motion.button
                                 whileTap={{ scale: 0.93 }}
-                                onClick={() => navigate(`/edit/${noteId}`)}
+                                onClick={() => navigate(`/note/${noteId}/edit`)}
                                 style={{
                                     flex: 1, padding: '13px 12px', borderRadius: 14,
                                     background: '#fff', border: '1px solid #E5E7EB',
@@ -421,7 +430,7 @@ export default function NoteView() {
                     ) : (
                         <motion.button
                             whileTap={{ scale: 0.93 }}
-                            onClick={() => navigate(`/edit/${noteId}`)}
+                            onClick={() => navigate(`/note/${noteId}/edit`)}
                             style={{
                                 flex: 1, padding: '13px 12px', borderRadius: 14,
                                 background: '#fff', border: '1px solid #E5E7EB',

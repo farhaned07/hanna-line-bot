@@ -17,6 +17,7 @@ export default function Processing() {
     const location = useLocation()
     const [stage, setStage] = useState(0)
     const [error, setError] = useState(null)
+    const audioBlobRef = useState(() => location.state?.audioBlob)[0]
 
     useEffect(() => {
         processAudio()
@@ -24,17 +25,22 @@ export default function Processing() {
 
     const processAudio = async () => {
         try {
-            const audioBlob = location.state?.audioBlob
+            const audioBlob = audioBlobRef
             if (!audioBlob) {
                 setError('No audio recording found. Please try recording again.')
                 return
             }
 
+            // Stage 0: Upload
             setStage(0)
+            await new Promise(r => setTimeout(r, 600))
+
+            // Stage 1: Transcribe
             setStage(1)
             const { text: transcript } = await api.transcribe(audioBlob)
             await api.updateSession(sessionId, { transcript, status: 'transcribed' })
 
+            // Stage 2: Generate note
             setStage(2)
             const note = await api.generateNote(sessionId)
             navigate(`/note/${note.id}`, { replace: true })

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../hooks/useAuth'
 import { api } from '../api/client'
@@ -9,6 +10,7 @@ import { User, ChevronRight, Globe, FileText, Zap, Info, HelpCircle, LogOut } fr
 
 export default function Settings() {
     const { user, logout } = useAuth()
+    const navigate = useNavigate()
     const [lang, setLang] = useState(getLocale())
     const [noteLang, setNoteLang] = useState(localStorage.getItem('scribe_note_lang') || 'en')
     const [autoFinalize, setAutoFinalize] = useState(localStorage.getItem('scribe_auto_finalize') === 'true')
@@ -258,7 +260,7 @@ export default function Settings() {
                 <motion.div {...anim(0.25)}>
                     <motion.button
                         whileTap={{ scale: 0.97 }}
-                        onClick={logout}
+                        onClick={() => { logout(); navigate('/login', { replace: true }) }}
                         style={{
                             width: '100%', padding: '14px', borderRadius: 14,
                             background: '#fff', border: '1px solid #F0F0F0',
