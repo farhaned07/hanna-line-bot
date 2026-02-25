@@ -88,7 +88,9 @@ export const usePatients = () => {
         try {
             setLoading(true);
             const res = await api.get('/api/nurse/patients');
-            setPatients(res.data);
+            // API returns { patients: [], pagination: {} } or plain array
+            const data = res.data?.patients || (Array.isArray(res.data) ? res.data : []);
+            setPatients(data);
             setError(null);
         } catch (err) {
             console.error("Failed to fetch patients", err);
