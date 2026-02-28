@@ -120,7 +120,7 @@ export default function Login() {
                             {/* Hero Text */}
                             <div className="mb-4">
                                 <h1 className="text-4xl font-medium leading-[1.15] tracking-tight mb-5 text-white">
-                                    The financial risk engine<br />for capitation
+                                    Care intelligence<br />for capitation
                                 </h1>
                                 <p className="text-slate-400 text-base leading-relaxed max-w-sm font-light">
                                     Close the 90-day black hole between visits. Detect deterioration early. Prevent expensive complications.
