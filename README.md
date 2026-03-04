@@ -1,4 +1,4 @@
-# Hanna: The Financial Risk Engine for Capitation-Based Hospitals
+# Hanna: Care Intelligence
 
 **Hanna continuously monitors chronic patients via LINE, predicts deterioration before it becomes a complication, and converts unmanaged diabetes risk into measurable cost avoidance.**
 
