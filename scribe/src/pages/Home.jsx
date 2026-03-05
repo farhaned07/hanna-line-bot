@@ -189,21 +189,93 @@ export default function Home() {
                         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                         style={{ textAlign: 'center', padding: '60px 32px 32px' }}
                     >
+                        {/* Illustration */}
                         <div style={{
-                            width: 80, height: 80, margin: '0 auto 20px',
-                            borderRadius: 24,
-                            background: 'linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(139,92,246,0.12) 100%)',
+                            width: 120, height: 120, margin: '0 auto 24px',
+                            borderRadius: 40,
+                            background: 'linear-gradient(135deg, rgba(99,102,241,0.1) 0%, rgba(139,92,246,0.15) 100%)',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            boxShadow: '0 4px 16px rgba(99,102,241,0.08)'
+                            boxShadow: '0 8px 24px rgba(99,102,241,0.15)',
+                            position: 'relative'
                         }}>
-                            <Mic size={32} style={{ color: '#6366F1' }} />
+                            {/* Animated phone icon */}
+                            <div style={{
+                                width: 60, height: 80, borderRadius: 12,
+                                background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
+                                position: 'relative',
+                                boxShadow: '0 4px 12px rgba(99,102,241,0.3)'
+                            }}>
+                                {/* Screen glow */}
+                                <div style={{
+                                    position: 'absolute', top: 8, left: 4, right: 4, bottom: 8,
+                                    background: 'rgba(255,255,255,0.2)', borderRadius: 8
+                                }} />
+                                {/* Mic icon */}
+                                <div style={{
+                                    position: 'absolute', top: '50%', left: '50%',
+                                    transform: 'translate(-50%, -50%)',
+                                    width: 24, height: 24, borderRadius: 12,
+                                    background: 'white',
+                                    animation: 'pulse 2s ease-in-out infinite'
+                                }} />
+                            </div>
                         </div>
-                        <h3 style={{ fontWeight: 700, fontSize: 18, color: '#111827', marginBottom: 8, letterSpacing: '-0.3px' }}>
-                            {t('home.noSessions')}
+                        
+                        {/* Title */}
+                        <h3 style={{
+                            fontSize: 22, fontWeight: 800, color: '#111827',
+                            marginBottom: 8, letterSpacing: '-0.5px'
+                        }}>
+                            Create your first clinical note
                         </h3>
-                        <p style={{ fontSize: 14, color: '#9CA3AF', lineHeight: 1.5, maxWidth: 240, margin: '0 auto' }}>
-                            {t('home.noSessionsSub')}
+                        
+                        {/* Subtitle */}
+                        <p style={{
+                            fontSize: 15, color: '#6B7280', lineHeight: 1.6,
+                            maxWidth: 280, margin: '0 auto 16px'
+                        }}>
+                            Tap the button below to start recording. Takes about 60 seconds.
                         </p>
+                        
+                        {/* Time estimate */}
+                        <div style={{
+                            display: 'inline-flex', alignItems: 'center', gap: 6,
+                            padding: '6px 14px', borderRadius: 20,
+                            background: 'rgba(99,102,241,0.08)',
+                            marginBottom: 32
+                        }}>
+                            <div style={{
+                                width: 6, height: 6, borderRadius: 3,
+                                background: '#6366F1',
+                                animation: 'pulse 1.5s ease-in-out infinite'
+                            }} />
+                            <span style={{ fontSize: 13, color: '#6366F1', fontWeight: 600 }}>
+                                3 steps to your first note
+                            </span>
+                        </div>
+                        
+                        {/* Steps */}
+                        <div style={{
+                            display: 'flex', flexDirection: 'column', gap: 12,
+                            maxWidth: 280, margin: '0 auto 32px', textAlign: 'left'
+                        }}>
+                            {[
+                                { icon: '🎙️', text: 'Tap record & speak' },
+                                { icon: '⚡', text: 'AI writes your note' },
+                                { icon: '📋', text: 'Review & finalize' }
+                            ].map((step, i) => (
+                                <div key={i} style={{
+                                    display: 'flex', alignItems: 'center', gap: 10,
+                                    padding: '10px 14px', borderRadius: 12,
+                                    background: '#F9FAFB'
+                                }}>
+                                    <span style={{ fontSize: 20 }}>{step.icon}</span>
+                                    <span style={{ fontSize: 14, color: '#374151', fontWeight: 500 }}>
+                                        {step.text}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
                     </motion.div>
                 ) : (
                     Object.entries(groups).map(([label, items], groupIndex) => (

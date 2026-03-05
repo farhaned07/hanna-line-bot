@@ -200,6 +200,30 @@ export default function Record() {
                 </p>
             </div>
 
+            {/* Large Timer Display */}
+            <div style={{ textAlign: 'center', marginBottom: 24, padding: '0 20px' }}>
+                <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                    style={{
+                        fontSize: 56, fontWeight: 800, color: 'white',
+                        fontVariantNumeric: 'tabular-nums', letterSpacing: '-2px',
+                        textShadow: '0 2px 12px rgba(0,0,0,0.3)'
+                    }}
+                >
+                    {recorder.formattedDuration}
+                </motion.div>
+                {/* Context hint */}
+                <div style={{
+                    fontSize: 13,
+                    color: recorder.duration > 300 ? '#EF4444' : recorder.duration > 120 ? '#F59E0B' : 'rgba(255,255,255,0.5)',
+                    fontWeight: 600, marginTop: 8
+                }}>
+                    {recorder.duration > 300 ? 'Consider wrapping up' : recorder.duration > 120 ? 'Perfect length' : recorder.duration > 30 ? 'Keep talking...' : 'Start speaking'}
+                </div>
+            </div>
+
             {/* Transcript Area */}
             <div style={{
                 margin: '0 20px 20px', maxHeight: 130, overflowY: 'auto',

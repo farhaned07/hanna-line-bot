@@ -49,8 +49,10 @@ export default function Onboarding() {
     }
 
     const handleSkip = () => {
-        localStorage.setItem('scribe_onboarded', 'true')
-        navigate('/', { replace: true })
+        if (window.confirm('Skip onboarding? You can always view this later from Settings.')) {
+            localStorage.setItem('scribe_onboarded', 'true')
+            navigate('/', { replace: true })
+        }
     }
 
     const slide = slides[step]
