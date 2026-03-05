@@ -361,13 +361,33 @@ router.patch('/sessions/:id', async (req, res) => {
 
 // ─── Transcription ───
 
+// GET /transcription/debug - Check if Deepgram is configured
+router.get('/transcription/debug', async (req, res) => {
+    try {
+        const hasKey = !!process.env.DEEPGRAM_API_KEY;
+        const keyPreview = hasKey ? process.env.DEEPGRAM_API_KEY.substring(0, 8) + '...' : 'NOT SET';
+        
+        res.json({
+            deepgram_configured: hasKey,
+            api_key_preview: keyPreview,
+            status: hasKey ? 'ready' : 'missing_api_key'
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // POST /transcribe
 router.post('/transcribe', upload.single('audio'), async (req, res) => {
     try {
         if (!req.file) return res.status(400).json({ error: 'No audio file provided' });
 
         console.log(`[Scribe] Transcribing audio: ${req.file.size} bytes, ${req.file.mimetype}`);
+        console.log(`[Scribe] Deepgram API key present: ${!!process.env.DEEPGRAM_API_KEY}`);
+        
         const text = await transcribeAudio(req.file.buffer);
+
+        console.log(`[Scribe] Transcription result: "${text}"`);
 
         if (!text) return res.status(500).json({ error: 'Transcription failed' });
         res.json({ text });
