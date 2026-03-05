@@ -47,10 +47,18 @@ export default function Login() {
         try {
             if (isRegister) {
                 await register({ email, pin: pinStr, displayName })
+                // New users should see onboarding
+                navigate('/onboarding', { replace: true })
             } else {
                 await login(email, pinStr)
+                // Check if user has seen onboarding before
+                const hasSeenOnboarding = localStorage.getItem('scribe_onboarded') === 'true'
+                if (hasSeenOnboarding) {
+                    navigate('/', { replace: true })
+                } else {
+                    navigate('/onboarding', { replace: true })
+                }
             }
-            navigate('/', { replace: true })
         } catch (err) {
             setError(err.message || t('login.error'))
             setShake(true)
