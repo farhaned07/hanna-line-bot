@@ -253,6 +253,54 @@ export default function Settings() {
                             <span style={{ fontSize: 15, color: '#111827', fontWeight: 500 }}>{t('settings.help')}</span>
                             <ChevronRight size={16} color="#D1D5DB" />
                         </button>
+                        
+                        {/* PDPA Compliance */}
+                        <hr style={{ border: 'none', borderTop: '1px solid #F0F0F0', margin: '16px 0' }} />
+                        <div style={{ padding: '0 16px', marginBottom: '12px' }}>
+                            <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12' }}>
+                                Data & Privacy (PDPA)
+                            </p>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                    <FileText size={18} color="#6366F1" />
+                                    <span style={{ fontSize: 14, color: '#111827', fontWeight: 600 }}>Export My Data</span>
+                                </div>
+                                <motion.button
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => alert('Data export feature coming soon. Contact support@hanna.care for immediate request.')}
+                                    style={{
+                                        padding: '8px 16px', borderRadius: 10,
+                                        background: '#F3F4F6', border: 'none',
+                                        color: '#6366F1', fontWeight: 600, fontSize: 13,
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    Export
+                                </motion.button>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                    <Zap size={18} color="#EF4444" />
+                                    <span style={{ fontSize: 14, color: '#EF4444', fontWeight: 600 }}>Delete Account</span>
+                                </div>
+                                <motion.button
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => {
+                                        if (window.confirm('⚠️ Are you sure? This will permanently delete all your data. This action cannot be undone.')) {
+                                            alert('Account deletion feature coming soon. Contact support@hanna.care for immediate request.');
+                                        }
+                                    }}
+                                    style={{
+                                        padding: '8px 16px', borderRadius: 10,
+                                        background: '#FEF2F2', border: 'none',
+                                        color: '#EF4444', fontWeight: 600, fontSize: 13,
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    Delete
+                                </motion.button>
+                            </div>
+                        </div>
                     </div>
                 </motion.div>
 

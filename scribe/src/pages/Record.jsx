@@ -228,22 +228,17 @@ export default function Record() {
                 </div>
             </div>
 
-            {/* Transcript Area */}
+            {/* Recording Tips */}
             <div style={{
-                margin: '0 20px 20px', maxHeight: 130, overflowY: 'auto',
-                borderRadius: 16, padding: '16px 18px',
+                margin: '0 20px 20px', padding: '16px 18px',
+                borderRadius: 16,
                 background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.06)'
+                border: '1px solid rgba(255,255,255,0.06)',
+                textAlign: 'center'
             }}>
-                {transcript ? (
-                    <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 14, lineHeight: 1.6 }}>
-                        {transcript}
-                    </p>
-                ) : (
-                    <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: 14, fontStyle: 'italic' }}>
-                        {recorder.isRecording ? 'Transcript will appear here...' : ''}
-                    </p>
-                )}
+                <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, lineHeight: 1.6 }}>
+                    🎤 Speak clearly and naturally. Transcription happens after you stop.
+                </p>
             </div>
 
             {/* Controls */}
