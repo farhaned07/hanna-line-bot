@@ -380,20 +380,39 @@ router.get('/transcription/debug', async (req, res) => {
 // POST /transcribe
 router.post('/transcribe', upload.single('audio'), async (req, res) => {
     try {
-        if (!req.file) return res.status(400).json({ error: 'No audio file provided' });
+        if (!req.file) {
+            console.error('[Scribe] No audio file in request');
+            return res.status(400).json({ error: 'No audio file provided' });
+        }
 
-        console.log(`[Scribe] Transcribing audio: ${req.file.size} bytes, ${req.file.mimetype}`);
-        console.log(`[Scribe] Deepgram API key present: ${!!process.env.DEEPGRAM_API_KEY}`);
+        console.log(`[Scribe] Transcribing audio:`);
+        console.log(`  - Size: ${req.file.size} bytes`);
+        console.log(`  - Type: ${req.file.mimetype}`);
+        console.log(`  - Original name: ${req.file.originalname}`);
+        console.log(`  - Buffer length: ${req.file.buffer.length}`);
+        console.log(`  - Deepgram API key present: ${!!process.env.DEEPGRAM_API_KEY}`);
+        
+        // Log first few bytes to verify it's valid audio
+        const preview = req.file.buffer.subarray(0, 20).toString('hex');
+        console.log(`  - Audio header (hex): ${preview}`);
         
         const text = await transcribeAudio(req.file.buffer);
 
         console.log(`[Scribe] Transcription result: "${text}"`);
+        console.log(`[Scribe] Result length: ${text.length} characters`);
 
-        if (!text) return res.status(500).json({ error: 'Transcription failed' });
+        if (!text || text.trim() === '') {
+            console.warn('[Scribe] Empty transcript returned');
+            // Return success with empty string instead of error
+            // This allows the flow to continue even if transcription is empty
+            return res.json({ text: '' });
+        }
+        
         res.json({ text });
     } catch (err) {
-        console.error('[Scribe] Transcribe error:', err);
-        res.status(500).json({ error: 'Transcription failed' });
+        console.error('[Scribe] Transcribe error:', err.message);
+        console.error('[Scribe] Stack:', err.stack);
+        res.status(500).json({ error: 'Transcription failed: ' + err.message });
     }
 });
 

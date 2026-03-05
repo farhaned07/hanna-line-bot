@@ -71,6 +71,16 @@ const transcribeAudio = async (audioBuffer) => {
 
     } catch (error) {
         console.error('❌ [Deepgram] Transcription Error:', error.message);
+        console.error('❌ [Deepgram] Error details:', JSON.stringify(error, null, 2));
+        
+        // Check for specific error types
+        if (error.message.includes('corrupt or unsupported')) {
+            console.error('❌ [Deepgram] Audio format issue - expected WebM/MP4 with Opus codec');
+        } else if (error.message.includes('400')) {
+            console.error('❌ [Deepgram] Bad Request - check audio format and API key');
+        } else if (error.message.includes('401')) {
+            console.error('❌ [Deepgram] Authentication failed - check API key');
+        }
         
         // Fallback: Return empty string instead of null
         // This prevents the entire flow from breaking
