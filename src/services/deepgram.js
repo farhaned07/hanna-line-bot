@@ -35,29 +35,54 @@ const transcribeAudio = async (audioBuffer) => {
             return '';
         }
 
+        // Use Deepgram's multilingual model with auto-detection
+        // nova-2-general automatically detects from 30+ languages including Thai, Bangla, English
         const result = await client.listen.prerecorded.transcribeFile(
             audioBuffer,
             {
                 model: 'nova-2',
-                // Support Thai, Bangla, and English with auto-detection
-                language: 'th', // Primary: Thai (auto-detects others)
+                // Enable multilingual detection - removes language bias
+                language: null, // Let Deepgram auto-detect (supports 30+ languages)
+                detect_language: true, // Enable language detection
+                
+                // Alternative: Specify multiple languages for better detection
+                // This tells Deepgram to expect Thai, Bangla, or English
+                multilingual: true, // Enable multilingual mode
+                
                 alternatives: 1,
                 smart_format: true,
-                detect_language: true, // Auto-detect Thai/Bangla/English
                 utterances: true,
                 filler_words: false,
                 punctuate: true,
                 paragraphs: true,
-                // Medical terminology optimization
+                diarize: false, // Not needed for medical notes
+                
+                // Medical terminology optimization for all three languages
                 keywords: [
-                    // Thai medical terms
+                    // Thai medical terms (20 common terms)
                     'ความดัน', 'น้ำตาล', 'เบาหวาน', 'เลือด', 'หัวใจ',
                     'ไข้', 'ปวด', 'ยา', 'หมอ', 'โรงพยาบาล',
-                    // Bangla medical terms
+                    'พาราเซตามอล', 'อินซูลิน', 'เมตฟอร์มิน', 'กลูโคส',
+                    'ไต', 'ตับ', 'ปอด', 'กระเพาะ', 'ลำไส้', 'สมอง',
+                    
+                    // Bangla medical terms (20 common terms)
                     'রক্ত', 'চিনি', 'ডায়াবেটিস', 'ঔষধ', 'ডাক্তার',
-                    // English medical terms
+                    'হাসপাতাল', 'জ্বর', 'ব্যথা', 'ইনসুলিন', 'মেটফরমিন',
+                    'প্যারাসিটামল', 'গ্লুকোজ', 'কিডনি', 'লিভার', 'ফুসফুস',
+                    'হৃদরোগ', 'উচ্চ রক্তচাপ', 'মাথাব্যথা', 'বমি', 'সর্দি',
+                    
+                    // English medical terms (20 common terms)
                     'diabetes', 'hypertension', 'blood pressure', 'glucose',
-                    'medication', 'doctor', 'hospital', 'fever', 'pain'
+                    'medication', 'doctor', 'hospital', 'fever', 'pain',
+                    'paracetamol', 'insulin', 'metformin', 'kidney', 'liver',
+                    'heart', 'lung', 'stomach', 'headache', 'nausea', 'prescription'
+                ],
+                
+                // Boost accuracy for medical terms
+                boost: [
+                    'diabetes', 'hypertension', 'glucose', 'insulin',
+                    'เบาหวาน', 'ความดัน', 'น้ำตาล',
+                    'ডায়াবেটিস', 'রক্ত', 'চিনি'
                 ],
             }
         );
