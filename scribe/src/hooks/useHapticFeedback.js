@@ -91,25 +91,3 @@ export function useHapticFeedback() {
         ...haptic
     }
 }
-
-/**
- * 📳 Haptic Button Component Wrapper
- * Adds haptic feedback to any button
- * 
- * Usage:
- * const HapticButton = withHaptic(MyButton)
- * <HapticButton hapticType="tap" onClick={...} />
- */
-export function withHaptic(WrappedComponent) {
-    return function HapticWrapper(props) {
-        const { hapticType = 'tap', onClick, ...rest } = props
-        const { triggerHaptic } = useHapticFeedback()
-
-        const handleClick = (e) => {
-            triggerHaptic(hapticType)
-            if (onClick) onClick(e)
-        }
-
-        return <WrappedComponent {...rest} onClick={handleClick} />
-    }
-}
