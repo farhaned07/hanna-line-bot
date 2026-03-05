@@ -1,4 +1,5 @@
 const { createClient } = require('@deepgram/sdk');
+const { getAllMedicalTerms, getBoostedTerms } = require('./medicalTerms');
 
 // Lazy initialization - only create client when API key is available
 let deepgram = null;
@@ -17,13 +18,17 @@ const getDeepgramClient = () => {
 
 /**
  * 🎤 Transcribe Audio using Deepgram
- * Model: nova-2 (General) or nova-2-meeting (Medical optimized)
- * Languages: Thai (th), Bangla (bn), English (en)
+ * Model: nova-2 (General) - supports 30+ languages
  * Features:
- * - Multilingual (auto-detects Thai, Bangla, English)
- * - Medical terminology support
- * - Faster than Whisper
- * - Better accuracy for clinical terms
+ * - True multilingual detection (auto-detects language)
+ * - Code-switching support (mixing languages in one sentence)
+ * - 200+ medical terms across 8 languages
+ * - Boosted recognition for common medical terms
+ * 
+ * Supported Languages:
+ * 🇹🇭 Thai (th) | 🇧🇩 Bangla (bn) | 🇬🇧 English (en)
+ * 🇮🇳 Hindi (hi) | 🇵🇰 Urdu (ur) | 🇪🇸 Spanish (es)
+ * 🇫🇷 French (fr) | 🇸🇦 Arabic (ar)
  */
 const transcribeAudio = async (audioBuffer) => {
     try {
@@ -35,21 +40,29 @@ const transcribeAudio = async (audioBuffer) => {
             return '';
         }
 
-        // Use Deepgram's multilingual model with auto-detection
-        // nova-2-general automatically detects from 30+ languages including Thai, Bangla, English
+        // Get comprehensive medical terminology
+        const allMedicalTerms = getAllMedicalTerms();
+        const boostedTerms = getBoostedTerms();
+
+        console.log(`📚 [Deepgram] Loaded ${allMedicalTerms.length} medical terms`);
+        console.log(`🚀 [Deepgram] Boosted ${boostedTerms.length} high-priority terms`);
+
+        // Use Deepgram's most advanced multilingual model
         const result = await client.listen.prerecorded.transcribeFile(
             audioBuffer,
             {
+                // Model: nova-2 supports 30+ languages with auto-detection
                 model: 'nova-2',
-                // Enable multilingual detection - removes language bias
-                language: null, // Let Deepgram auto-detect (supports 30+ languages)
-                detect_language: true, // Enable language detection
                 
-                // Alternative: Specify multiple languages for better detection
-                // This tells Deepgram to expect Thai, Bangla, or English
-                multilingual: true, // Enable multilingual mode
+                // True multilingual mode - no language bias
+                language: null, // Auto-detect from 30+ languages
+                detect_language: true, // Enable language ID
+                multilingual: true, // Enable code-switching support
                 
-                alternatives: 1,
+                // Get multiple alternatives for better accuracy
+                alternatives: 2,
+                
+                // Smart formatting for medical text
                 smart_format: true,
                 utterances: true,
                 filler_words: false,
@@ -57,39 +70,28 @@ const transcribeAudio = async (audioBuffer) => {
                 paragraphs: true,
                 diarize: false, // Not needed for medical notes
                 
-                // Medical terminology optimization for all three languages
-                keywords: [
-                    // Thai medical terms (20 common terms)
-                    'ความดัน', 'น้ำตาล', 'เบาหวาน', 'เลือด', 'หัวใจ',
-                    'ไข้', 'ปวด', 'ยา', 'หมอ', 'โรงพยาบาล',
-                    'พาราเซตามอล', 'อินซูลิน', 'เมตฟอร์มิน', 'กลูโคส',
-                    'ไต', 'ตับ', 'ปอด', 'กระเพาะ', 'ลำไส้', 'สมอง',
-                    
-                    // Bangla medical terms (20 common terms)
-                    'রক্ত', 'চিনি', 'ডায়াবেটিস', 'ঔষধ', 'ডাক্তার',
-                    'হাসপাতাল', 'জ্বর', 'ব্যথা', 'ইনসুলিন', 'মেটফরমিন',
-                    'প্যারাসিটামল', 'গ্লুকোজ', 'কিডনি', 'লিভার', 'ফুসফুস',
-                    'হৃদরোগ', 'উচ্চ রক্তচাপ', 'মাথাব্যথা', 'বমি', 'সর্দি',
-                    
-                    // English medical terms (20 common terms)
-                    'diabetes', 'hypertension', 'blood pressure', 'glucose',
-                    'medication', 'doctor', 'hospital', 'fever', 'pain',
-                    'paracetamol', 'insulin', 'metformin', 'kidney', 'liver',
-                    'heart', 'lung', 'stomach', 'headache', 'nausea', 'prescription'
-                ],
+                // Comprehensive medical terminology (200+ terms)
+                keywords: allMedicalTerms,
                 
-                // Boost accuracy for medical terms
-                boost: [
-                    'diabetes', 'hypertension', 'glucose', 'insulin',
-                    'เบาหวาน', 'ความดัน', 'น้ำตาล',
-                    'ডায়াবেটিস', 'রক্ত', 'চিনি'
-                ],
+                // Boost recognition for most common terms
+                boost: boostedTerms,
+                
+                // Additional optimizations
+                numerals: true, // Convert numbers to digits
+                search: boostedTerms, // Search for key terms
+                replace: [], // No replacements needed
+                profanity_filter: false, // Don't filter medical terms
             }
         );
 
         console.log('🎤 [Deepgram] Raw response:', JSON.stringify(result, null, 2).substring(0, 500));
 
+        // Get the best transcript (first alternative)
         const transcript = result.result?.results?.channels?.[0]?.alternatives?.[0]?.transcript || '';
+        
+        // Get detected language (if available)
+        const detectedLanguage = result.result?.results?.channels?.[0]?.detected_language || 'unknown';
+        console.log(`🌍 [Deepgram] Detected language: ${detectedLanguage}`);
         
         console.log(`🎤 [Deepgram] Transcript: "${transcript}"`);
         return transcript.trim();
