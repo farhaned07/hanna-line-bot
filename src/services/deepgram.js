@@ -1,6 +1,19 @@
 const { createClient } = require('@deepgram/sdk');
 
-const deepgram = createClient(process.env.DEEPGRAM_API_KEY);
+// Lazy initialization - only create client when API key is available
+let deepgram = null;
+
+const getDeepgramClient = () => {
+    if (!deepgram) {
+        const apiKey = process.env.DEEPGRAM_API_KEY;
+        if (!apiKey) {
+            console.warn('⚠️ [Deepgram] No API key provided - transcription will be disabled');
+            return null;
+        }
+        deepgram = createClient(apiKey);
+    }
+    return deepgram;
+};
 
 /**
  * 🎤 Transcribe Audio using Deepgram
@@ -15,7 +28,13 @@ const transcribeAudio = async (audioBuffer) => {
     try {
         console.log('🎤 [Deepgram] Transcribing audio...');
 
-        const result = await deepgram.listen.prerecorded.transcribeFile(
+        const client = getDeepgramClient();
+        if (!client) {
+            console.error('❌ [Deepgram] Client not initialized - no API key');
+            return '';
+        }
+
+        const result = await client.listen.prerecorded.transcribeFile(
             audioBuffer,
             {
                 model: 'nova-2',
