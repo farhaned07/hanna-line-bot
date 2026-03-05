@@ -1,5 +1,7 @@
 # Hanna: Care Intelligence
 
+> **Unified Product Specification**: See [docs/PRODUCT_SPEC.md](./docs/PRODUCT_SPEC.md) for complete architecture, user journeys, and deployment guides.
+
 **Hanna Scribe** — Voice-first clinical documentation that turns patient conversations into structured SOAP notes in seconds.
 
 [![Status](https://img.shields.io/badge/Status-Production-green)]()
@@ -7,6 +9,31 @@
 [![AI](https://img.shields.io/badge/AI-Llama_3.3_70B-purple)]()
 
 > **Live at**: [hanna.care/scribe/app](https://hanna.care/scribe/app)
+
+---
+
+## 🎯 **Product Strategy**
+
+We build **two products** with a clear upgrade path:
+
+| Product | Target | Price | Purpose |
+|---------|--------|-------|---------|
+| **Scribe** | Individual doctors, clinics | ฿1,990-4,990/mo | Voice-first documentation |
+| **Care Intelligence** | Hospitals, large clinics | ฿50,000+/mo | Chronic disease monitoring |
+
+**Upgrade Path**: Scribe → Care Plan → Care Intelligence
+
+---
+
+## 📚 **Documentation**
+
+| Document | Purpose |
+|----------|---------|
+| **[PRODUCT_SPEC.md](./docs/PRODUCT_SPEC.md)** | **Unified product specification (START HERE)** |
+| [SCRIBE_GUIDE.md](./docs/SCRIBE_GUIDE.md) | Scribe user manual |
+| [SCRIBE_LAUNCH_CHECKLIST.md](./docs/SCRIBE_LAUNCH_CHECKLIST.md) | Launch checklist |
+| [PHASE1_DISCOVERY_REPORT.md](./docs/PHASE1_DISCOVERY_REPORT.md) | Codebase analysis |
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | System architecture |
 
 ---
 
