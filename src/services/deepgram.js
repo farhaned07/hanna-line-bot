@@ -18,8 +18,9 @@ const getDeepgramClient = () => {
 /**
  * 🎤 Transcribe Audio using Deepgram
  * Model: nova-2 (General) or nova-2-meeting (Medical optimized)
+ * Languages: Thai (th), Bangla (bn), English (en)
  * Features:
- * - Multilingual (Thai, English, etc.)
+ * - Multilingual (auto-detects Thai, Bangla, English)
  * - Medical terminology support
  * - Faster than Whisper
  * - Better accuracy for clinical terms
@@ -38,13 +39,26 @@ const transcribeAudio = async (audioBuffer) => {
             audioBuffer,
             {
                 model: 'nova-2',
-                language: 'th', // Thai (auto-detects English too)
+                // Support Thai, Bangla, and English with auto-detection
+                language: 'th', // Primary: Thai (auto-detects others)
+                alternatives: 1,
                 smart_format: true,
-                detect_language: true,
+                detect_language: true, // Auto-detect Thai/Bangla/English
                 utterances: true,
                 filler_words: false,
                 punctuate: true,
                 paragraphs: true,
+                // Medical terminology optimization
+                keywords: [
+                    // Thai medical terms
+                    'ความดัน', 'น้ำตาล', 'เบาหวาน', 'เลือด', 'หัวใจ',
+                    'ไข้', 'ปวด', 'ยา', 'หมอ', 'โรงพยาบาล',
+                    // Bangla medical terms
+                    'রক্ত', 'চিনি', 'ডায়াবেটিস', 'ঔষধ', 'ডাক্তার',
+                    // English medical terms
+                    'diabetes', 'hypertension', 'blood pressure', 'glucose',
+                    'medication', 'doctor', 'hospital', 'fever', 'pain'
+                ],
             }
         );
 
