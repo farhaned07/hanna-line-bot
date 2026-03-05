@@ -1,45 +1,17 @@
 const Groq = require('groq-sdk');
-const OpenAI = require('openai');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const db = require('./db'); // Enterprise: For AI response logging
+const db = require('./db');
+const { transcribeAudio } = require('./deepgram'); // Use Deepgram instead of OpenAI
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 /**
- * 👂 Hearing: Transcribe Audio using OpenAI Whisper
- * Model: whisper-1 (Multilingual — Thai, Bangla, English)
- * Note: OpenAI handles transcription only. All LLM tasks use Groq.
+ * 🎤 Transcribe Audio using Deepgram
+ * Already imported from ./deepgram
  */
-const transcribeAudio = async (audioBuffer) => {
-    try {
-        console.log('👂 [OpenAI] Transcribing audio with Whisper...');
-
-        // OpenAI SDK requires a file stream
-        const tempFilePath = path.join(os.tmpdir(), `audio-${Date.now()}.m4a`);
-        fs.writeFileSync(tempFilePath, audioBuffer);
-
-        const transcription = await openai.audio.transcriptions.create({
-            file: fs.createReadStream(tempFilePath),
-            model: "whisper-1",
-            response_format: "text",
-            temperature: 0.0
-        });
-
-        // Cleanup
-        fs.unlinkSync(tempFilePath);
-
-        const text = transcription.trim();
-        console.log(`👂 [OpenAI] Transcript: "${text}"`);
-        return text;
-
-    } catch (error) {
-        console.error('❌ [OpenAI] STT Error:', error);
-        return null;
-    }
-};
+// transcribeAudio function is imported from ./deepgram.js
 
 /**
  * 🧠 Speaking: Generate Response using Llama 3 (Open Weights)
