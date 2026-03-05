@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Mic, Search, X, ChevronRight, FileText, Clock, CheckCircle2 } from 'lucide-react'
+import { Plus, Mic, Search, X, ChevronRight, FileText, Clock, CheckCircle2, Trash2, Share2 } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { api } from '../api/client'
 import { t, getGreeting } from '../i18n'
+import { useSwipeGesture } from '../hooks/useSwipeGesture'
 import TabBar from '../components/TabBar'
 import NewSessionSheet from '../components/NewSessionSheet'
 import UpgradeModal from '../components/UpgradeModal'
+import SwipeableSessionCard from '../components/SwipeableSessionCard'
 
 export default function Home() {
     const { user } = useAuth()
@@ -86,6 +88,33 @@ export default function Home() {
             navigate(`/note/${session.notes[0].id}`)
         } else {
             navigate(`/record/${session.id}`)
+        }
+    }
+
+    const handleDeleteSession = async (sessionId) => {
+        try {
+            await api.deleteSession(sessionId)
+            // Reload sessions
+            loadSessions()
+        } catch (err) {
+            console.error('Delete failed:', err)
+            alert('Failed to delete session')
+        }
+    }
+
+    const handleExportSession = async (sessionId) => {
+        try {
+            // Navigate to note and trigger export
+            const session = await api.getSession(sessionId)
+            if (session.notes?.[0]?.id) {
+                navigate(`/note/${session.notes[0].id}`)
+                // Export will be triggered by user in note view
+                setTimeout(() => {
+                    alert('Swipe right to export - opening note...')
+                }, 500)
+            }
+        } catch (err) {
+            console.error('Export failed:', err)
         }
     }
 
@@ -299,77 +328,15 @@ export default function Home() {
                                 </span>
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                                {items.map((session, i) => {
-                                    const isFinalized = session.notes?.[0]?.is_final
-                                    return (
-                                        <motion.button
-                                            key={session.id}
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: (groupIndex * 0.05) + (i * 0.04), ease: [0.16, 1, 0.3, 1] }}
-                                            whileTap={{ scale: 0.98 }}
-                                            onClick={() => handleSessionTap(session)}
-                                            style={{
-                                                width: '100%', display: 'flex', alignItems: 'center',
-                                                justifyContent: 'space-between',
-                                                padding: '14px 16px',
-                                                background: '#fff',
-                                                borderRadius: 16, cursor: 'pointer',
-                                                textAlign: 'left', border: '1px solid #F0F0F0',
-                                                boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)',
-                                                transition: 'box-shadow 0.2s, border-color 0.2s',
-                                            }}
-                                        >
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
-                                                {/* Status Icon */}
-                                                <div style={{
-                                                    width: 38, height: 38, borderRadius: 12, flexShrink: 0,
-                                                    background: isFinalized
-                                                        ? 'linear-gradient(135deg, rgba(16,185,129,0.1) 0%, rgba(52,211,153,0.15) 100%)'
-                                                        : 'linear-gradient(135deg, rgba(245,158,11,0.1) 0%, rgba(251,191,36,0.15) 100%)',
-                                                    display: 'flex', alignItems: 'center', justifyContent: 'center'
-                                                }}>
-                                                    {isFinalized
-                                                        ? <CheckCircle2 size={18} color="#059669" />
-                                                        : <Clock size={18} color="#D97706" />
-                                                    }
-                                                </div>
-                                                <div style={{ minWidth: 0 }}>
-                                                    <p style={{
-                                                        fontWeight: 600, fontSize: 15, color: '#111827',
-                                                        overflow: 'hidden', textOverflow: 'ellipsis',
-                                                        whiteSpace: 'nowrap', letterSpacing: '-0.2px'
-                                                    }}>
-                                                        {session.patient_name || 'Unknown Patient'}
-                                                    </p>
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3 }}>
-                                                        <span style={{
-                                                            fontSize: 11, fontWeight: 600,
-                                                            color: isFinalized ? '#059669' : '#D97706',
-                                                            background: isFinalized
-                                                                ? 'rgba(16,185,129,0.08)'
-                                                                : 'rgba(245,158,11,0.08)',
-                                                            padding: '2px 8px', borderRadius: 6
-                                                        }}>
-                                                            {isFinalized ? 'Finalized' : 'In Progress'}
-                                                        </span>
-                                                        <span style={{ fontSize: 11, color: '#9CA3AF', fontWeight: 500 }}>
-                                                            {session.template_type?.toUpperCase() || 'SOAP'}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, marginLeft: 12 }}>
-                                                <span style={{ fontSize: 12, color: '#9CA3AF', fontVariantNumeric: 'tabular-nums', fontWeight: 500 }}>
-                                                    {new Date(session.created_at).toLocaleTimeString([], {
-                                                        hour: '2-digit', minute: '2-digit'
-                                                    })}
-                                                </span>
-                                                <ChevronRight size={14} style={{ color: '#D1D5DB' }} />
-                                            </div>
-                                        </motion.button>
-                                    )
-                                })}
+                                {items.map((session, i) => (
+                                    <SwipeableSessionCard
+                                        key={session.id}
+                                        session={session}
+                                        onTap={handleSessionTap}
+                                        onDelete={handleDeleteSession}
+                                        onExport={handleExportSession}
+                                    />
+                                ))}
                             </div>
                         </div>
                     ))

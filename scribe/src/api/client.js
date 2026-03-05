@@ -41,6 +41,7 @@ export const api = {
     getSession: (id) => request(`/sessions/${id}`),
     createSession: (data) => request('/sessions', { method: 'POST', body: JSON.stringify(data) }),
     updateSession: (id, data) => request(`/sessions/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+    deleteSession: (id) => request(`/sessions/${id}`, { method: 'DELETE' }),
 
     // Transcription
     transcribe: (audioBlob) => {

@@ -331,6 +331,21 @@ router.get('/sessions/:id', async (req, res) => {
     }
 });
 
+// DELETE /sessions/:id
+router.delete('/sessions/:id', async (req, res) => {
+    try {
+        const result = await db.query(
+            `DELETE FROM scribe_sessions WHERE id = $1 AND clinician_id = $2 RETURNING *`,
+            [req.params.id, req.clinicianId]
+        );
+        if (result.rows.length === 0) return res.status(404).json({ error: 'Session not found' });
+        res.json({ success: true });
+    } catch (err) {
+        console.error('[Scribe] Delete session error:', err);
+        res.status(500).json({ error: 'Failed to delete session' });
+    }
+});
+
 // PATCH /sessions/:id
 router.patch('/sessions/:id', async (req, res) => {
     try {

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Pause, Play, Square } from 'lucide-react'
 import { useRecorder } from '../hooks/useRecorder'
+import { useHapticFeedback } from '../hooks/useHapticFeedback'
 import { api } from '../api/client'
 import { t } from '../i18n'
 
@@ -10,6 +11,7 @@ export default function Record() {
     const { sessionId } = useParams()
     const navigate = useNavigate()
     const recorder = useRecorder()
+    const haptic = useHapticFeedback()
     const [session, setSession] = useState(null)
     const [transcript, setTranscript] = useState('')
     const [showDiscard, setShowDiscard] = useState(false)
@@ -20,6 +22,7 @@ export default function Record() {
         recorder.start().catch(err => {
             console.error('Mic access denied:', err)
             setMicError(true)
+            haptic.error()
         })
         return () => recorder.reset()
     }, [])
@@ -35,6 +38,7 @@ export default function Record() {
     }
 
     const handleDone = useCallback(async () => {
+        haptic.recordingStop()
         recorder.stop()
         // Wait for audioBlob to be set by the recorder's onstop callback (via ref)
         const waitForBlob = () => new Promise((resolve) => {
@@ -52,7 +56,7 @@ export default function Record() {
             state: { audioBlob: blob },
             replace: true
         })
-    }, [recorder, sessionId, navigate])
+    }, [recorder, sessionId, navigate, haptic])
 
     const handleDiscard = () => {
         recorder.reset()
