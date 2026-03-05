@@ -1,0 +1,2016 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hanna — Investor Data Room</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #050505;
+            --bg-secondary: #0A0A0A;
+            --bg-tertiary: #111111;
+            --text-primary: #E5E5E5;
+            --text-secondary: #888888;
+            --text-tertiary: #666666;
+            --border: #222222;
+            --accent: #0047FF;
+            --green: #22C55E;
+            --red: #EF4444;
+            --yellow: #EAB308;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding-bottom: 4rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 4rem;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 600;
+            letter-spacing: -0.03em;
+            margin-bottom: 1rem;
+            line-height: 1.1;
+        }
+
+        .header-subtitle {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .header-meta {
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            margin-top: 2rem;
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 3rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-family: 'Menlo', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.2s;
+        }
+
+        .nav-tab:hover {
+            border-color: var(--text-tertiary);
+            color: var(--text-primary);
+        }
+
+        .nav-tab.active {
+            background: var(--bg-secondary);
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+
+        /* Document Section */
+        .document-section {
+            display: none;
+        }
+
+        .document-section.active {
+            display: block;
+        }
+
+        .section {
+            margin-bottom: 4rem;
+            padding-bottom: 4rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section-number {
+            font-family: 'Menlo', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-tertiary);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .section h2 {
+            font-size: 2rem;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            margin-bottom: 2rem;
+            color: var(--text-primary);
+        }
+
+        .section h3 {
+            font-size: 1.25rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            margin-top: 2rem;
+            color: var(--text-primary);
+        }
+
+        .section p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 1.05rem;
+        }
+
+        .section ul {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .section ul li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .section ul li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--text-tertiary);
+        }
+
+        /* Executive Summary Box */
+        .exec-summary {
+            background: var(--bg-secondary);
+            padding: 2.5rem;
+            border: 1px solid var(--border);
+            margin-bottom: 3rem;
+        }
+
+        .exec-summary h2 {
+            margin-top: 0;
+            font-size: 1.75rem;
+        }
+
+        .highlight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .highlight-item span {
+            display: block;
+            font-family: 'Menlo', monospace;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-tertiary);
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight-item strong {
+            font-size: 1.125rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            font-size: 0.9rem;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 1rem 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            font-family: 'Menlo', monospace;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-tertiary);
+            font-weight: 400;
+        }
+
+        td {
+            color: var(--text-secondary);
+        }
+
+        td:first-child {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* Roadmap - Strategic Horizons Grid */
+        .roadmap-container {
+            margin: 2rem 0;
+            overflow-x: auto;
+        }
+
+        .roadmap-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            min-width: 800px;
+            /* Force scroll on small screens */
+        }
+
+        .horizon-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            transition: transform 0.2s;
+        }
+
+        .horizon-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Top Accent Bar */
+        .horizon-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--border);
+            border-radius: 8px 8px 0 0;
+        }
+
+        .horizon-card.active::after {
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        .horizon-card.profit::after {
+            background: var(--green);
+            box-shadow: 0 0 10px var(--green);
+        }
+
+        .horizon-header {
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .horizon-period {
+            font-family: 'Menlo', monospace;
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            background: var(--bg-primary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+
+        .horizon-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+
+        .horizon-stats {
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value {
+            font-family: 'Menlo', monospace;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .horizon-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        .horizon-list li {
+            position: relative;
+            padding-left: 1.25rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .horizon-list li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+        }
+
+        .horizon-card.profit .horizon-list li::before {
+            color: var(--green);
+        }
+
+        /* Mobile Stack */
+        @media (max-width: 900px) {
+            .roadmap-grid {
+                grid-template-columns: 1fr;
+                min-width: auto;
+            }
+
+            .horizon-card {
+                margin-bottom: 1rem;
+            }
+        }
+
+        /* UNUSED LEGACY CSS BELOW - Left safe to avoid matching errors */
+        /* .timeline { */
+
+        /* The vertical line track */
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0.85rem;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: rgba(34, 34, 34, 0.5);
+            border-radius: 3px;
+        }
+
+        /* The progress gradient overlay */
+        .timeline::after {
+            content: '';
+            position: absolute;
+            left: 0.85rem;
+            top: 0;
+            bottom: 2rem;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--accent) 0%, var(--green) 100%);
+            border-radius: 3px;
+            box-shadow: 0 0 15px rgba(0, 71, 255, 0.3);
+        }
+
+        .milestone {
+            position: relative;
+            background: linear-gradient(145deg, var(--bg-secondary) 0%, rgba(20, 20, 20, 0.8) 100%);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2.5rem;
+            margin-left: 1rem;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .milestone:last-child {
+            margin-bottom: 0;
+        }
+
+        .milestone:hover {
+            transform: translateY(-2px);
+            border-color: var(--text-tertiary);
+        }
+
+        /* The Node Dot */
+        .milestone::before {
+            content: '';
+            position: absolute;
+            left: -3.15rem;
+            /* Centers on the line */
+            top: 1.5rem;
+            width: 16px;
+            height: 16px;
+            background: var(--bg-primary);
+            border: 4px solid var(--accent);
+            border-radius: 50%;
+            z-index: 2;
+            box-shadow: 0 0 0 4px var(--bg-primary);
+            /* Visual spacing from line */
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Hover effect on the dot */
+        .milestone:hover::before {
+            transform: scale(1.3);
+            box-shadow: 0 0 0 4px var(--bg-primary), 0 0 15px var(--accent);
+        }
+
+        .milestone.complete::before {
+            border-color: var(--green);
+        }
+
+        .milestone.complete:hover::before {
+            box-shadow: 0 0 0 4px var(--bg-primary), 0 0 15px var(--green);
+        }
+
+        .milestone-highlight {
+            border: 1px solid rgba(0, 71, 255, 0.3);
+            background: linear-gradient(145deg, rgba(0, 71, 255, 0.08) 0%, var(--bg-secondary) 100%);
+        }
+
+        .milestone-highlight h4 {
+            color: var(--accent);
+        }
+
+        .milestone-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .milestone-period {
+            font-family: 'Menlo', monospace;
+            font-size: 0.9rem;
+            color: var(--accent);
+            font-weight: 700;
+            background: rgba(0, 71, 255, 0.1);
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+        }
+
+        .milestone.complete .milestone-period {
+            color: var(--green);
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .milestone-spend {
+            font-family: 'Menlo', monospace;
+            font-size: 0.8rem;
+            color: var(--text-tertiary);
+            font-weight: 500;
+        }
+
+        .milestone h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .milestone ul {
+            margin-bottom: 0;
+            margin-left: 0.5rem;
+            /* Indent lists slightly */
+        }
+
+        .milestone ul li {
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        /* Code/Formula Block */
+        .formula-block {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            font-family: 'Menlo', monospace;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin: 1.5rem 0;
+            overflow-x: auto;
+        }
+
+        /* Safety Pipeline - Snake Layout */
+        /* Safety Pipeline - Snake Layout */
+        .pipeline-container {
+            padding: 2rem 0;
+            overflow-x: auto;
+            /* Safety for very small screens */
+            position: relative;
+            /* Fixes absolute connectivity lines escaping */
+        }
+
+        .pipeline-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            position: relative;
+        }
+
+        /* Connecting Lines Layer */
+        .pipeline-connectors {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            display: none;
+            /* Show only on desktop via media query */
+        }
+
+        @media (min-width: 900px) {
+            .pipeline-connectors {
+                display: block;
+            }
+
+            /* Line 1->2 */
+            .connector-1-2 {
+                position: absolute;
+                top: 20%;
+                left: 30%;
+                width: 40%;
+                height: 2px;
+                background: linear-gradient(to right, var(--border) 50%, var(--accent) 100%);
+            }
+
+            /* Line 2->3 */
+            .connector-2-3 {
+                position: absolute;
+                top: 20%;
+                left: 63%;
+                width: 40%;
+                /* Adjusted to connect */
+                height: 2px;
+                background: var(--border);
+            }
+
+            /* Line 3->4 (Down and Left) */
+            .connector-3-4 {
+                position: absolute;
+                top: 20%;
+                right: 16%;
+                width: 2px;
+                height: 60%;
+                border-right: 2px solid var(--border);
+                border-bottom: 2px solid var(--border);
+                border-bottom-right-radius: 20px;
+            }
+
+            /* Line 4->5 */
+            .connector-4-5 {
+                position: absolute;
+                bottom: 25%;
+                /* Align with 2nd row */
+                right: 30%;
+                width: 40%;
+                height: 2px;
+                background: var(--border);
+            }
+
+            /* Line 5->6 */
+            .connector-5-6 {
+                position: absolute;
+                bottom: 25%;
+                right: 63%;
+                width: 40%;
+                height: 2px;
+                background: linear-gradient(to left, var(--border) 50%, var(--accent) 100%);
+            }
+        }
+
+        .pipeline-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pipeline-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border-color: var(--accent);
+        }
+
+        .pipeline-step {
+            font-family: 'Menlo', monospace;
+            font-size: 0.7rem;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .step-badge {
+            background: var(--bg-tertiary);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .pipeline-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .pipeline-card:hover .pipeline-icon {
+            color: var(--accent);
+            transform: scale(1.1);
+            transition: transform 0.3s;
+        }
+
+        .pipeline-card h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .pipeline-card p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0;
+            line-height: 1.5;
+            flex-grow: 1;
+        }
+
+        .pipeline-final {
+            background: linear-gradient(135deg, rgba(0, 71, 255, 0.1) 0%, var(--bg-secondary) 100%);
+            border-color: var(--accent);
+        }
+
+        .pipeline-final .pipeline-icon {
+            color: var(--accent);
+        }
+
+        /* Mobile adjustment */
+        @media (max-width: 900px) {
+            .pipeline-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            font-family: 'Menlo', monospace;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-green {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--green);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .badge-red {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--red);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .badge-yellow {
+            background: rgba(234, 179, 8, 0.1);
+            color: var(--yellow);
+            border: 1px solid rgba(234, 179, 8, 0.3);
+        }
+
+        /* Comparison Table Styling */
+        .compare-table td.hanna {
+            color: var(--green);
+        }
+
+        /* Quote Block */
+        .quote-block {
+            border-left: 2px solid var(--accent);
+            padding-left: 1.5rem;
+            margin: 2rem 0;
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+
+        /* Moat Cards */
+        .moat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .moat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+        }
+
+        .moat-card h4 {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .moat-card p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        /* Checkmark List */
+        .check-list li::before {
+            content: "✅";
+            font-size: 0.85rem;
+        }
+
+        /* Response Flow - Horizontal Timeline */
+        .response-flow {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .response-step {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+            position: relative;
+            text-align: center;
+        }
+
+        .response-step::after {
+            content: '→';
+            position: absolute;
+            right: -1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-tertiary);
+            font-size: 1.25rem;
+        }
+
+        .response-step:last-child::after {
+            display: none;
+        }
+
+        .response-time {
+            font-family: 'Menlo', monospace;
+            font-size: 0.7rem;
+            color: var(--accent);
+            background: rgba(0, 71, 255, 0.1);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 0.75rem;
+        }
+
+        .response-step h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .response-step p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        @media (max-width: 800px) {
+            .response-flow {
+                grid-template-columns: 1fr;
+            }
+
+            .response-step::after {
+                display: none;
+            }
+        }
+
+        /* Compliance Grid */
+        .compliance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .compliance-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .compliance-icon {
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .compliance-content h4 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .compliance-content p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .compliance-card.active {
+            border-color: var(--green);
+        }
+
+        .compliance-card.active .compliance-icon {
+            color: var(--green);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding-top: 4rem;
+            margin-top: 4rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer p {
+            font-size: 0.875rem;
+            color: var(--text-tertiary);
+        }
+
+        /* Contact */
+        .contact {
+            text-align: center;
+            padding: 3rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            margin-top: 3rem;
+        }
+
+        .contact-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-role {
+            font-family: 'Menlo', monospace;
+            font-size: 0.875rem;
+            color: var(--text-tertiary);
+            margin-bottom: 1.5rem;
+        }
+
+        .contact a {
+            color: var(--text-primary);
+            text-decoration: none;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2px;
+            transition: color 0.2s;
+        }
+
+        .contact a:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        /* Print Optimization */
+        @media print {
+            @page {
+                size: A4;
+                margin: 0;
+            }
+
+            body {
+                background-color: #050505 !important;
+                color: #E5E5E5 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .container {
+                max-width: 100% !important;
+                padding: 2cm !important;
+            }
+
+            .nav-tabs {
+                display: none !important;
+            }
+
+            .document-section {
+                display: block !important;
+                page-break-before: always;
+            }
+
+            .section {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
+            h1,
+            h2,
+            h3,
+            h4 {
+                break-after: avoid;
+                page-break-after: avoid;
+            }
+        }
+
+        /* Burn Rate Visual */
+        .burn-bar-container {
+            margin: 2rem 0;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .burn-bar {
+            display: flex;
+            height: 48px;
+            width: 100%;
+        }
+
+        .burn-segment {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+            font-family: 'Menlo', monospace;
+            transition: opacity 0.2s;
+            position: relative;
+        }
+
+        .burn-segment:hover {
+            opacity: 0.9;
+            z-index: 2;
+        }
+
+        /* Tooltip-like label on hover could be added here, but simple labels below are better for print */
+
+        .burn-legend {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .legend-color {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            margin-right: 0.5rem;
+        }
+
+        .legend-title {
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            font-weight: 500;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .legend-meta {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            font-family: 'Menlo', monospace;
+        }
+
+        /* Visual Formula - Improved Math Layout */
+        .visual-formula {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Center alignment */
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 2rem 0;
+            padding: 2rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .formula-pill {
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-tertiary);
+            /* Darker background for pills */
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            text-align: center;
+            min-width: 100px;
+            position: relative;
+            transition: transform 0.2s;
+        }
+
+        .formula-pill:hover {
+            transform: translateY(-2px);
+            border-color: var(--text-tertiary);
+        }
+
+        .formula-name {
+            font-size: 0.7rem;
+            color: var(--text-tertiary);
+            /* Muted label */
+            margin-bottom: 0.25rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        .formula-val {
+            font-family: 'Menlo', monospace;
+            color: var(--accent);
+            /* Bright blue value */
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .formula-op {
+            color: var(--text-secondary);
+            font-weight: 400;
+            font-size: 1.5rem;
+            margin: 0 0.5rem;
+        }
+
+        /* Assumptions Grid */
+        .assumptions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .assumption-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 1rem;
+            border-radius: 6px;
+        }
+
+        .assumption-label {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .assumption-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .assumption-context {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* Why Works Cards */
+        .why-works-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .work-card {
+            padding: 1.5rem;
+            background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .work-card h4 {
+            color: var(--green);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- Header -->
+        <header class="header">
+            <img src="../hanna-logo.png" alt="Hanna Logo" style="height: 100px; margin-bottom: 2rem;">
+            <h1>Investor Data Room</h1>
+            <p class="header-subtitle">Hanna Care Intelligence</p>
+            <div class="header-meta">Confidential — Pre-Seed Round</div>
+            <div class="header-meta" style="margin-top: 0.5rem; color: var(--accent);">Raising ฿20M SAFE @ ฿160M cap +
+                20% discount</div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <button class="nav-tab active" onclick="showSection('financials')">01 Burn Rate & Financials</button>
+            <button class="nav-tab" onclick="showSection('safety')">02 Clinical Safety</button>
+            <button class="nav-tab" onclick="showSection('competitive')">03 Competitive Matrix</button>
+        </nav>
+
+        <!-- ==================== SECTION 1: FINANCIAL MODEL ==================== -->
+        <div id="financials" class="document-section active">
+
+            <div class="exec-summary">
+                <span class="section-number">Financial Overview</span>
+                <h2>18-Month Financial Model</h2>
+                <p>Capital-efficient path to profitability with milestone-gated spending.</p>
+
+                <div class="highlight-grid">
+                    <div class="highlight-item">
+                        <span>Raise</span>
+                        <strong>฿20M</strong>
+                    </div>
+                    <div class="highlight-item">
+                        <span>Monthly Burn</span>
+                        <strong>฿1.2M</strong>
+                    </div>
+                    <div class="highlight-item">
+                        <span>Runway</span>
+                        <strong>17-18 months</strong>
+                    </div>
+                    <div class="highlight-item">
+                        <span>M12 Target</span>
+                        <strong>฿10M MRR</strong>
+                    </div>
+                    <div class="highlight-item">
+                        <span>Breakeven</span>
+                        <strong>Month 14-15</strong>
+                    </div>
+                </div>
+            </div>
+
+            <section class="section">
+                <span class="section-number">Burn Allocation</span>
+                <h2>Where Capital Goes</h2>
+
+                <div class="burn-bar-container">
+                    <div class="burn-bar">
+                        <div class="burn-segment" style="width: 50%; background: #0047FF;">50%</div>
+                        <div class="burn-segment" style="width: 30%; background: #7C3AED;">30%</div>
+                        <div class="burn-segment" style="width: 20%; background: #059669;">20%</div>
+                    </div>
+                    <div class="burn-legend">
+                        <div class="legend-item">
+                            <span class="legend-title"><span class="legend-color" style="background: #0047FF;"></span>
+                                Sales & Pilots</span>
+                            <div class="legend-meta">฿600K/mo • Revenue generation</div>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-title"><span class="legend-color" style="background: #7C3AED;"></span>
+                                Team</span>
+                            <div class="legend-meta">฿360K/mo • Clinical + Eng (12 hires)</div>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-title"><span class="legend-color" style="background: #059669;"></span>
+                                Regulatory</span>
+                            <div class="legend-meta">฿240K/mo • Thai FDA Certs</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <span class="section-number">Milestones</span>
+                <h2>18-Month Strategic Horizons</h2>
+
+                <div class="roadmap-container">
+                    <div class="roadmap-grid">
+
+                        <!-- Horizon 1 -->
+                        <div class="horizon-card">
+                            <div class="horizon-header">
+                                <span class="horizon-period">Months 1-3</span>
+                                <h4 class="horizon-title">Validation</h4>
+                            </div>
+                            <div class="horizon-stats">
+                                <span class="stat-label">Investment</span>
+                                <div class="stat-value">฿3.6M</div>
+                            </div>
+                            <ul class="horizon-list">
+                                <li>Close 2 hospital contracts</li>
+                                <li>Submit Thai FDA application</li>
+                                <li>Hire Core Team (4 pax)</li>
+                            </ul>
+                        </div>
+
+                        <!-- Horizon 2 -->
+                        <div class="horizon-card active">
+                            <div class="horizon-header">
+                                <span class="horizon-period">Months 4-6</span>
+                                <h4 class="horizon-title">Scale Up</h4>
+                            </div>
+                            <div class="horizon-stats">
+                                <span class="stat-label">Investment</span>
+                                <div class="stat-value">฿3.6M</div>
+                            </div>
+                            <ul class="horizon-list">
+                                <li>5 Active Hospitals</li>
+                                <li><strong>฿2.5M MRR</strong></li>
+                                <li>Establish Sales Ops</li>
+                            </ul>
+                        </div>
+
+                        <!-- Horizon 3 -->
+                        <div class="horizon-card active">
+                            <div class="horizon-header">
+                                <span class="horizon-period">Months 7-12</span>
+                                <h4 class="horizon-title">Expansion</h4>
+                            </div>
+                            <div class="horizon-stats">
+                                <span class="stat-label">Investment</span>
+                                <div class="stat-value">฿7.2M</div>
+                            </div>
+                            <ul class="horizon-list">
+                                <li>10 Hospitals Live</li>
+                                <li><strong>฿10M MRR Target</strong></li>
+                                <li>Prepare Regional Pilot</li>
+                            </ul>
+                        </div>
+
+                        <!-- Horizon 4 -->
+                        <div class="horizon-card profit">
+                            <div class="horizon-header">
+                                <span class="horizon-period">Months 13-18</span>
+                                <h4 class="horizon-title">Profitability</h4>
+                            </div>
+                            <div class="horizon-stats">
+                                <span class="stat-label">Investment</span>
+                                <div class="stat-value">฿7.2M</div>
+                            </div>
+                            <ul class="horizon-list">
+                                <li>Positive Cashflow</li>
+                                <li>Vietnam/Malaysia Pilots</li>
+                                <li>Series A Funding Ready</li>
+                            </ul>
+                            <div
+                                style="font-size: 0.7rem; color: var(--text-tertiary); margin-top: 0.75rem; font-style: italic;">
+                                *Partially funded by revenue
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <span class="section-number">Assumptions</span>
+                <h2>Key Assumptions</h2>
+
+                <div class="assumptions-grid">
+                    <div class="assumption-card">
+                        <div class="assumption-label">Pricing</div>
+                        <div class="assumption-value">฿50-200</div>
+                        <div class="assumption-context">Per Member Per Month</div>
+                    </div>
+                    <div class="assumption-card">
+                        <div class="assumption-label">Volume</div>
+                        <div class="assumption-value">2,500+</div>
+                        <div class="assumption-context">Patients per Hospital</div>
+                    </div>
+                    <div class="assumption-card">
+                        <div class="assumption-label">Speed</div>
+                        <div class="assumption-value">2-3 Mo</div>
+                        <div class="assumption-context">Sales Cycle</div>
+                    </div>
+                    <div class="assumption-card">
+                        <div class="assumption-label">Retention</div>
+                        <div class="assumption-value">&lt;5%</div>
+                        <div class="assumption-context">Annual Churn</div>
+                    </div>
+                    <div class="assumption-card">
+                        <div class="assumption-label">Value</div>
+                        <div class="assumption-value">฿6M+</div>
+                        <div class="assumption-context">LTV / Hospital (3yr)</div>
+                    </div>
+                </div>
+
+                <h3>Why This Works</h3>
+                <div class="why-works-grid">
+                    <div class="work-card">
+                        <h4>✅ Capital Discipline</h4>
+                        <p>Product is already built. Spend is focused on distribution, not R&D.</p>
+                    </div>
+                    <div class="work-card">
+                        <h4>✅ Revenue Gates</h4>
+                        <p>Spending increases are unlocked only by hitting revenue milestones.</p>
+                    </div>
+                    <div class="work-card">
+                        <h4>✅ 18-Month Buffer</h4>
+                        <p>Sufficient runway to reach Series A metrics from a position of strength.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <span class="section-number">Investment Terms</span>
+                <h2>Deal Structure</h2>
+
+                <div class="exec-summary" style="margin-bottom: 2rem;">
+                    <div class="highlight-grid" style="border-top: none; padding-top: 0; margin-top: 0;">
+                        <div class="highlight-item">
+                            <span>Instrument</span>
+                            <strong>SAFE</strong>
+                        </div>
+                        <div class="highlight-item">
+                            <span>Amount</span>
+                            <strong>฿20M</strong>
+                        </div>
+                        <div class="highlight-item">
+                            <span>Valuation Cap</span>
+                            <strong>฿160M</strong>
+                        </div>
+                        <div class="highlight-item">
+                            <span>Discount</span>
+                            <strong>20%</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>What This Means</h3>
+                <p>We're raising on a <strong>SAFE (Simple Agreement for Future Equity)</strong> — the standard
+                    instrument for pre-seed rounds. Your investment converts to equity at our next priced round (Seed),
+                    at the better of:</p>
+
+                <div class="why-works-grid" style="margin-top: 1.5rem;">
+                    <div class="work-card">
+                        <h4>฿160M Cap</h4>
+                        <p>If Seed valuation exceeds ฿160M, you convert at ฿160M — protecting your upside.</p>
+                    </div>
+                    <div class="work-card">
+                        <h4>20% Discount</h4>
+                        <p>If Seed valuation is lower, you get 20% off that price — rewarding early risk.</p>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 2.5rem;">Why SAFE, Not Equity?</h3>
+                <p>We're pre-revenue. A SAFE lets us defer valuation until we have <strong>enterprise contracts and
+                        MRR</strong> — giving you a fair price based on proof, not projections.</p>
+
+                <div class="formula-block" style="margin-top: 1.5rem; text-align: center; font-size: 1rem;">
+                    <strong style="color: var(--text-primary);">18 months to convert pilots → contracts → Seed
+                        round</strong>
+                </div>
+
+                <div class="quote-block" style="margin-top: 2rem;">
+                    "We're raising pre-seed with an unusually mature product. The capital is for distribution, not
+                    development — which means lower execution risk and faster path to revenue."
+                </div>
+
+                <h3 style="margin-top: 2.5rem;">Implied Economics</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Seed Valuation</th>
+                            <th>Your Conversion Price</th>
+                            <th>Your Ownership</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>฿200M+</td>
+                            <td>฿160M (cap)</td>
+                            <td>~12.5%</td>
+                        </tr>
+                        <tr>
+                            <td>฿160M</td>
+                            <td>฿128M (discount)</td>
+                            <td>~15.6%</td>
+                        </tr>
+                        <tr>
+                            <td>฿120M</td>
+                            <td>฿96M (discount)</td>
+                            <td>~20.8%</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="font-size: 0.85rem; color: var(--text-tertiary); margin-top: 1rem;">Our target: Seed at ฿200M+
+                    based on ฿10M MRR by Month 12.</p>
+            </section>
+
+            <section class="section">
+                <span class="section-number">Market Timing</span>
+                <h2>Why Now?</h2>
+
+                <div class="why-works-grid">
+                    <div class="work-card">
+                        <h4>🏥 Post-COVID Shift</h4>
+                        <p>Thai hospitals are actively adopting digital care tools. Budget has been allocated, decisions
+                            are being made now.</p>
+                    </div>
+                    <div class="work-card">
+                        <h4>📱 LINE Dominance</h4>
+                        <p>56M Thai users on LINE. Patients already use it daily — zero app download friction.</p>
+                    </div>
+                    <div class="work-card">
+                        <h4>🚫 No Enterprise Player</h4>
+                        <p>Competitors serve consumers (Sabai) or US employers (Livongo). No one owns the Thai hospital
+                            channel.</p>
+                    </div>
+                </div>
+
+                <div class="quote-block" style="margin-top: 2rem;">
+                    "The window is open. Hospitals are buying. We're the only enterprise-ready solution in the market."
+                </div>
+            </section>
+
+            <section class="section" style="border-bottom: none;">
+                <span class="section-number">The Ask</span>
+                <h2>Your Investment</h2>
+
+                <div class="exec-summary"
+                    style="margin-bottom: 2rem; background: linear-gradient(135deg, rgba(0, 71, 255, 0.1) 0%, var(--bg-secondary) 100%); border-color: var(--accent);">
+                    <div class="highlight-grid" style="border-top: none; padding-top: 0; margin-top: 0;">
+                        <div class="highlight-item">
+                            <span>You Invest</span>
+                            <strong style="color: var(--accent);">฿20M</strong>
+                        </div>
+                        <div class="highlight-item">
+                            <span>We Deliver</span>
+                            <strong>10 Hospitals</strong>
+                        </div>
+                        <div class="highlight-item">
+                            <span>By Month 12</span>
+                            <strong style="color: var(--green);">฿10M MRR</strong>
+                        </div>
+                        <div class="highlight-item">
+                            <span>Then</span>
+                            <strong>Series A Ready</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <p style="text-align: center; font-size: 1.1rem; color: var(--text-primary); margin-bottom: 2rem;">
+                    <strong>Make 1 nurse as effective as 10. That's what we're building.</strong>
+                </p>
+            </section>
+        </div>
+
+        <!-- ==================== SECTION 2: CLINICAL SAFETY ==================== -->
+        <div id="safety" class="document-section">
+
+            <div class="exec-summary">
+                <span class="section-number">Clinical Safety Protocol</span>
+                <h2>AI-Assisted, Human-Supervised Care</h2>
+                <p>6-layer safety system designed for zero false negatives in clinical escalation.</p>
+
+                <div class="highlight-grid">
+                    <div class="highlight-item">
+                        <span>Core Principle</span>
+                        <strong>AI Assists, Humans Decide</strong>
+                    </div>
+                    <div class="highlight-item">
+                        <span>Safety Layers</span>
+                        <strong>6 Redundant Systems</strong>
+                    </div>
+                    <div class="highlight-item">
+                        <span>Target FN Rate</span>
+                        <strong>
+                            <strong>&lt;0.1%</strong>
+                    </div>
+                </div>
+            </div>
+
+            <section class="section">
+                <span class="section-number">Prohibited Actions</span>
+                <h2>What Hanna Cannot Do</h2>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Prohibited Action</th>
+                            <th>Enforcement</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>❌ Diagnose conditions</td>
+                            <td>Prompt-level block</td>
+                        </tr>
+                        <tr>
+                            <td>❌ Prescribe/change medications</td>
+                            <td>Prompt-level block</td>
+                        </tr>
+                        <tr>
+                            <td>❌ Interpret lab results</td>
+                            <td>Prompt-level block</td>
+                        </tr>
+                        <tr>
+                            <td>❌ Clear patients without nurse review</td>
+                            <td>System design</td>
+                        </tr>
+                        <tr>
+                            <td>❌ Auto-close CRITICAL tasks</td>
+                            <td>System design</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p><strong>Identity Disclosure:</strong> Every conversation includes "ฮันนาเป็น AI ไม่ใช่พยาบาลจริง"</p>
+            </section>
+
+            <section class="section">
+                <span class="section-number">False Negative Prevention</span>
+                <h2>6-Layer Defense Pipeline</h2>
+                <p>Designed as a continuous filtration process where each signal must pass through multiple safety
+                    gates.</p>
+
+                <div class="pipeline-container">
+
+                    <div class="pipeline-connectors">
+                        <!-- Visual Lines Only -->
+                        <div class="connector-1-2"></div>
+                        <div class="connector-2-3"></div>
+                        <!-- 3 to 4 turns around -->
+                        <div class="connector-3-4"></div>
+                        <!-- 4 to 5 reverses -->
+                        <div class="connector-4-5"></div>
+                        <!-- 5 to 6 reverses -->
+                        <div class="connector-5-6"></div>
+                    </div>
+
+                    <div class="pipeline-grid">
+
+                        <!-- Row 1: Left to Right -->
+                        <div class="pipeline-card">
+                            <div class="pipeline-step">
+                                <span class="step-badge">Step 01</span>
+                                <span>Filter</span>
+                            </div>
+                            <div class="pipeline-icon">⚡</div>
+                            <h4>Emergency Bypass</h4>
+                            <p>Keywords like "chest pain" bypass AI entirely for instant alert.</p>
+                        </div>
+
+                        <div class="pipeline-card">
+                            <div class="pipeline-step">
+                                <span class="step-badge">Step 02</span>
+                                <span>Check</span>
+                            </div>
+                            <div class="pipeline-icon">📊</div>
+                            <h4>Vital Thresholds</h4>
+                            <p>Hard rules for dangerous values (e.g. Glucose > 400).</p>
+                        </div>
+
+                        <div class="pipeline-card">
+                            <div class="pipeline-step">
+                                <span class="step-badge">Step 03</span>
+                                <span>Analyze</span>
+                            </div>
+                            <div class="pipeline-icon">📈</div>
+                            <h4>Trend Analysis</h4>
+                            <p>Detects >10% week-over-week deterioration.</p>
+                        </div>
+
+                        <!-- Row 2: Right to Left (conceptually, but CSS grid is LTR, so we place them 6-5-4 or 4-5-6? Let's do 4-5-6 but assume visual flow) -->
+                        <!-- Actually, for a snake layout in Grid, it's easier to just list them 4, 5, 6 and use Arrows to show direction if we want simple. -->
+                        <!-- Let's just do a 2-row grid. 4, 5, 6. -->
+
+                        <div class="pipeline-card">
+                            <div class="pipeline-step">
+                                <span class="step-badge">Step 04</span>
+                                <span>Sensors</span>
+                            </div>
+                            <div class="pipeline-icon">🤥</div>
+                            <h4>Hedging Detection</h4>
+                            <p>NLP catches minimizing language ("not too bad").</p>
+                        </div>
+
+                        <div class="pipeline-card">
+                            <div class="pipeline-step">
+                                <span class="step-badge">Step 05</span>
+                                <span>Monitor</span>
+                            </div>
+                            <div class="pipeline-icon">⏱</div>
+                            <h4>Silence Watch</h4>
+                            <p>48h silence triggers nurse ping. 72h triggers alert.</p>
+                        </div>
+
+                        <div class="pipeline-card pipeline-final">
+                            <div class="pipeline-step">
+                                <span class="step-badge" style="color: var(--accent);">Final</span>
+                                <span style="color: var(--accent);">Gatekeeper</span>
+                            </div>
+                            <div class="pipeline-icon">👩‍⚕️</div>
+                            <h4>Human Resolution</h4>
+                            <p>AI cannot close tasks. Nurse must explicitly resolve.</p>
+                        </div>
+
+                    </div>
+
+                    <div style="text-align: center; margin-top: 1rem; color: var(--text-tertiary); font-size: 0.8rem;">
+                        <span style="display: inline-block; transform: rotate(90deg); margin-right: 0.5rem;">⤴</span>
+                        Signal Flow: 1 → 2 → 3 → 4 → 5 → 6
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <span class="section-number">Risk Scoring</span>
+                <h2>Algorithmic Prioritization</h2>
+
+                <div class="visual-formula">
+                    <div class="formula-pill">
+                        <div class="formula-name">Emergency</div>
+                        <div class="formula-val">+3</div>
+                    </div>
+                    <div class="formula-op">+</div>
+                    <div class="formula-pill">
+                        <div class="formula-name">Vital Danger</div>
+                        <div class="formula-val">+2</div>
+                    </div>
+                    <div class="formula-op">+</div>
+                    <div class="formula-pill">
+                        <div class="formula-name">Missed Meds</div>
+                        <div class="formula-val">+2</div>
+                    </div>
+                    <div class="formula-op">+</div>
+                    <div class="formula-pill">
+                        <div class="formula-name">Hedging</div>
+                        <div class="formula-val">+1</div>
+                    </div>
+                    <div class="formula-op">+</div>
+                    <div class="formula-pill">
+                        <div class="formula-name">Silence</div>
+                        <div class="formula-val">+1</div>
+                    </div>
+                    <div class="formula-op">×</div>
+                    <div class="formula-pill">
+                        <div class="formula-name">Age Factor</div>
+                        <div class="formula-val">1.2</div>
+                    </div>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Score</th>
+                            <th>Action</th>
+                            <th>SLA</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-green">0-4 LOW</span></td>
+                            <td>Routine monitoring</td>
+                            <td>Daily</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-yellow">5-7 HIGH</span></td>
+                            <td>Nurse outreach</td>
+                            <td>4 hours</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-red">8-10 CRITICAL</span></td>
+                            <td>Immediate call</td>
+                            <td>30 min</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <span class="section-number">Post-Mortem Process</span>
+                <h2>False Negative Response</h2>
+                <p>Systematic protocol when a patient hospitalization wasn't predicted.</p>
+
+                <div class="response-flow">
+                    <div class="response-step">
+                        <span class="response-time">0-24h</span>
+                        <h4>Log Extraction</h4>
+                        <p>Pull all conversation and risk data</p>
+                    </div>
+                    <div class="response-step">
+                        <span class="response-time">24-72h</span>
+                        <h4>Root Cause</h4>
+                        <p>Why missed? What would catch it?</p>
+                    </div>
+                    <div class="response-step">
+                        <span class="response-time">3-7 days</span>
+                        <h4>Remediate</h4>
+                        <p>Update logic, add tests</p>
+                    </div>
+                    <div class="response-step">
+                        <span class="response-time">Ongoing</span>
+                        <h4>Notify</h4>
+                        <p>Hospital + regulators informed</p>
+                    </div>
+                </div>
+
+                <h3>Audit & Compliance</h3>
+                <div class="compliance-grid">
+                    <div class="compliance-card active">
+                        <div class="compliance-icon">📝</div>
+                        <div class="compliance-content">
+                            <h4>Full Logging</h4>
+                            <p>Every risk calc, task, suppression</p>
+                        </div>
+                    </div>
+                    <div class="compliance-card">
+                        <div class="compliance-icon">🏥</div>
+                        <div class="compliance-content">
+                            <h4>Thai FDA</h4>
+                            <p>Non-medical device submission M2</p>
+                        </div>
+                    </div>
+                    <div class="compliance-card active">
+                        <div class="compliance-icon">🔒</div>
+                        <div class="compliance-content">
+                            <h4>PDPA</h4>
+                            <p>Data protection implemented</p>
+                        </div>
+                    </div>
+                    <div class="compliance-card active">
+                        <div class="compliance-icon">🛡️</div>
+                        <div class="compliance-content">
+                            <h4>Encryption</h4>
+                            <p>AES-256 at rest, TLS in transit</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quote-block">
+                    "Silence is a symptom. Hedging is a red flag. When in doubt, escalate."
+                </div>
+            </section>
+        </div>
+
+        <!-- ==================== SECTION 3: COMPETITIVE MATRIX ==================== -->
+        <div id="competitive" class="document-section">
+
+            <div class="exec-summary">
+                <span class="section-number">Competitive Analysis</span>
+                <h2>Market Position</h2>
+                <p>Hanna is the first enterprise-grade chronic care platform for Southeast Asian hospitals.</p>
+            </div>
+
+            <section class="section">
+                <span class="section-number">Competitive Landscape</span>
+                <h2>Head-to-Head Comparison</h2>
+
+                <table class="compare-table">
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Hanna</th>
+                            <th>Sabai Health</th>
+                            <th>Livongo (US)</th>
+                            <th>Omada (US)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Target Customer</td>
+                            <td class="hanna">Hospitals (B2B)</td>
+                            <td>Consumers (B2C)</td>
+                            <td>Employers (B2B)</td>
+                            <td>Employers (B2B)</td>
+                        </tr>
+                        <tr>
+                            <td>Thai Language</td>
+                            <td class="hanna">✅ Native</td>
+                            <td>✅ Native</td>
+                            <td>❌</td>
+                            <td>❌</td>
+                        </tr>
+                        <tr>
+                            <td>LINE Integration</td>
+                            <td class="hanna">✅ Native</td>
+                            <td>✅ Native</td>
+                            <td>❌</td>
+                            <td>❌</td>
+                        </tr>
+                        <tr>
+                            <td>Pricing</td>
+                            <td class="hanna">฿50-200 PMPM</td>
+                            <td>฿99-299/mo B2C</td>
+                            <td>$50+ PMPM</td>
+                            <td>$40+ PMPM</td>
+                        </tr>
+                        <tr>
+                            <td>Thai FDA Path</td>
+                            <td class="hanna">✅ Planned</td>
+                            <td>❌</td>
+                            <td>❌</td>
+                            <td>❌</td>
+                        </tr>
+                        <tr>
+                            <td>Nurse Multiplier</td>
+                            <td class="hanna">✅ 10x</td>
+                            <td>❌</td>
+                            <td>Coaching</td>
+                            <td>Coaching</td>
+                        </tr>
+                        <tr>
+                            <td>Clinical Triage</td>
+                            <td class="hanna">✅ AI-Assisted</td>
+                            <td>Wellness chatbot</td>
+                            <td>Coaching</td>
+                            <td>Coaching</td>
+                        </tr>
+                        <tr>
+                            <td>Audit Trail</td>
+                            <td class="hanna">✅ Full</td>
+                            <td>❌</td>
+                            <td>✅</td>
+                            <td>✅</td>
+                        </tr>
+
+                    </tbody>
+                </table>
+
+                <div class="quote-block" style="margin-top: 2rem;">
+                    Sabai serves consumers who want convenience. Hanna serves hospitals who need compliance.
+                </div>
+            </section>
+
+            <section class="section">
+                <span class="section-number">Why Hanna</span>
+                <h2>Why Hospitals Choose Hanna</h2>
+
+                <h3>vs Sabai (Consumer App)</h3>
+                <ul class="check-list">
+                    <li>Enterprise audit trails for regulators</li>
+                    <li>Nurse dashboard integration</li>
+                    <li>Clinical-grade liability coverage</li>
+                    <li>B2B contract billing</li>
+                </ul>
+
+                <h3>vs Livongo/Omada (US)</h3>
+                <ul class="check-list">
+                    <li>Native Thai language</li>
+                    <li>LINE-first architecture</li>
+                    <li>10x cheaper (฿150K vs $500K+ contracts)</li>
+                    <li>Bangkok-based support</li>
+                    <li>Thai FDA compliance path</li>
+                </ul>
+
+                <h3>vs Build In-House</h3>
+                <ul class="check-list">
+                    <li>2-4 weeks to deploy (vs 12-18 months)</li>
+                    <li>฿0 upfront (vs ฿5M+ eng cost)</li>
+                    <li>Managed service (vs IT burden)</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <span class="section-number">Moats</span>
+                <h2>Defensible Moats</h2>
+
+                <div class="moat-grid">
+                    <div class="moat-card">
+                        <h4>LINE-Native</h4>
+                        <p>56M Thai users, 6+ months to replicate</p>
+                    </div>
+                    <div class="moat-card">
+                        <h4>Thai Language AI</h4>
+                        <p>Bangkok dialect, cultural context</p>
+                    </div>
+                    <div class="moat-card">
+                        <h4>Hospital-Validated</h4>
+                        <p>Thai CNO protocols, FDA timeline</p>
+                    </div>
+                    <div class="moat-card">
+                        <h4>Unit Economics</h4>
+                        <p>10x cheaper than US, 75%+ margins</p>
+                    </div>
+                </div>
+
+                <div class="quote-block" style="margin-top: 3rem;">
+                    "We're not competing with Sabai — we're creating the enterprise category they don't serve."<br><br>
+                    "We're not competing with Livongo — we're 10x cheaper, Thai-native, LINE-first."<br><br>
+                    "We're the only company that makes 1 nurse as effective as 10."
+                </div>
+            </section>
+        </div>
+
+        <!-- Contact -->
+        <div class="contact">
+            <div
+                style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.1em;">
+                Ready to discuss?</div>
+            <div class="contact-name">Farhan Sabbir</div>
+            <div class="contact-role">Founder & CEO</div>
+            <div style="margin-bottom: 0.5rem;"><a href="mailto:farhan@hanna.care">farhan@hanna.care</a></div>
+            <div><a href="tel:0926867042">092-686-7042</a></div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Hanna is a product of Archangel Co., Ltd.</p>
+            <p style="margin-top: 0.5rem; font-size: 0.75rem;">This document contains confidential information.</p>
+        </footer>
+
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.document-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Remove active from all tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+
+            // Activate clicked tab
+            event.target.classList.add('active');
+        }
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hanna — One Nurse, 500+ Patients</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #050505;
+            --bg-secondary: #0A0A0A;
+            --text-primary: #E5E5E5;
+            --text-secondary: #888888;
+            --text-tertiary: #666666;
+            --border: #222222;
+            --accent: #0047FF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding-bottom: 4rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 4rem;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 600;
+            letter-spacing: -0.03em;
+            margin-bottom: 1rem;
+            line-height: 1.1;
+        }
+
+        .header-subtitle {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+        }
+
+        .header-description {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 4rem;
+            padding-bottom: 4rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section h2 {
+            font-size: 2rem;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            margin-bottom: 2rem;
+            color: var(--text-primary);
+        }
+
+        .section p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 1.05rem;
+        }
+
+        .section strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .section ul,
+        .section ol {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .section li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .section ul li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--text-tertiary);
+        }
+
+        .section ol {
+            counter-reset: item;
+        }
+
+        .section ol li {
+            padding-left: 2rem;
+        }
+
+        .section ol li::before {
+            content: counter(item) ".";
+            counter-increment: item;
+            position: absolute;
+            left: 0;
+            color: var(--text-tertiary);
+            font-family: 'Menlo', monospace;
+        }
+
+        /* Quote Box */
+        .quote-box {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-left: 2px solid var(--accent);
+            margin: 2rem 0;
+        }
+
+        .quote-box p {
+            margin: 0;
+            color: var(--text-primary);
+            font-weight: 500;
+            font-size: 1.125rem;
+            line-height: 1.6;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Flow Section */
+        .flow-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .flow-card {
+            border: 1px solid var(--border);
+            padding: 2rem;
+            background: transparent;
+        }
+
+        .flow-card h3 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-family: 'Menlo', monospace;
+            font-weight: 400;
+        }
+
+        .flow-card p {
+            margin: 0;
+            font-size: 1rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .flow-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            font-size: 0.95rem;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 1.25rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            font-family: 'Menlo', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-tertiary);
+            font-weight: 400;
+        }
+
+        td {
+            color: var(--text-secondary);
+        }
+
+        td:first-child {
+            color: var(--text-primary);
+            font-weight: 500;
+            width: 30%;
+        }
+
+        /* Trust Grid */
+        .trust-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .trust-card {
+            border: 1px solid var(--border);
+            padding: 2rem;
+            background: transparent;
+        }
+
+        .trust-card h3 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .trust-card h3::before {
+            content: "";
+            display: block;
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+        }
+
+        .trust-card p {
+            margin: 0;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .trust-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Contact */
+        .contact {
+            text-align: center;
+            padding: 4rem 0;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+
+        .contact-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .contact-role {
+            font-family: 'Menlo', monospace;
+            font-size: 0.875rem;
+            color: var(--text-tertiary);
+            margin-bottom: 2rem;
+        }
+
+        .contact a {
+            color: var(--text-primary);
+            text-decoration: none;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2px;
+            transition: color 0.2s;
+        }
+
+        .contact a:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding-top: 4rem;
+            margin-top: 4rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer p {
+            font-size: 0.875rem;
+            color: var(--text-tertiary);
+        }
+
+        .emphasized-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: 2rem;
+            display: block;
+        }
+
+        /* ----- PRINT OPTIMIZATION ----- */
+        @media print {
+            @page {
+                size: A4;
+                margin: 0;
+            }
+
+            body {
+                background-color: #050505 !important;
+                color: #E5E5E5 !important;
+                margin: 0;
+                width: 100%;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .container {
+                max-width: 100% !important;
+                width: 100% !important;
+                padding: 2.5cm !important;
+                margin: 0 !important;
+            }
+
+            .section {
+                page-break-inside: auto;
+                border-color: #222 !important;
+            }
+
+            h1,
+            h2,
+            h3,
+            h4 {
+                break-after: avoid;
+                page-break-after: avoid;
+            }
+
+            .stat-card,
+            .flow-card,
+            .trust-card,
+            .quote-box,
+            .contact {
+                border: 1px solid #222 !important;
+                background-color: #0A0A0A !important;
+                color: #E5E5E5 !important;
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
+            .header {
+                break-inside: avoid;
+            }
+
+            .container {
+                background-color: #050505 !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <img src="/hanna-logo.png" alt="Hanna Logo" style="height: 100px; margin-bottom: 2rem;">
+            <h1>Hanna</h1>
+            <p class="header-subtitle">One nurse can now monitor 500+ patients daily.</p>
+            <p class="header-description">We're solving Thailand's 50,000 nurse shortage with AI that handles routine
+                check-ins, so nurses only see patients who need help.</p>
+        </header>
+
+        <!-- The Problem -->
+        <section class="section">
+            <h2>The Problem (in numbers)</h2>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">50,000</div>
+                    <div class="stat-label">nurses short in Thailand (permanent)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">90%</div>
+                    <div class="stat-label">of chronic patient time spent at home, invisible to hospitals</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">20–30</div>
+                    <div class="stat-label">calls/day maximum per nurse today</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">500–1,000</div>
+                    <div class="stat-label">patients per nurse needed for continuous monitoring</div>
+                </div>
+            </div>
+
+            <p class="emphasized-text">Gap = unsolvable by hiring</p>
+        </section>
+
+        <!-- What We Do -->
+        <section class="section">
+            <h2>What We Do</h2>
+            <p>Daily automated check-ins via LINE (Thailand's WhatsApp) → AI scores every response → Nurses see only the
+                5-10% that need attention</p>
+
+            <div class="flow-grid">
+                <div class="flow-card">
+                    <h3>Patient Side</h3>
+                    <p>60-second voice check-in each day</p>
+                </div>
+                <div class="flow-card">
+                    <h3>Nurse Side</h3>
+                    <p>Prioritized list of who needs help today</p>
+                </div>
+                <div class="flow-card">
+                    <h3>Hospital Side</h3>
+                    <p>5-10x capacity increase per nurse</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Why It Works -->
+        <section class="section">
+            <h2>Why It Works</h2>
+            <p>Most check-ins are routine. The exceptions are critical. Humans can't scale monitoring. Software can.</p>
+
+            <div class="quote-box">
+                <p>We don't replace nurses. We multiply them.</p>
+            </div>
+        </section>
+
+        <!-- Business Model -->
+        <section class="section">
+            <h2>Business Model</h2>
+
+            <table>
+                <tbody>
+                    <tr>
+                        <td>Pilot</td>
+                        <td>฿237K (90 days, up to 1,000 patients)</td>
+                    </tr>
+                    <tr>
+                        <td>Full deployment</td>
+                        <td>฿149K–299K/month based on patient volume</td>
+                    </tr>
+                    <tr>
+                        <td>Alternative cost</td>
+                        <td>Hiring 5–10 nurses = ฿150K–350K/month <em>(who don't exist)</em></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Market -->
+        <section class="section">
+            <h2>Market</h2>
+
+            <div class="trust-grid">
+                <div class="trust-card">
+                    <h3>Thailand</h3>
+                    <p>700+ hospitals, millions of chronic patients, structural nurse shortage</p>
+                </div>
+                <div class="trust-card">
+                    <h3>Southeast Asia</h3>
+                    <p>Same problem, every country, getting worse</p>
+                </div>
+            </div>
+
+            <p style="margin-top: 2rem; font-style: italic; color: var(--text-tertiary);">
+                Not a "nice to have." Hospitals literally cannot scale any other way.
+            </p>
+        </section>
+
+        <!-- Traction -->
+        <section class="section">
+            <h2>Traction</h2>
+            <p>In active pilot discussions with multiple hospitals.</p>
+
+            <p><strong>Target proof points:</strong></p>
+            <ul>
+                <li>Daily patient engagement</li>
+                <li>Nurse workload reduction</li>
+                <li>Early deterioration detection</li>
+            </ul>
+        </section>
+
+        <!-- The Opportunity -->
+        <section class="section">
+            <h2>The Opportunity</h2>
+
+            <table>
+                <tbody>
+                    <tr>
+                        <td>Short-term</td>
+                        <td>Standard monitoring layer for Thai hospitals</td>
+                    </tr>
+                    <tr>
+                        <td>Long-term</td>
+                        <td>Care coordination infrastructure across Asia</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="quote-box">
+                <p>We're building the operating system for patients outside the hospital.</p>
+            </div>
+        </section>
+
+        <!-- Raising For -->
+        <section class="section">
+            <h2>Raising For</h2>
+            <ul>
+                <li>Scale deployment across Thailand</li>
+                <li>Deepen clinical intelligence</li>
+                <li>Regional expansion prep</li>
+            </ul>
+        </section>
+
+        <!-- Contact -->
+        <div class="contact">
+            <h2 style="margin-bottom: 0.5rem; font-size: 1.5rem;">Hanna</h2>
+            <p style="margin-bottom: 2rem; font-style: italic; color: var(--text-secondary);">
+                Multiplying nurse capacity 10x</p>
+
+            <div class="contact-name">Farhan Sabbir</div>
+            <div style="margin-bottom: 0.5rem;"><a href="mailto:farhan@hanna.care">farhan@hanna.care</a></div>
+            <div><a href="tel:0926867042">092-686-7042</a></div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Hanna is a product of Archangel Co., Ltd.</p>
+        </footer>
+    </div>
+</body>
+
+</html>

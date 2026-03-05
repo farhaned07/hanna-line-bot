@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hanna — การดูแลที่ขยายผลได้จริง</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #050505;
+            --bg-secondary: #0A0A0A;
+            --text-primary: #E5E5E5;
+            --text-secondary: #888888;
+            --text-tertiary: #666666;
+            --border: #222222;
+            --accent: #0047FF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Sarabun', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding-bottom: 4rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 4rem;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 600;
+            letter-spacing: -0.03em;
+            margin-bottom: 1rem;
+            line-height: 1.1;
+        }
+
+        .header-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 4rem;
+            padding-bottom: 4rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section h2 {
+            font-size: 2rem;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            margin-bottom: 2rem;
+            color: var(--text-primary);
+        }
+
+        .section p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 1.05rem;
+        }
+
+        .section strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .section ul,
+        .section ol {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .section li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .section ul li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--text-tertiary);
+        }
+
+        .section ol {
+            counter-reset: item;
+        }
+
+        .section ol li {
+            padding-left: 2rem;
+        }
+
+        .section ol li::before {
+            content: counter(item) ".";
+            counter-increment: item;
+            position: absolute;
+            left: 0;
+            color: var(--text-tertiary);
+            font-family: 'Menlo', monospace;
+        }
+
+        /* Quote Box */
+        .quote-box {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-left: 2px solid var(--accent);
+            margin: 2rem 0;
+        }
+
+        .quote-box p {
+            margin: 0;
+            color: var(--text-primary);
+            font-weight: 500;
+            font-size: 1.125rem;
+            line-height: 1.6;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            font-size: 0.95rem;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 1.25rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            font-family: 'Menlo', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-tertiary);
+            font-weight: 400;
+        }
+
+        td {
+            color: var(--text-secondary);
+        }
+
+        td:first-child {
+            color: var(--text-primary);
+            font-weight: 500;
+            width: 30%;
+        }
+
+        /* Contact */
+        .contact {
+            text-align: center;
+            padding: 4rem 0;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+
+        .contact-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .contact-role {
+            font-family: 'Menlo', monospace;
+            font-size: 0.875rem;
+            color: var(--text-tertiary);
+            margin-bottom: 2rem;
+        }
+
+        .contact a {
+            color: var(--text-primary);
+            text-decoration: none;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2px;
+            transition: color 0.2s;
+        }
+
+        .contact a:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding-top: 4rem;
+            margin-top: 4rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer p {
+            font-size: 0.875rem;
+            color: var(--text-tertiary);
+        }
+
+        .emphasized-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: 2rem;
+            display: block;
+        }
+
+        /* ----- PRINT OPTIMIZATION ----- */
+        @media print {
+            @page {
+                size: A4;
+                margin: 0;
+            }
+
+            body {
+                background-color: #050505 !important;
+                color: #E5E5E5 !important;
+                margin: 0;
+                width: 100%;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .container {
+                max-width: 100% !important;
+                width: 100% !important;
+                padding: 2.5cm !important;
+                margin: 0 !important;
+            }
+
+            .section {
+                page-break-inside: auto;
+                border-color: #222 !important;
+            }
+
+            h1,
+            h2,
+            h3,
+            h4 {
+                break-after: avoid;
+                page-break-after: avoid;
+            }
+
+            /* Ensure cards look good and stay together */
+            .stakeholder-card,
+            .trust-card,
+            .quote-box,
+            .contact {
+                border: 1px solid #222 !important;
+                background-color: #0A0A0A !important;
+                color: #E5E5E5 !important;
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
+            .header {
+                break-inside: avoid;
+            }
+
+            .container {
+                background-color: #050505 !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <img src="/hanna-logo.png" alt="Hanna Logo" style="height: 100px; margin-bottom: 2rem;">
+            <h1>Hanna</h1>
+            <p class="header-subtitle">การดูแลที่ขยายผลได้จริง โดยไม่เพิ่มภาระพยาบาล</p>
+        </header>
+
+        <!-- The Problem -->
+        <section class="section">
+            <h2>ปัญหา</h2>
+            <p>ประเทศไทยกำลังเผชิญกับภาวะขาดแคลนพยาบาล โรงพยาบาลไม่สามารถแก้ปัญหาด้วยการจ้างเพิ่มเพียงอย่างเดียวได้</p>
+            <p><strong>สถานการณ์จริงหน้างาน:</strong></p>
+            <ul>
+                <li>พยาบาลมีภาระงานล้นมือ ทั้งการติดตามผล การโทรศัพท์ และงานเอกสาร</li>
+                <li>ผู้ป่วยขาดการขาดการติดต่อระหว่างนัดหมาย</li>
+                <li>การขาดยาและอาการที่ไม่ได้รับการดูแล</li>
+                <li>ไม่มีข้อมูลสุขภาพผู้ป่วยเมื่อออกจากโรงพยาบาล</li>
+            </ul>
+            <p class="emphasized-text">การดูแลหยุดลงเมื่อหมดเวลาตรวจ ปัญหาจึงลุกลามเมื่อสายเกินไป</p>
+        </section>
+
+        <!-- The Solution -->
+        <section class="section">
+            <h2>ทางออก</h2>
+            <p>Hanna คือโครงสร้างพื้นฐานสำหรับการดูแลแบบกำกับที่ช่วยให้พยาบาลดูแลผู้ป่วยได้มากขึ้นอย่างปลอดภัย
+                โดยไม่เพิ่มภาระงาน</p>
+
+            <div class="quote-box">
+                <p><strong>Hanna จัดการการติดตามผลผู้ป่วยรายวัน</strong><br>
+                    <strong>พยาบาลโฟกัสเฉพาะเคสที่ต้องใช้การตัดสินใจของมนุษย์</strong>
+                </p>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>สิ่งที่ Hanna ทำ</th>
+                        <th>กระบวนการทำงาน</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>เช็คอินผู้ป่วยรายวัน</td>
+                        <td>ติดตามผลอัตโนมัติผ่าน LINE (ไม่ต้องโหลดแอป)</td>
+                    </tr>
+                    <tr>
+                        <td>เตือนการทานยา</td>
+                        <td>ข้อความเตือนที่เรียบง่าย สม่ำเสมอ และจูงใจให้ตอบกลับ</td>
+                    </tr>
+                    <tr>
+                        <td>ติดตามอาการ</td>
+                        <td>ผู้ป่วยรายงานค่าสัญญาณชีพและอาการได้ทุกวัน</td>
+                    </tr>
+                    <tr>
+                        <td>ตรวจจับความเสี่ยง</td>
+                        <td>Hanna ระบุสัญญาณเตือนล่วงหน้าโดยอัตโนมัติ</td>
+                    </tr>
+                    <tr>
+                        <td>ศูนย์บัญชาการพยาบาล</td>
+                        <td>พยาบาลเห็นรายชื่อผู้ป่วยเรียงตามลำดับความสำคัญที่ต้องดูแล</td>
+                    </tr>
+                    <tr>
+                        <td>มนุษย์คือกุญแจสำคัญ</td>
+                        <td>AI ช่วยสนับสนุน พยาบาลเป็นผู้ตัดสินใจและดำเนินการ</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p style="text-align: center; margin-top: 1rem; color: var(--text-tertiary); font-style: italic;">
+                เราไม่ได้มาแทนที่พยาบาล แต่เรามาเพื่อปกป้องเวลาและความใส่ใจของพวกเขา
+            </p>
+        </section>
+
+        <!-- Why Hospitals Trust Hanna -->
+        <section class="section">
+            <h2>ทำไมโรงพยาบาลถึงมั่นใจใน Hanna</h2>
+
+            <style>
+                .trust-grid {
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 1.5rem;
+                }
+
+                .trust-card {
+                    border: 1px solid var(--border);
+                    padding: 2rem;
+                    background: transparent;
+                }
+
+                .trust-card h3 {
+                    margin-top: 0;
+                    margin-bottom: 1rem;
+                    font-size: 1.1rem;
+                    color: var(--text-primary);
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                }
+
+                .trust-card h3::before {
+                    content: "";
+                    display: block;
+                    width: 6px;
+                    height: 6px;
+                    background: var(--accent);
+                    border-radius: 50%;
+                }
+
+                .trust-card p {
+                    margin: 0;
+                    font-size: 0.95rem;
+                    color: var(--text-secondary);
+                    line-height: 1.6;
+                }
+
+                @media (max-width: 768px) {
+                    .trust-grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
+            </style>
+
+            <div class="trust-grid">
+                <div class="trust-card">
+                    <h3>AI ช่วยสนับสนุน ไม่ตัดสินใจเอง</h3>
+                    <p>การตัดสินใจทางคลินิกทั้งหมดยังคงเป็นอำนาจของบุคลากรทางการแพทย์</p>
+                </div>
+                <div class="trust-card">
+                    <h3>กฎการส่งต่อเคสที่ชัดเจน</h3>
+                    <p>สัญญาณความเสี่ยงจะแจ้งเตือนพยาบาล และแนะนำการส่งต่อฉุกเฉินเมื่อจำเป็น</p>
+                </div>
+                <div class="trust-card">
+                    <h3>ตรวจสอบย้อนหลังได้ครบถ้วน</h3>
+                    <p>ทุกการโต้ตอบถูกบันทึกเพื่อการกำกับดูแลและตรวจสอบ</p>
+                </div>
+                <div class="trust-card">
+                    <h3>โครงสร้างพื้นฐานแบบกำกับดูแล</h3>
+                    <p>Hanna สนับสนุนการให้บริการ ไม่ได้ทำงานโดยพลการ</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- The Pilot Program -->
+        <section class="section">
+            <h2>โครงการนำร่อง</h2>
+            <p>วิธีเริ่มต้นที่ง่ายและมีความเสี่ยงต่ำเพื่อเห็นผลลัพธ์จริง</p>
+
+            <table>
+                <tbody>
+                    <tr>
+                        <td>ระยะเวลา</td>
+                        <td>90 วัน</td>
+                    </tr>
+                    <tr>
+                        <td>กลุ่มผู้ป่วย</td>
+                        <td>ผู้ป่วยโรคเรื้อรัง 500–1,000 ราย (เช่น เบาหวาน, ความดันฯ)</td>
+                    </tr>
+                    <tr>
+                        <td>ค่าบริการรายเดือน</td>
+                        <td>฿79,000</td>
+                    </tr>
+                    <tr>
+                        <td>งบประมาณโครงการ</td>
+                        <td>฿237,000 (3 เดือน)</td>
+                    </tr>
+                    <tr>
+                        <td>สิ่งที่รวมในบริการ</td>
+                        <td>การติดตั้ง, อบรมบุคลากร, การสนับสนุนรายสัปดาห์, รายงานสรุปผล</td>
+                    </tr>
+                    <tr>
+                        <td>ตัวชี้วัดผลลัพธ์</td>
+                        <td>การมีส่วนร่วม, ความร่วมมือในการใช้ยา, การช่วยเหลือทันท่วงที, เวลาพยาบาลที่ลดลง</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Who Hanna Is For -->
+        <section class="section">
+            <h2>Hanna ดีกับใคร</h2>
+
+            <style>
+                .stakeholder-grid {
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 1.5rem;
+                }
+
+                .stakeholder-card {
+                    border: 1px solid var(--border);
+                    padding: 2rem;
+                    background: var(--bg-secondary);
+                }
+
+                .stakeholder-card h3 {
+                    margin-top: 0;
+                    margin-bottom: 1.5rem;
+                    font-size: 1.1rem;
+                    border-bottom: 1px solid var(--border);
+                    padding-bottom: 1rem;
+                    letter-spacing: 0.02em;
+                }
+
+                .stakeholder-card ul {
+                    margin-bottom: 0;
+                }
+
+                .stakeholder-card li {
+                    font-size: 0.95rem;
+                    margin-bottom: 0.5rem;
+                }
+
+                @media (max-width: 768px) {
+                    .stakeholder-grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
+            </style>
+            <div class="stakeholder-grid">
+                <div class="stakeholder-card">
+                    <h3>ผู้ป่วย</h3>
+                    <ul>
+                        <li>ข้อความ LINE ที่เรียบง่าย</li>
+                        <li>เสียงภาษาไทยที่เป็นมิตร</li>
+                        <li>คำแนะนำและเตือนความจำรายวัน</li>
+                    </ul>
+                </div>
+                <div class="stakeholder-card">
+                    <h3>พยาบาล</h3>
+                    <ul>
+                        <li>ไม่ต้องโทรตามหรือไล่ล่าข้อมูล</li>
+                        <li>เห็นเฉพาะเคสที่มีปัญหา</li>
+                        <li>ข้อมูลครบถ้วนเมื่อต้องดำเนินการ</li>
+                    </ul>
+                </div>
+                <div class="stakeholder-card">
+                    <h3>ผู้บริหาร</h3>
+                    <ul>
+                        <li>มองเห็นภาพรวมการดูแลนอกโรงพยาบาล</li>
+                        <li>ตัวชี้วัดการดำเนินงานที่ชัดเจน</li>
+                        <li>มั่นใจว่าการดูแลไม่ตกหล่นระหว่างนัดหมาย</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Next Steps -->
+        <section class="section">
+            <h2>ขั้นตอนถัดไป</h2>
+            <ol>
+                <li><strong>นัดหมายพูดคุย</strong> — 30 นาที เพื่อทำความเข้าใจกระบวนการทำงานของท่าน</li>
+                <li><strong>ชมการสาธิตระบบจริง</strong> — ชมตัวอย่างสถานการณ์ผู้ป่วยจริง</li>
+                <li><strong>เสนอแผนงาน</strong> — เสนอแผนโครงการที่เหมาะกับโรงพยาบาลของท่าน</li>
+            </ol>
+        </section>
+
+        <!-- Contact -->
+        <div class="contact">
+            <h2 style="margin-bottom: 0.5rem; font-size: 1.5rem;">Hanna</h2>
+            <p style="margin-bottom: 2rem; font-style: italic; color: var(--text-secondary);">
+                เพิ่มขีดความสามารถพยาบาล 10 เท่า</p>
+
+            <div class="contact-name">Farhan Sabbir</div>
+            <div style="margin-bottom: 0.5rem;"><a href="mailto:farhan@hanna.care">farhan@hanna.care</a></div>
+            <div><a href="tel:0926867042">092-686-7042</a></div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Hanna เป็นผลิตภัณฑ์ของ บริษัท อาร์คแองเจิล จำกัด (Archangel Co., Ltd.)</p>
+        </footer>
+    </div>
+</body>
+
+</html>

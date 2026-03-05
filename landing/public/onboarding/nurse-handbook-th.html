@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>คู่มือพยาบาล — Hanna Dashboard</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #050505;
+            --bg-secondary: #0A0A0A;
+            --text-primary: #E5E5E5;
+            --text-secondary: #888888;
+            --text-tertiary: #666666;
+            --border: #222222;
+            --accent: #0047FF;
+            --critical: #FF4444;
+            --high: #FF9900;
+            --low: #22CC66;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        html {
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Sarabun', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding-bottom: 4rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 4rem;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 600;
+            letter-spacing: -0.03em;
+            margin-bottom: 1rem;
+            line-height: 1.1;
+        }
+
+        .header-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 4rem;
+            padding-bottom: 4rem;
+            border-bottom: 1px solid var(--border);
+            page-break-inside: avoid;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section h2 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 2rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section h2::before {
+            content: "";
+            display: block;
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+        }
+
+        .section h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            margin-top: 2rem;
+            color: var(--text-primary);
+        }
+
+        .section h3:first-of-type {
+            margin-top: 0;
+        }
+
+        .section p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+        }
+
+        .section strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .section ul,
+        .section ol {
+            list-style: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .section li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .section ul li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--text-tertiary);
+        }
+
+        .section ol {
+            counter-reset: item;
+        }
+
+        .section ol li {
+            padding-left: 2rem;
+        }
+
+        .section ol li::before {
+            content: counter(item) ".";
+            counter-increment: item;
+            position: absolute;
+            left: 0;
+            color: var(--text-tertiary);
+            font-family: 'Menlo', monospace;
+            font-size: 0.875rem;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        th {
+            font-family: 'Menlo', monospace;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-tertiary);
+            font-weight: 400;
+        }
+
+        td {
+            color: var(--text-secondary);
+        }
+
+        td:first-child {
+            color: var(--text-primary);
+            font-weight: 500;
+            width: 30%;
+        }
+
+        /* Code Block */
+        .code-block {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            font-family: 'Menlo', monospace;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+
+        /* Tip Box */
+        .tip-box {
+            background: var(--bg-secondary);
+            padding: 1.25rem 1.5rem;
+            border-left: 2px solid var(--accent);
+            margin: 1.5rem 0;
+            font-size: 0.95rem;
+        }
+
+        .tip-box strong {
+            color: var(--accent);
+        }
+
+        /* Checklist */
+        .checklist {
+            list-style: none;
+            margin: 1.5rem 0;
+        }
+
+        .checklist li {
+            padding-left: 2rem;
+            margin-bottom: 0.75rem;
+            position: relative;
+        }
+
+        .checklist li::before {
+            content: "☐";
+            position: absolute;
+            left: 0;
+            color: var(--text-tertiary);
+        }
+
+        /* Risk Colors */
+        .critical {
+            color: var(--critical);
+        }
+
+        .high {
+            color: var(--high);
+        }
+
+        .low {
+            color: var(--low);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding-top: 4rem;
+            margin-top: 4rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer p {
+            font-size: 0.875rem;
+            color: var(--text-tertiary);
+        }
+
+        /* ----- PRINT OPTIMIZATION ----- */
+        @media print {
+            @page {
+                size: A4;
+                margin: 0;
+            }
+
+            body {
+                background-color: #050505 !important;
+                color: #E5E5E5 !important;
+                margin: 0;
+                width: 100%;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .container {
+                max-width: 100% !important;
+                width: 100% !important;
+                padding: 2.5cm !important;
+                margin: 0 !important;
+            }
+
+            .section {
+                page-break-inside: auto;
+                border-color: #222 !important;
+            }
+
+            h1,
+            h2,
+            h3,
+            h4 {
+                break-after: avoid;
+                page-break-after: avoid;
+            }
+
+            p,
+            li {
+                orphans: 3;
+                widows: 3;
+            }
+
+            .page-break {
+                page-break-after: always;
+                display: block;
+                height: 0;
+            }
+
+            /* Ensure background consistency */
+            .tip-box,
+            .code-block,
+            table,
+            table tr,
+            th,
+            td {
+                background-color: #0A0A0A !important;
+                color: #E5E5E5 !important;
+                border-color: #222 !important;
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
+            .header {
+                break-inside: avoid;
+            }
+
+            .container {
+                background-color: #050505 !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <img src="/hanna-logo.png" alt="Hanna Logo" style="height: 100px; margin-bottom: 2rem;">
+            <h1>คู่มือพยาบาล</h1>
+            <p class="header-subtitle">คู่มืออ้างอิงด่วนสำหรับ Hanna Dashboard</p>
+        </header>
+
+        <!-- Welcome -->
+        <section class="section">
+            <h2>ยินดีต้อนรับ</h2>
+            <p>คู่มือนี้มีทุกสิ่งที่คุณต้องการเพื่อใช้งาน Hanna dashboard อย่างมีประสิทธิภาพ
+                เก็บไว้เป็นคู่มืออ้างอิงบนโต๊ะทำงาน</p>
+            <div class="tip-box">
+                <strong>ฝ่ายสนับสนุน:</strong> หากมีคำถาม ติดต่อผู้จัดการการติดตั้งของคุณ หรืออีเมล
+                <strong>support@hanna.care</strong>
+            </div>
+        </section>
+
+        <!-- 1. Getting Started -->
+        <section class="section">
+            <h2>1. เริ่มต้นใช้งาน</h2>
+            <h3>การเข้าระบบ</h3>
+            <ol>
+                <li>เปิด URL ของ dashboard (ที่ได้รับจากผู้ดูแลระบบ)</li>
+                <li>ป้อน access token ของคุณ</li>
+                <li>คลิก "Sign In"</li>
+                <li>คุณจะเห็นหน้า Mission Control</li>
+            </ol>
+            <div class="tip-box">
+                <strong>เคล็ดลับ:</strong> บันทึก bookmark ของ dashboard เพื่อเข้าใช้งานได้รวดเร็ว
+            </div>
+        </section>
+
+        <!-- 2. Understanding the Dashboard -->
+        <section class="section">
+            <h2>2. ทำความเข้าใจ Dashboard</h2>
+            <h3>Mission Control (หน้าหลัก)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ส่วน</th>
+                        <th>แสดงอะไร</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>แถวตัวชี้วัด</td>
+                        <td>ผู้ป่วยที่กำลังดูแล, งานที่รอดำเนินการ, งานที่เสร็จวันนี้</td>
+                    </tr>
+                    <tr>
+                        <td>แบนเนอร์แจ้งเตือนวิกฤต</td>
+                        <td>แบนเนอร์สีแดงหากมีการแจ้งเตือนระดับ CRITICAL</td>
+                    </tr>
+                    <tr>
+                        <td>Triage Queue</td>
+                        <td>ผู้ป่วยที่ต้องให้ความสนใจก่อน</td>
+                    </tr>
+                    <tr>
+                        <td>AI Activity Log</td>
+                        <td>การประเมินล่าสุดจาก OneBrain</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>สีความเสี่ยง</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>สี</th>
+                        <th>ระดับ</th>
+                        <th>ความหมาย</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="critical">🔴 แดง</td>
+                        <td>CRITICAL</td>
+                        <td>ต้องดูแลทันที</td>
+                    </tr>
+                    <tr>
+                        <td class="high">🟠 ส้ม</td>
+                        <td>HIGH</td>
+                        <td>ตรวจสอบภายใน 24 ชั่วโมง</td>
+                    </tr>
+                    <tr>
+                        <td class="low">🟢 เขียว</td>
+                        <td>LOW</td>
+                        <td>ไม่ต้องดำเนินการ (AI ดูแลอยู่)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 3. Daily Workflow -->
+        <section class="section">
+            <h2>3. กระบวนการทำงานประจำวัน</h2>
+            <h3>ตรวจเช้า (5 นาที)</h3>
+            <ol>
+                <li>เข้าสู่ระบบ dashboard</li>
+                <li>ตรวจสอบการแจ้งเตือน <strong class="critical">CRITICAL</strong> (สีแดง) → จัดการทันที</li>
+                <li>ตรวจสอบการแจ้งเตือน <strong class="high">HIGH</strong> (สีส้ม) ที่เข้ามาช่วงกลางคืน</li>
+                <li>บันทึกผู้ป่วยที่ต้องติดตาม</li>
+            </ol>
+            <h3>ระหว่างวัน</h3>
+            <ol>
+                <li>Dashboard จะแสดงการแจ้งเตือนใหม่เมื่อเข้ามา</li>
+                <li>จัดการ CRITICAL ภายใน <strong>1 ชั่วโมง</strong></li>
+                <li>จัดการ HIGH ภายใน <strong>24 ชั่วโมง</strong></li>
+                <li>ปิดงานหลังจากดำเนินการเสร็จ</li>
+            </ol>
+            <h3>ตรวจเย็น (5 นาที)</h3>
+            <ol>
+                <li>ตรวจสอบงาน HIGH ที่ยังไม่เสร็จ</li>
+                <li>บันทึกหมายเหตุหากต้องส่งต่อกะ</li>
+                <li>ออกจากระบบ</li>
+            </ol>
+        </section>
+
+        <!-- 3.5 Understanding Daily Check-Ins -->
+        <section class="section">
+            <h2>3.5 ทำความเข้าใจการเช็คอินรายวัน</h2>
+            <h3>ระบบปุ่มกดโต้ตอบ</h3>
+            <p>ผู้ป่วยจะได้รับการเช็คอินแบบกดปุ่ม (ไม่ใช่พิมพ์ข้อความ):</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ขั้นตอน</th>
+                        <th>คำถาม</th>
+                        <th>ปุ่มตอบ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>วันนี้เป็นอย่างไรบ้าง?</td>
+                        <td>[ดี] [ปกติ] [ไม่ดี]</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>ทานยาแล้วหรือยัง?</td>
+                        <td>[ได้ ครบ] [บางส่วน] [ไม่ได้เลย]</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>มีอาการผิดปกติไหม?</td>
+                        <td>[ไม่] [มีอาการบ้าง]</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>(หากมีอาการ) อาการอะไร?</td>
+                        <td>[มีไข้] [ปวดศีรษะ] [คลื่นไส้] ฯลฯ</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>การฉลองความต่อเนื่อง (Streak)</h3>
+            <ul>
+                <li>🔥 วันที่ 7: "7 วันติดต่อกัน!"</li>
+                <li>🏆 วันที่ 14: "2 อาทิตย์แล้ว!"</li>
+                <li>⭐ วันที่ 30: "1 เดือนเต็ม!"</li>
+            </ul>
+
+            <h3>ขั้นตอนสำหรับผู้ป่วยที่ไม่ตอบ</h3>
+            <ul>
+                <li><strong>วันที่ 3-4:</strong> ส่งข้อความห่วงใย</li>
+                <li><strong>วันที่ 5-6:</strong> ส่งข้อความส่วนตัว</li>
+                <li><strong>วันที่ 7:</strong> เสนอทางเลือกสุดท้าย</li>
+                <li><strong>วันที่ 8+:</strong> แจ้งเตือนปรากฏบน dashboard (ระดับ HIGH)</li>
+            </ul>
+            <p>หากมีการรายงานอาการเดิมซ้ำ 3 วันติดต่อกัน จะสร้างงาน <strong class="critical">CRITICAL</strong> อัตโนมัติ
+            </p>
+        </section>
+
+        <div class="page-break"></div>
+
+        <!-- 4. Reading Patient Alerts -->
+        <section class="section">
+            <h2>4. การอ่านการแจ้งเตือนผู้ป่วย</h2>
+            <h3>สิ่งที่คุณเห็น</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ฟิลด์</th>
+                        <th>ความหมาย</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>ชื่อผู้ป่วย</td>
+                        <td>คลิกเพื่อดูโปรไฟล์เต็ม</td>
+                    </tr>
+                    <tr>
+                        <td>คะแนนความเสี่ยง</td>
+                        <td>0-10 (ยิ่งสูง = ยิ่งเร่งด่วน)</td>
+                    </tr>
+                    <tr>
+                        <td>สาเหตุ</td>
+                        <td>สิ่งที่ทำให้เกิดการแจ้งเตือน</td>
+                    </tr>
+                    <tr>
+                        <td>เวลา</td>
+                        <td>เวลาที่สร้างการแจ้งเตือน</td>
+                    </tr>
+                    <tr>
+                        <td>คำแนะนำ AI</td>
+                        <td>การดำเนินการที่ AI แนะนำ (เพื่อข้อมูลเท่านั้น)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3>ตัวอย่างการแจ้งเตือน</h3>
+            <div class="code-block">🔴 CRITICAL | ความเสี่ยง: 9/10
+                ผู้ป่วย: คุณสมหญิง (62, เบาหวาน)
+                สาเหตุ: ตรวจพบคำเตือนฉุกเฉิน - "เจ็บหน้าอก"
+                เวลา: 2 นาทีที่แล้ว
+                AI: แนะนำให้โทรทันที โปรโตคอล 1669</div>
+        </section>
+
+        <!-- 5. Taking Action -->
+        <section class="section">
+            <h2>5. การดำเนินการ</h2>
+            <h3>ตัวเลือก 1: โทรหาผู้ป่วย</h3>
+            <ol>
+                <li>คลิกปุ่ม "📞 โทร"</li>
+                <li>โทรศัพท์จะเปิดพร้อมเบอร์ผู้ป่วย</li>
+                <li>โทรหาผู้ป่วย</li>
+                <li>หลังโทรเสร็จ คลิก "ปิดงาน" เพื่อบันทึกผลลัพธ์</li>
+            </ol>
+            <h3>ตัวเลือก 2: ส่งข้อความ</h3>
+            <ol>
+                <li>คลิกชื่อผู้ป่วยเพื่อเปิดโปรไฟล์</li>
+                <li>ตรวจสอบประวัติการสนทนา</li>
+                <li>ใช้ LINE ส่งข้อความ (นอก Hanna)</li>
+                <li>กลับมาคลิก "ปิดงาน"</li>
+            </ol>
+            <h3>ตัวเลือก 3: ปิดงานโดยตรง</h3>
+            <ol>
+                <li>คลิก "ปิดงาน"</li>
+                <li>เลือกผลลัพธ์ที่เหมาะสม</li>
+                <li>เพิ่มหมายเหตุ (ถ้าต้องการ)</li>
+                <li>ส่ง</li>
+            </ol>
+        </section>
+
+        <div class="page-break"></div>
+
+        <!-- 6. Resolving Tasks -->
+        <section class="section">
+            <h2>6. การปิดงาน</h2>
+            <h3>ผลลัพธ์</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ผลลัพธ์</th>
+                        <th>ใช้เมื่อ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>ปกติ (Stable)</td>
+                        <td>ผู้ป่วยปกติดี ปัญหาได้รับการแก้ไข</td>
+                    </tr>
+                    <tr>
+                        <td>ส่งต่อ (Escalated)</td>
+                        <td>ส่งต่อไปหาแพทย์หรือผู้เชี่ยวชาญ</td>
+                    </tr>
+                    <tr>
+                        <td>ส่ง ER</td>
+                        <td>ส่งผู้ป่วยไปห้องฉุกเฉิน</td>
+                    </tr>
+                    <tr>
+                        <td>สัญญาณเท็จ</td>
+                        <td>การแจ้งเตือนไม่ถูกต้อง</td>
+                    </tr>
+                    <tr>
+                        <td>อื่นๆ</td>
+                        <td>กรณีอื่น (เพิ่มหมายเหตุ)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 7. Understanding Risk Scores -->
+        <section class="section">
+            <h2>7. ทำความเข้าใจคะแนนความเสี่ยง</h2>
+            <h3>วิธีคำนวณความเสี่ยง</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ปัจจัย</th>
+                        <th>คะแนน</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>คำฉุกเฉิน (เจ็บหน้าอก, เป็นลม, หายใจไม่ออก)</td>
+                        <td>+3 (หรือ CRITICAL ทันทีสำหรับ SOS)</td>
+                    </tr>
+                    <tr>
+                        <td>ค่าสัญญาณชีพอันตราย (น้ำตาล >400 หรือ <70)< /td>
+                        <td>+2</td>
+                    </tr>
+                    <tr>
+                        <td>ขาดยา (3+ วัน)</td>
+                        <td>+2</td>
+                    </tr>
+                    <tr>
+                        <td>แนวโน้มแย่ลง (น้ำตาลลดลง)</td>
+                        <td>+1</td>
+                    </tr>
+                    <tr>
+                        <td>ไม่ติดต่อ (48+ ชั่วโมง)</td>
+                        <td>+1</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p><strong>คะแนน 8-10 = <span class="critical">CRITICAL</span></strong><br>
+                <strong>คะแนน 5-7 = <span class="high">HIGH</span></strong><br>
+                <strong>คะแนน 0-4 = <span class="low">LOW</span> (ไม่มีการแจ้งเตือน)</strong>
+            </p>
+        </section>
+
+        <!-- 8. Emergency Protocol -->
+        <section class="section">
+            <h2>8. โปรโตคอลฉุกเฉิน</h2>
+            <h3>หากผู้ป่วยแจ้งเหตุฉุกเฉิน</h3>
+            <p><strong>Hanna จะทำโดยอัตโนมัติ:</strong> บอกผู้ป่วยให้โทร 1669 และสร้างการแจ้งเตือน CRITICAL</p>
+            <p><strong>สิ่งที่คุณต้องทำ:</strong></p>
+            <ol>
+                <li>โทรหาผู้ป่วยทันที</li>
+                <li>ยืนยันว่าโทร 1669 แล้วหรือยัง</li>
+                <li>ประสานงานกับหน่วยฉุกเฉินถ้าจำเป็น</li>
+            </ol>
+        </section>
+
+        <div class="page-break"></div>
+
+        <!-- Quick Reference Card -->
+        <section class="section">
+            <h2>การ์ดอ้างอิงด่วน</h2>
+            <h3>เช็คลิสต์ประจำวัน</h3>
+            <ul class="checklist">
+                <li>เช้า: ตรวจสอบการแจ้งเตือน CRITICAL</li>
+                <li>จัดการ CRITICAL ภายใน 1 ชั่วโมง</li>
+                <li>จัดการ HIGH ภายใน 24 ชั่วโมง</li>
+                <li>ตอนเย็น: ตรวจสอบงานที่ยังไม่เสร็จ</li>
+            </ul>
+            <h3>เวลาตอบสนอง</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ลำดับความสำคัญ</th>
+                        <th>เป้าหมาย</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="critical">CRITICAL</td>
+                        <td>&lt; 1 ชั่วโมง</td>
+                    </tr>
+                    <tr>
+                        <td class="high">HIGH</td>
+                        <td>&lt; 24 ชั่วโมง</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <footer class="footer">
+            <p>Hanna เป็นผลิตภัณฑ์ของ บริษัท อาร์คแองเจิล จำกัด (Archangel Co., Ltd.)</p>
+        </footer>
+    </div>
+</body>
+
+</html>
