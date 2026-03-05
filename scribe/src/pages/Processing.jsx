@@ -6,9 +6,26 @@ import { api } from '../api/client'
 import { t } from '../i18n'
 
 const STAGES = [
-    { key: 'upload', label: 'Uploading audio...', sublabel: 'Preparing your recording' },
-    { key: 'transcribe', label: 'Transcribing...', sublabel: 'Whisper AI is processing speech' },
-    { key: 'generate', label: 'Generating note...', sublabel: 'Creating your clinical note' }
+    { 
+        key: 'upload', 
+        label: 'Uploading audio...', 
+        sublabel: 'Preparing your recording',
+        timeEstimate: '1-2 seconds'
+    },
+    { 
+        key: 'transcribe', 
+        label: 'Transcribing...', 
+        sublabel: 'AI is converting speech to text',
+        timeEstimate: '10-30 seconds',
+        detail: 'Recognizing medical terms in Thai, Bangla & English'
+    },
+    { 
+        key: 'generate', 
+        label: 'Generating SOAP note...', 
+        sublabel: 'Creating structured clinical note',
+        timeEstimate: '5-15 seconds',
+        detail: 'Organizing into Subjective, Objective, Assessment, Plan'
+    }
 ]
 
 export default function Processing() {
@@ -17,6 +34,8 @@ export default function Processing() {
     const location = useLocation()
     const [stage, setStage] = useState(0)
     const [error, setError] = useState(null)
+    const [startTime] = useState(Date.now())
+    const [detectedLang, setDetectedLang] = useState(null)
     const audioBlobRef = useState(() => location.state?.audioBlob)[0]
 
     useEffect(() => {
@@ -39,6 +58,13 @@ export default function Processing() {
             setStage(1)
             const { text: transcript } = await api.transcribe(audioBlob)
             await api.updateSession(sessionId, { transcript, status: 'transcribed' })
+            
+            // Detect language from transcript
+            const hasThai = /[ก-๙]/.test(transcript)
+            const hasBangla = /[ঀ-৿]/.test(transcript)
+            if (hasThai) setDetectedLang('Thai 🇹🇭')
+            else if (hasBangla) setDetectedLang('Bangla 🇧🇩')
+            else setDetectedLang('English 🇬🇧')
 
             // Stage 2: Generate note
             setStage(2)
@@ -155,23 +181,77 @@ export default function Processing() {
                 </motion.div>
             ) : (
                 /* Progress */
-                <div style={{ textAlign: 'center', width: '100%', maxWidth: 300 }}>
+                <div style={{ textAlign: 'center', width: '100%', maxWidth: 320 }}>
+                    {/* Main label */}
                     <motion.p
                         key={stage}
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
-                        style={{ fontSize: 18, fontWeight: 700, marginBottom: 4, color: '#F9FAFB', letterSpacing: '-0.3px' }}
+                        style={{ fontSize: 20, fontWeight: 800, marginBottom: 8, color: '#F9FAFB', letterSpacing: '-0.5px' }}
                     >
                         {STAGES[stage]?.label}
                     </motion.p>
+                    
+                    {/* Sublabel */}
                     <motion.p
                         key={`sub-${stage}`}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.15 }}
-                        style={{ fontSize: 13, color: 'rgba(255,255,255,0.35)', marginBottom: 28, fontWeight: 400 }}
+                        style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', marginBottom: 8, fontWeight: 400 }}
                     >
                         {STAGES[stage]?.sublabel}
+                    </motion.p>
+                    
+                    {/* Time estimate */}
+                    <div style={{
+                        display: 'inline-flex', alignItems: 'center', gap: 6,
+                        padding: '6px 12px', borderRadius: 16,
+                        background: 'rgba(99,102,241,0.15)',
+                        marginBottom: 16
+                    }}>
+                        <div style={{
+                            width: 6, height: 6, borderRadius: 3,
+                            background: '#6366F1',
+                            animation: 'pulse 1.5s ease-in-out infinite'
+                        }} />
+                        <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>
+                            ~{STAGES[stage]?.timeEstimate}
+                        </span>
+                    </div>
+                    
+                    {/* Language detected (stage 1+) */}
+                    {stage >= 1 && detectedLang && (
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            style={{
+                                display: 'inline-flex', alignItems: 'center', gap: 6,
+                                padding: '6px 12px', borderRadius: 12,
+                                background: 'rgba(255,255,255,0.08)',
+                                marginBottom: 16
+                            }}
+                        >
+                            <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>
+                                Detected:
+                            </span>
+                            <span style={{ fontSize: 13, color: '#fff', fontWeight: 600 }}>
+                                {detectedLang}
+                            </span>
+                        </motion.div>
+                    )}
+                    
+                    {/* Detail text */}
+                    {STAGES[stage]?.detail && (
+                        <motion.p
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.3 }}
+                            style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 24, maxWidth: 280, margin: '0 auto' }}
+                        >
+                            {STAGES[stage]?.detail}
+                        </motion.p>
+                    )}
                     </motion.p>
 
                     {/* Progress Steps */}
