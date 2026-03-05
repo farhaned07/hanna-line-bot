@@ -62,7 +62,9 @@ const transcribeAudio = async (audioBuffer) => {
             }
         );
 
-        const transcript = result.result.results.channels[0]?.alternatives[0]?.transcript || '';
+        console.log('🎤 [Deepgram] Raw response:', JSON.stringify(result, null, 2).substring(0, 500));
+
+        const transcript = result.result?.results?.channels?.[0]?.alternatives?.[0]?.transcript || '';
         
         console.log(`🎤 [Deepgram] Transcript: "${transcript}"`);
         return transcript.trim();
