@@ -1,6 +1,14 @@
 const { createClient } = require('@deepgram/sdk');
 
-const API_KEY = '8f65a54db4a986b5a370ede7b360f246a0f4f322';
+// CRITICAL FIX: Use environment variable instead of hardcoded key
+const API_KEY = process.env.DEEPGRAM_API_KEY;
+
+if (!API_KEY) {
+    console.error('❌ CRITICAL: DEEPGRAM_API_KEY not set in environment variables');
+    console.error('Please set DEEPGRAM_API_KEY in your .env file or Railway environment');
+    process.exit(1);
+}
+
 const deepgram = createClient(API_KEY);
 
 // Create a simple test: record 1 second of actual audio would be ideal, but let's test with a file

@@ -4,6 +4,7 @@ import Login from './pages/Login'
 import DashboardHome from './pages/DashboardHome'
 import DashboardLayout from './components/DashboardLayout'
 import ErrorBoundary from './components/ErrorBoundary'
+import NotFound from './pages/NotFound'
 import { supabase } from './lib/supabase'
 import './styles/tokens.css'
 
@@ -66,6 +67,7 @@ function App() {
 
         </Route>
         <Route path="/" element={<Navigate to="/dashboard" />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </ErrorBoundary>
   )

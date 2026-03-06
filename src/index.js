@@ -14,8 +14,53 @@ const path = require('path');
 
 const app = express();
 
-// Enable CORS for LIFF
-app.use(cors());
+// ─── SECURITY: CORS Configuration ───
+const allowedOrigins = [
+    'https://hanna.care',
+    'https://www.hanna.care',
+    'https://hanna-line-bot-production.up.railway.app',
+    process.env.NODE_ENV === 'development' && 'http://localhost:3000',
+    process.env.NODE_ENV === 'development' && 'http://localhost:5174',
+    process.env.NODE_ENV === 'development' && 'http://localhost:5173'
+].filter(Boolean);
+
+app.use(cors({
+    origin: function(origin, callback) {
+        // Allow requests with no origin (mobile apps, curl, Postman, etc.)
+        if (!origin) return callback(null, true);
+        
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            console.warn(`⚠️ CORS blocked request from: ${origin}`);
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept-Version', 'Content-Length', 'Content-MD5', 'Date', 'X-Api-Version']
+}));
+
+// ─── SECURITY: Security Headers Middleware ───
+app.use((req, res, next) => {
+    // Prevent clickjacking
+    res.setHeader('X-Frame-Options', 'DENY');
+    // Prevent MIME type sniffing
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    // XSS protection
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    // Referrer policy
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    // Feature policy
+    res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+    
+    // HSTS (only in production)
+    if (process.env.NODE_ENV === 'production') {
+        res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+    }
+    
+    next();
+});
 
 // H5 FIX: Rate Limiting
 const rateLimit = {};
@@ -42,6 +87,46 @@ const rateLimitMiddleware = (req, res, next) => {
 
 // Apply rate limiting to API routes
 app.use('/api', rateLimitMiddleware);
+
+// ─── SECURITY: Stricter rate limiting for auth endpoints ───
+const authRateLimit = {};
+const AUTH_RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+const AUTH_RATE_LIMIT_MAX_REQUESTS = 10; // 10 attempts per 15 minutes
+
+const authRateLimitMiddleware = (req, res, next) => {
+    const ip = req.ip || req.connection.remoteAddress;
+    const now = Date.now();
+    const key = `auth:${ip}`;
+
+    if (!authRateLimit[key]) {
+        authRateLimit[key] = { count: 1, startTime: now };
+    } else if (now - authRateLimit[key].startTime > AUTH_RATE_LIMIT_WINDOW_MS) {
+        authRateLimit[key] = { count: 1, startTime: now };
+    } else {
+        authRateLimit[key].count++;
+        if (authRateLimit[key].count > AUTH_RATE_LIMIT_MAX_REQUESTS) {
+            console.warn(`⚠️ Auth rate limit exceeded for IP: ${ip}`);
+            return res.status(429).json({ 
+                error: 'Too many authentication attempts. Please try again in 15 minutes.' 
+            });
+        }
+    }
+    next();
+};
+
+// Apply stricter rate limiting to auth routes
+app.use('/api/auth', authRateLimitMiddleware);
+app.use('/api/scribe/auth', authRateLimitMiddleware);
+
+// Cleanup auth rate limit entries every 5 minutes
+setInterval(() => {
+    const now = Date.now();
+    for (const key in authRateLimit) {
+        if (now - authRateLimit[key].startTime > AUTH_RATE_LIMIT_WINDOW_MS * 2) {
+            delete authRateLimit[key];
+        }
+    }
+}, 300000);
 
 // Admin API Routes
 app.use('/api/admin', express.json(), require('./routes/admin'));
