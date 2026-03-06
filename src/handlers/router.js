@@ -664,6 +664,31 @@ const handlePostback = async (event) => {
             return dailyCheckin.handleCheckInPostback(event, user);
         }
 
+        // Route follow-up postbacks (Day 1/3/7/14 responses)
+        if (action && action.startsWith('day') && action.includes('_response')) {
+            const followupScheduler = require('../services/followupScheduler');
+            const responseText = event.postback.data;
+            
+            await followupScheduler.processPatientResponse(userId, responseText, responseText);
+            
+            // Acknowledge response
+            return line.replyMessage(event.replyToken, {
+                type: 'text',
+                text: '✓ ขอบคุณสำหรับข้อมูลค่ะ ฮันนาบันทึกข้อมูลเรียบร้อยแล้ว 🙏'
+            });
+        }
+
+        // Handle follow-up welcome acknowledgment
+        if (action === 'followup_welcome') {
+            const followupScheduler = require('../services/followupScheduler');
+            await followupScheduler.processPatientResponse(userId, 'Acknowledged welcome message', event.postback.data);
+            
+            return line.replyMessage(event.replyToken, {
+                type: 'text',
+                text: '✓ ยินดีต้อนรับสู่โปรแกรมติดตามอาการของฮันนานะคะ 😊'
+            });
+        }
+
         return Promise.resolve(null);
     } catch (error) {
         console.error('❌ Error in handlePostback:', error);

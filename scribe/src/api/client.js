@@ -36,6 +36,9 @@ export const api = {
     getBillingStatus: () => request('/billing/status'),
     createCheckoutSession: (data) => request('/billing/create-checkout-session', { method: 'POST', body: JSON.stringify(data) }),
 
+    // Follow-up Enrollment
+    enrollFollowup: (data) => request('/followup/enroll', { method: 'POST', body: JSON.stringify(data) }),
+
     // Sessions
     getSessions: () => request('/sessions'),
     getSession: (id) => request(`/sessions/${id}`),

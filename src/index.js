@@ -51,6 +51,7 @@ app.use('/api/analytics', express.json(), require('./routes/analytics'));
 app.use('/api/superadmin', express.json(), require('./routes/superadmin'));
 app.use('/api/patient', require('./routes/patient')); // PDPA Right-to-Erasure
 app.use('/api/scribe', express.json(), require('./routes/scribe')); // Scribe Clinical Documentation
+app.use('/api/followup', express.json(), require('./routes/followup')); // Follow-up Enrollment & Management
 
 // Serve Scribe PWA
 const scribeBuildPath = path.join(__dirname, '../scribe/dist');

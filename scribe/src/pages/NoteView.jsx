@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, Check, Copy, Pencil, CheckCheck, Download, Share2, ChevronDown, ChevronUp, Sparkles } from 'lucide-react'
+import { ArrowLeft, Check, Copy, Pencil, CheckCheck, Download, Share2, ChevronDown, ChevronUp, Sparkles, Users } from 'lucide-react'
 import { api } from '../api/client'
 import { t } from '../i18n'
+import FollowupEnrollmentModal from '../components/FollowupEnrollmentModal'
 
 const SECTION_LABELS = {
     subjective: 'Subjective',
@@ -35,6 +36,8 @@ export default function NoteView() {
     const [loading, setLoading] = useState(true)
     const [showTranscript, setShowTranscript] = useState(false)
     const [copied, setCopied] = useState(false)
+    const [showFollowupModal, setShowFollowupModal] = useState(false)
+    const [justFinalized, setJustFinalized] = useState(false)
 
     useEffect(() => {
         loadNote()
@@ -60,8 +63,17 @@ export default function NoteView() {
         try {
             await api.finalizeNote(noteId)
             setNote(prev => ({ ...prev, is_final: true, updated_at: new Date().toISOString() }))
+            setJustFinalized(true)
+            // Show follow-up enrollment modal after finalizing
+            setTimeout(() => {
+                setShowFollowupModal(true)
+            }, 500)
         } catch (err) {
             setNote(prev => ({ ...prev, is_final: true, updated_at: new Date().toISOString() }))
+            setJustFinalized(true)
+            setTimeout(() => {
+                setShowFollowupModal(true)
+            }, 500)
         }
     }
 
@@ -447,5 +459,15 @@ export default function NoteView() {
                 </div>
             </div>
         </div>
+
+        {/* Follow-up Enrollment Modal */}
+        <AnimatePresence>
+            {showFollowupModal && session && (
+                <FollowupEnrollmentModal
+                    session={session}
+                    onClose={() => setShowFollowupModal(false)}
+                />
+            )}
+        </AnimatePresence>
     )
 }

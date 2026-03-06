@@ -1,6 +1,7 @@
 const cron = require('node-cron');
 const db = require('./services/db');
 const line = require('./services/line');
+const followupScheduler = require('./services/followupScheduler');
 // const { checkTrialStatus } = require('./handlers/trial'); // Module missing, disabling for MVP
 
 // H10 FIX: Retry logic for LINE API calls
@@ -122,6 +123,17 @@ const initScheduler = () => {
 
     // Enterprise: Post-Resolution Recheck (Every hour)
     cron.schedule('0 * * * *', processRechecks);
+
+    // FOLLOW-UP: Send scheduled messages (Every hour)
+    cron.schedule('0 * * * *', async () => {
+        try {
+            await followupScheduler.runFollowupScheduler();
+        } catch (err) {
+            console.error('[Scheduler] Follow-up scheduler error:', err);
+        }
+    }, {
+        timezone: "Asia/Bangkok"
+    });
 
     // PRODUCTIZATION: Daily Health Summary (9:00 AM)
     cron.schedule('0 9 * * *', async () => {
