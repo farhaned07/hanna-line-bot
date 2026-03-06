@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hanna System Walkthrough — การนำเสนอสำหรับนักลงทุน</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #050505;
+            --bg-secondary: #0A0A0A;
+            --text-primary: #E5E5E5;
+            --text-secondary: #888888;
+            --text-tertiary: #666666;
+            --border: #222222;
+            --accent: #0047FF;
+            --success: #22C55E;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Sarabun', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding-bottom: 4rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 4rem;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .header-subtitle {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .header-meta {
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            margin-top: 2rem;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 4rem;
+            padding-bottom: 4rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section-number {
+            font-family: 'Menlo', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-tertiary);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .section h2 {
+            font-size: 2rem;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+            margin-bottom: 2rem;
+            color: var(--text-primary);
+        }
+
+        .section h3 {
+            font-size: 1.25rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            margin-top: 2rem;
+            color: var(--text-primary);
+        }
+
+        .section p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 1.05rem;
+        }
+
+        .section ul,
+        .section ol {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .section ul li,
+        .section ol li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .section ul li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--text-tertiary);
+        }
+
+        .section ol {
+            counter-reset: list-counter;
+        }
+
+        .section ol li {
+            counter-increment: list-counter;
+        }
+
+        .section ol li::before {
+            content: counter(list-counter) ".";
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Executive Summary Box */
+        .exec-summary {
+            background: var(--bg-secondary);
+            padding: 2.5rem;
+            border: 1px solid var(--border);
+            margin-bottom: 4rem;
+        }
+
+        .exec-summary h2 {
+            margin-top: 0;
+            font-size: 1.75rem;
+        }
+
+        .highlight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .highlight-item span {
+            display: block;
+            font-family: 'Menlo', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-tertiary);
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight-item strong {
+            font-size: 1.125rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            font-size: 0.95rem;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 1.25rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            font-family: 'Menlo', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-tertiary);
+            font-weight: 400;
+        }
+
+        td {
+            color: var(--text-secondary);
+        }
+
+        td:first-child {
+            color: var(--text-primary);
+            font-weight: 500;
+            width: 30%;
+        }
+
+        /* Architecture Diagram */
+        .architecture-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            margin: 2rem 0;
+            font-family: 'Menlo', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+        }
+
+        .layer {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .layer:last-child {
+            margin-bottom: 0;
+        }
+
+        .layer-title {
+            font-family: 'Sarabun', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+
+        .layer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .layer-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .layer-item-name {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            font-weight: 500;
+            font-family: 'Sarabun', sans-serif;
+        }
+
+        .layer-item-desc {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            margin-top: 0.25rem;
+        }
+
+        /* Screenshot Box */
+        .screenshot-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .screenshot-box img {
+            width: 100%;
+            border: 1px solid var(--border);
+            margin-bottom: 1rem;
+        }
+
+        .screenshot-caption {
+            font-family: 'Sarabun', sans-serif;
+            font-size: 0.85rem;
+            color: var(--text-tertiary);
+            text-align: center;
+        }
+
+        /* Status Badges */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 2px;
+            font-family: 'Sarabun', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-right: 0.5rem;
+        }
+
+        .badge-critical {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .badge-success {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        /* Metric Cards */
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .metric-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .metric-label {
+            font-family: 'Sarabun', sans-serif;
+            font-size: 0.85rem;
+            color: var(--text-tertiary);
+            margin-top: 0.5rem;
+        }
+
+        /* Quote Box */
+        .quote-box {
+            border-left: 3px solid var(--accent);
+            padding-left: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .quote-box p {
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            font-style: italic;
+        }
+
+        /* Comparison Table */
+        .comparison-table td:nth-child(2) {
+            color: var(--text-tertiary);
+        }
+
+        .comparison-table td:nth-child(3) {
+            color: var(--success);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding-top: 4rem;
+            margin-top: 4rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer p {
+            font-size: 0.875rem;
+            color: var(--text-tertiary);
+        }
+
+        /* ----- PRINT OPTIMIZATION ----- */
+        @media print {
+            @page {
+                size: A4;
+                margin: 0;
+            }
+
+            body {
+                background-color: #050505 !important;
+                color: #E5E5E5 !important;
+                margin: 0;
+                width: 100%;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .container {
+                max-width: 100% !important;
+                width: 100% !important;
+                padding: 2.5cm !important;
+                margin: 0 !important;
+            }
+
+            .section {
+                border-color: #222 !important;
+                page-break-inside: auto;
+            }
+
+            h1,
+            h2,
+            h3,
+            h4,
+            .section-number {
+                break-after: avoid;
+                page-break-after: avoid;
+            }
+
+            p,
+            li {
+                orphans: 3;
+                widows: 3;
+            }
+
+            .exec-summary,
+            .architecture-box,
+            .screenshot-box,
+            .metric-card,
+            table,
+            .layer {
+                break-inside: avoid;
+                page-break-inside: avoid;
+                border: 1px solid #222 !important;
+                background-color: #0A0A0A !important;
+            }
+
+            .header {
+                break-inside: avoid;
+            }
+
+            .container {
+                background-color: #050505 !important;
+            }
+
+            .page-break {
+                page-break-after: always;
+                display: block;
+                height: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- Header -->
+        <header class="header">
+            <img src="/hanna-logo.png" alt="Hanna Logo"
+                style="height: 80px; margin-bottom: 2rem; filter: brightness(0.9);">
+            <h1>Hanna System Walkthrough</h1>
+            <p class="header-subtitle">เอกสารนำเสนอสำหรับนักลงทุน</p>
+            <div class="header-meta">ระบบประเมินความเสี่ยงทางการเงินสำหรับโรงพยาบาลระบบเหมาจ่าย</div>
+        </header>
+
+        <!-- Executive Summary -->
+        <div class="exec-summary">
+            <span class="section-number">บทสรุปผู้บริหาร</span>
+            <h2>โอกาสทางธุรกิจ</h2>
+            <p style="margin-top: 1rem;">
+                ระบบสาธารณสุขกำลังเผชิญกับข้อจำกัดสำคัญ: <strong>ช่องว่าง 90 วันระหว่างนัดพบแพทย์</strong>
+                ภายใต้ระบบเหมาจ่าย โรงพยาบาลต้องรับภาระค่าใช้จ่ายเมื่อผู้ป่วยเรื้อรังมีภาวะแทรกซ้อน
+                Hanna คือ <strong>ระบบประเมินความเสี่ยงทางการเงิน (Financial Risk Engine)</strong> —
+                ระบบอัจฉริยะที่ติดตามผู้ป่วยทุกวันผ่าน LINE
+                ตรวจจับอาการทรุดลงก่อนจะกลายเป็นภาวะแทรกซ้อนที่มีค่าใช้จ่ายสูง
+                เพื่อปกป้องโรงพยาบาลจากต้นทุนที่ป้องกันได้
+            </p>
+
+            <div class="highlight-grid">
+                <div class="highlight-item">
+                    <span>การปกป้องทางการเงิน</span>
+                    <strong>ลดต้นทุนภาวะแทรกซ้อน</strong>
+                </div>
+                <div class="highlight-item">
+                    <span>ช่องทางผู้ป่วย</span>
+                    <strong>LINE + เสียง</strong>
+                </div>
+                <div class="highlight-item">
+                    <span>โมเดลทางคลินิก</span>
+                    <strong>AI ภายใต้การกำกับดูแล</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. System Architecture -->
+        <section class="section">
+            <span class="section-number">01 / สถาปัตยกรรมระบบ</span>
+            <h2>โครงสร้าง 3 ชั้น</h2>
+
+            <div class="architecture-box">
+                <div class="layer">
+                    <div class="layer-title">ชั้นที่ 1 — ส่วนติดต่อผู้ใช้ (User Interfaces)</div>
+                    <div class="layer-content">
+                        <div class="layer-item">
+                            <div class="layer-item-name">LINE Chat Bot</div>
+                            <div class="layer-item-desc">เมนู Rich • AI ภาษาไทย</div>
+                        </div>
+                        <div class="layer-item">
+                            <div class="layer-item-name">Hanna Voice</div>
+                            <div class="layer-item-desc">โทรศัพท์ AI ภาษาไทย</div>
+                        </div>
+                        <div class="layer-item">
+                            <div class="layer-item-name">แดชบอร์ดพยาบาล</div>
+                            <div class="layer-item-desc">React SPA</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layer">
+                    <div class="layer-title">ชั้นที่ 2 — ระบบอัจฉริยะ (OneBrain™)</div>
+                    <div class="layer-content">
+                        <div class="layer-item">
+                            <div class="layer-item-name">ประเมินความเสี่ยง</div>
+                            <div class="layer-item-desc">คะแนน 0-10</div>
+                        </div>
+                        <div class="layer-item">
+                            <div class="layer-item-name">ตรวจจับเหตุผิดปกติ</div>
+                            <div class="layer-item-desc">ป้องกัน Alert Fatigue</div>
+                        </div>
+                        <div class="layer-item">
+                            <div class="layer-item-name">สร้างงาน (Tasks)</div>
+                            <div class="layer-item-desc">คิวจัดลำดับความสำคัญ</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layer">
+                    <div class="layer-title">ชั้นที่ 3 — ฐานข้อมูล (Data)</div>
+                    <div class="layer-content">
+                        <div class="layer-item" style="grid-column: 1 / -1;">
+                            <div class="layer-item-name">Supabase PostgreSQL</div>
+                            <div class="layer-item-desc">เข้ารหัส • รองรับ PDPA • บันทึก Audit Trail ครบถ้วน</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Patient Interface -->
+        <section class="section">
+            <span class="section-number">02 / ส่วนติดต่อผู้ป่วย</span>
+            <h2>LINE Bot — ผู้ใช้งานกว่า 50 ล้านคนในไทย</h2>
+
+            <p>ผู้ป่วยโต้ตอบกับ Hanna ผ่าน LINE — แพลตฟอร์มที่คนไทยใช้มากที่สุด ไม่ต้องดาวน์โหลดแอปเพิ่ม
+                รองรับ AI ภาษาไทยสำหรับทั้งข้อความและเสียง</p>
+
+            <h3>1. การเริ่มต้นใช้งาน (Onboarding) — ไร้แรงเสียดทาน</h3>
+            <p><strong>เป้าหมาย:</strong> เปิดใช้งานผู้ป่วยภายใน < 30 วินาที โดยไม่ต้องติดตั้งแอปใหม่</p>
+
+                    <div class="architecture-box" style="font-family: 'Sarabun', sans-serif;">
+                        <!-- Step 1 -->
+                        <div
+                            style="margin-bottom: 1.5rem; text-align: center; border-bottom: 1px dashed var(--border); padding-bottom: 1rem;">
+                            <span
+                                style="background: var(--bg-primary); padding: 0.2rem 0.8rem; border-radius: 4px; border: 1px solid var(--border); font-size: 0.75rem; color: var(--text-tertiary);">ขั้นตอนที่
+                                1: ที่โรงพยาบาล</span>
+                            <div style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">
+                                พยาบาลแสดง <strong>QR Code</strong> ให้ผู้ป่วยสแกน
+                            </div>
+                        </div>
+
+                        <!-- Step 2 -->
+                        <div style="margin-bottom: 1.5rem; text-align: center;">
+                            <div style="font-size: 0.8rem; color: var(--success); margin-bottom: 0.5rem;">📸 ผู้ป่วยสแกน
+                                QR</div>
+                            <div
+                                style="background: rgba(34, 197, 94, 0.1); color: var(--success); padding: 0.5rem; border-radius: 4px; display: inline-block; font-size: 0.8rem;">
+                                กำลังยืนยัน HN และเบอร์โทรศัพท์...
+                            </div>
+                        </div>
+
+                        <!-- Step 3 -->
+                        <div>
+                            <div style="color: var(--accent); font-size: 0.85rem; margin-bottom: 0.5rem;">🤖 HANNA
+                                (ตอบกลับทันที)</div>
+                            <div
+                                style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; margin-left: 0; font-size: 1.05rem;">
+                                <strong>สวัสดีค่ะ คุณสมชาย!</strong> 💚<br><br>
+                                หนูชื่อ Hanna เป็นผู้ช่วยพยาบาลส่วนตัวจากโรงพยาบาลไทยนครินทร์
+                                หนูจะคอยดูแลคุณลุงทุกวันนะคะ<br><br>
+                                กดปุ่ม "เช็คอินสุขภาพ" เพื่อเริ่มการใช้งานได้เลยค่ะ!
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3>2. การโต้ตอบประจำวัน (เมนู Rich)</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ปุ่ม</th>
+                                <th>ฟังก์ชัน</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>🎙️ โทรหา Hanna</td>
+                                <td>โทรศัพท์พูดคุยกับผู้ช่วย AI พยาบาล (ภาษาไทยธรรมชาติ)</td>
+                            </tr>
+                            <tr>
+                                <td>❤️ เช็คอินสุขภาพ</td>
+                                <td>การเช็คอินสุขภาพประจำวัน</td>
+                            </tr>
+                            <tr>
+                                <td>📊 บันทึกค่าสุขภาพ</td>
+                                <td>บันทึกความดันโลหิต, ระดับน้ำตาล</td>
+                            </tr>
+                            <tr>
+                                <td>💊 บันทึกการทานยา</td>
+                                <td>ติดตามการทานยา</td>
+                            </tr>
+                            <tr>
+                                <td>👤 โปรไฟล์</td>
+                                <td>ดูสรุปข้อมูลและประวัติผู้ป่วย</td>
+                            </tr>
+                            <tr>
+                                <td>ℹ️ ช่วยเหลือ</td>
+                                <td>ศูนย์ช่วยเหลือและคำสั่ง</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>3. ขั้นตอนการเช็คอินประจำวัน (ตัวอย่างบทสนทนา)</h3>
+                    <div class="architecture-box" style="font-family: 'Sarabun', sans-serif;">
+                        <div style="margin-bottom: 1.5rem;">
+                            <div style="color: var(--accent); font-size: 0.85rem; margin-bottom: 0.5rem;">🤖 HANNA
+                                (10:00 น.)
+                            </div>
+                            <div
+                                style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; margin-left: 0; font-size: 1.05rem;">
+                                สวัสดีค่ะ คุณสมชาย วันนี้รู้สึกเป็นอย่างไรบ้างคะ? 💚
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 1.5rem;">
+                            <div
+                                style="color: var(--success); font-size: 0.85rem; margin-bottom: 0.5rem; text-align: right;">
+                                👤
+                                ผู้ป่วย</div>
+                            <div
+                                style="background: rgba(34, 197, 94, 0.15); padding: 1rem; border-radius: 8px; margin-left: 20%; font-size: 1.05rem;">
+                                ดีครับ แต่ปวดหัวเล็กน้อย
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 1.5rem;">
+                            <div style="color: var(--accent); font-size: 0.85rem; margin-bottom: 0.5rem;">🤖 HANNA</div>
+                            <div
+                                style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; margin-left: 0; font-size: 1.05rem;">
+                                เข้าใจค่ะ ปวดหัวเล็กน้อย วันนี้ทานยาตอนเช้าแล้วหรือยังคะ?
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 1.5rem;">
+                            <div
+                                style="color: var(--success); font-size: 0.85rem; margin-bottom: 0.5rem; text-align: right;">
+                                👤
+                                ผู้ป่วย</div>
+                            <div
+                                style="background: rgba(34, 197, 94, 0.15); padding: 1rem; border-radius: 8px; margin-left: 20%; font-size: 1.05rem;">
+                                ทานแล้วครับ
+                            </div>
+                        </div>
+                        <div>
+                            <div style="color: var(--accent); font-size: 0.85rem; margin-bottom: 0.5rem;">🤖 HANNA</div>
+                            <div
+                                style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; margin-left: 0; font-size: 1.05rem;">
+                                ดีมากค่ะ! 👍 Hanna บันทึกข้อมูลให้เรียบร้อยแล้ว หากมีอาการผิดปกติ สามารถแจ้ง Hanna
+                                ได้ตลอดนะคะ
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3>4. การตรวจจับเหตุฉุกเฉินและเสียง (Emergency & Voice)</h3>
+                    <div class="quote-box">
+                        <p>"เจ็บหน้าอกมาก หายใจไม่ออก"</p>
+                    </div>
+                    <div class="architecture-box" style="font-family: 'Sarabun', sans-serif;">
+                        <div>
+                            <div style="color: var(--danger); font-size: 0.85rem; margin-bottom: 0.5rem;">🚨 HANNA
+                                (โหมดฉุกเฉิน)
+                            </div>
+                            <div
+                                style="background: rgba(239, 68, 68, 0.15); padding: 1rem; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.3); font-size: 1.05rem;">
+                                <strong style="color: var(--danger);">⚠️ อาการฉุกเฉิน!</strong><br><br>
+                                กรุณาโทร <strong>1669</strong> ทันทีค่ะ<br><br>
+                                Hanna ได้แจ้งเตือนพยาบาลเรียบร้อยแล้ว ทีมจะติดต่อกลับโดยเร็วที่สุด
+                            </div>
+                        </div>
+                    </div>
+                    <p>เมื่อตรวจพบคำสำคัญฉุกเฉิน (เจ็บหน้าอก, หายใจไม่ออก, อาการรุนแรง) Hanna จะดำเนินการทันที:</p>
+                    <ul>
+                        <li>แนะนำให้ผู้ป่วยโทร 1669</li>
+                        <li>สร้าง <strong>งานด่วนที่สุด (Critical Priority)</strong> แจ้งพยาบาล</li>
+                        <li>ส่งการแจ้งเตือนผ่าน LINE ให้เจ้าหน้าที่เวร</li>
+                    </ul>
+
+                    <p style="margin-top: 1.5rem;"><strong>ระบบสนทนาด้วยเสียง (Voice Call Interface):</strong>
+                        ผู้ป่วยสามารถพูดภาษาไทยได้ตามธรรมชาติ AI เสียงของ Hanna เข้าใจสำเนียงต่างๆ ทวนความเข้าใจ
+                        และทำงานตลอด 24 ชั่วโมง</p>
+
+                    <div class="highlight-grid">
+                        <div class="highlight-item">
+                            <span>ระยะเวลาตอบกลับ</span>
+                            <strong>
+                                < 2 วินาที</strong>
+                        </div>
+                        <div class="highlight-item">
+                            <span>ภาษา</span>
+                            <strong>ไทย + เสียง</strong>
+                        </div>
+                        <div class="highlight-item">
+                            <span>ความพร้อมใช้งาน</span>
+                            <strong>24/7</strong>
+                        </div>
+                    </div>
+        </section>
+
+        <!-- 3. Nurse Dashboard -->
+        <section class="section">
+            <span class="section-number">03 / แดชบอร์ดพยาบาล</span>
+            <h2>ศูนย์บัญชาการสำหรับทีมคลินิก</h2>
+
+            <p>แดชบอร์ดเปลี่ยนข้อมูลผู้ป่วยที่กระจัดกระจายให้เป็นคิวงานที่จัดลำดับความสำคัญอย่างชัดเจน
+                พยาบาลเห็นเฉพาะผู้ป่วยที่ต้องการความสนใจ — ไม่ใช่ทุกคน</p>
+
+            <h3>3.1 หน้าเข้าสู่ระบบ</h3>
+            <div class="screenshot-box">
+                <img src="hanna_dashboard_login_page_1769044785476.png" alt="Hanna Dashboard Login">
+                <div class="screenshot-caption">ยืนยันตัวตนด้วย Token • ระบบรักษาความปลอดภัยระดับองค์กร</div>
+            </div>
+
+            <h3>3.2 Mission Control</h3>
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <div class="metric-value">13</div>
+                    <div class="metric-label">ผู้ป่วยที่ดูแล</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">9</div>
+                    <div class="metric-label">งานรอดำเนินการ</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">8</div>
+                    <div class="metric-label">เช็คอินวันนี้</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">1:1</div>
+                    <div class="metric-label">อัตราส่วนความสามารถ</div>
+                </div>
+            </div>
+
+            <div class="screenshot-box">
+                <img src="hanna_mission_control_page_1769045654542.png" alt="Mission Control Dashboard">
+                <div class="screenshot-caption">การรับรู้สถานการณ์แบบเรียลไทม์สำหรับทีมพยาบาล</div>
+            </div>
+
+            <h3>3.3 กริดติดตามผู้ป่วย</h3>
+            <p>แสดงผู้ป่วยทั้งหมดแบบภาพพร้อมสถานะความเสี่ยงที่แบ่งตามสี:</p>
+
+            <p style="margin-bottom: 1rem;">
+                <span class="badge badge-critical">วิกฤต: 3 ราย</span>
+                <span class="badge badge-warning">เฝ้าระวัง: 11 ราย</span>
+                <span class="badge badge-success">ปกติ: 0 ราย</span>
+            </p>
+
+            <div class="screenshot-box">
+                <img src="hanna_monitoring_view_page_1769045729414.png" alt="Patient Monitoring Grid">
+                <div class="screenshot-caption">สถานะผู้ป่วยแบ่งตามสีเพื่อการติดตามอย่างรวดเร็ว</div>
+            </div>
+
+            <h3>3.4 ทะเบียนผู้ป่วย</h3>
+            <div class="screenshot-box">
+                <img src="hanna_patients_list_page_1769045798246.png" alt="Patient Registry">
+                <div class="screenshot-caption">ฐานข้อมูลผู้ป่วยที่ค้นหาได้พร้อมการกรองตามสถานะ</div>
+            </div>
+
+            <h3>3.5 หน้าข้อมูลผู้ป่วยแบบละเอียด</h3>
+            <div class="screenshot-box">
+                <img src="hanna_patient_detail_page_1769045892365.png" alt="Patient Detail View">
+                <div class="screenshot-caption">ข้อมูลเชิงลึก: แนวโน้มค่าสุขภาพ, การเช็คอิน, การดำเนินการทางคลินิก</div>
+            </div>
+
+            <h3>3.6 สร้างรายงาน PDF</h3>
+            <div class="screenshot-box">
+                <img src="hanna_report_generation_modal_1769046041137.png" alt="PDF Generation Modal">
+                <div class="screenshot-caption">สรุป PDF ระดับคลินิก • ไทย/อังกฤษ • 7/15/30 วัน</div>
+            </div>
+        </section>
+
+        <!-- 4. Intelligence Layer -->
+        <section class="section">
+            <span class="section-number">04 / ระบบอัจฉริยะ</span>
+            <h2>การประเมินความเสี่ยง OneBrain™</h2>
+
+            <p>อัลกอริทึมที่โปร่งใสและกำหนดได้ชัดเจน — ไม่ใช่กล่องดำ ทุกคะแนนสามารถอธิบายที่มาได้</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ปัจจัย</th>
+                        <th>คะแนน</th>
+                        <th>เงื่อนไข</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>🚨 คำสำคัญฉุกเฉิน</td>
+                        <td>+10</td>
+                        <td>เจ็บหน้าอก, หายใจลำบาก</td>
+                    </tr>
+                    <tr>
+                        <td>⚠️ ค่าสุขภาพอันตราย</td>
+                        <td>+2</td>
+                        <td>ความดัน >180/110, น้ำตาล >400 หรือ <70< /td>
+                    </tr>
+                    <tr>
+                        <td>💊 ลืมทานยา</td>
+                        <td>+2</td>
+                        <td>>3 วันติดต่อกัน</td>
+                    </tr>
+                    <tr>
+                        <td>📉 แนวโน้มแย่ลง</td>
+                        <td>+1</td>
+                        <td>3+ วันแนวโน้มแย่ลง</td>
+                    </tr>
+                    <tr>
+                        <td>🔇 ไม่ตอบกลับ</td>
+                        <td>+1</td>
+                        <td>>48 ชั่วโมงไม่ติดต่อ</td>
+                    </tr>
+                    <tr>
+                        <td>👴 ตัวปรับตามอายุ</td>
+                        <td>×1.2</td>
+                        <td>ถ้าผู้ป่วยอายุ > 70 ปี</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>ระดับความเสี่ยง</h3>
+            <p style="margin-bottom: 1rem;">
+                <span class="badge badge-success">0-4: ติดตามปกติ</span>
+                <span class="badge badge-warning">5-7: สร้างงานให้พยาบาล</span>
+                <span class="badge badge-critical">8-10: ต้องดูแลทันที</span>
+            </p>
+
+            <div class="quote-box">
+                <p>"Hanna ช่วยเหลือ พยาบาลตัดสินใจ"</p>
+            </div>
+            <p>การตัดสินใจทางคลินิกทุกครั้งต้องได้รับอนุมัติจากมนุษย์ AI แสดงกรณีที่ต้องสนใจ; พยาบาลดำเนินการ</p>
+        </section>
+
+        <!-- 5. Scalability -->
+        <section class="section">
+            <span class="section-number">05 / ความสามารถในการขยายตัว</span>
+            <h2>ตัวคูณความสามารถ 10 เท่า</h2>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>ตัวชี้วัด</th>
+                        <th>โมเดลดั้งเดิม</th>
+                        <th>ใช้ Hanna</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>อัตราส่วน ผู้ป่วย : พยาบาล</td>
+                        <td>1 : 20</td>
+                        <td>1 : 200+</td>
+                    </tr>
+                    <tr>
+                        <td>การตรวจสอบข้อมูล</td>
+                        <td>ดูเองทุกคน</td>
+                        <td>เฉพาะกรณีผิดปกติ</td>
+                    </tr>
+                    <tr>
+                        <td>การจัดการ Alert</td>
+                        <td>Alert Fatigue</td>
+                        <td>คิวจัดลำดับ</td>
+                    </tr>
+                    <tr>
+                        <td>โมเดลการดูแล</td>
+                        <td>ตอบสนอง (Reactive)</td>
+                        <td>เชิงรุก (Proactive)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="highlight-grid">
+                <div class="highlight-item">
+                    <span>ความปลอดภัยข้อมูล</span>
+                    <strong>รองรับ PDPA</strong>
+                </div>
+                <div class="highlight-item">
+                    <span>การเข้ารหัส</span>
+                    <strong>End-to-End</strong>
+                </div>
+                <div class="highlight-item">
+                    <span>บันทึกการใช้งาน</span>
+                    <strong>Audit Trail ครบถ้วน</strong>
+                </div>
+                <div class="highlight-item">
+                    <span>การตรวจสอบ AI</span>
+                    <strong>มีมนุษย์กำกับ</strong>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p style="margin-bottom: 0.5rem;">Hanna เป็นผลิตภัณฑ์ของ บริษัท อาร์คแองเจิล จำกัด (Archangel Co., Ltd.)</p>
+            <p>เอกสารสร้างเมื่อ: มกราคม 2026 | Hanna OS v2.1</p>
+        </footer>
+
+    </div>
+
+</body>
+
+</html>
