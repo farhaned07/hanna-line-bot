@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@heroui/react": "^2.8.9",
+    "@stripe/stripe-js": "^5.6.0",
     "@tiptap/extension-placeholder": "^3.20.0",
     "@tiptap/react": "^3.20.0",
     "@tiptap/starter-kit": "^3.20.0",

@@ -1,22 +1,52 @@
 import { motion } from 'framer-motion'
 import { X, Check, Zap, Users, Crown } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { api } from '../api/client'
 
 export default function UpgradeModal({ onClose }) {
     const [loading, setLoading] = useState(false)
+    const [stripe, setStripe] = useState(null)
+    const [clientSecret, setClientSecret] = useState('')
+
+    useEffect(() => {
+        // Load Stripe.js
+        const loadStripe = async () => {
+            const stripeLib = await import('@stripe/stripe-js')
+            const stripeInstance = await stripeLib.loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx')
+            setStripe(stripeInstance)
+        }
+        loadStripe()
+    }, [])
 
     const handleUpgrade = async (planType) => {
         try {
             setLoading(planType)
+            
+            // Create checkout session
             const res = await api.createCheckoutSession({
                 success_url: window.location.href,
                 cancel_url: window.location.href,
                 planType: planType
             })
-            window.location.href = res.url
+            
+            if (res.clientSecret && stripe) {
+                // Use embedded checkout
+                const { error } = await stripe.redirectToCheckout({
+                    sessionId: res.clientSecret.split('_secret_')[0]
+                })
+                
+                if (error) {
+                    console.error('Stripe redirect error:', error)
+                    // Fallback to redirect mode
+                    window.location.href = res.url
+                }
+            } else {
+                // Fallback to redirect mode
+                window.location.href = res.url
+            }
         } catch (err) {
             console.error('Failed to create checkout session:', err)
+            // Fallback to LINE
             window.open('https://line.me/R/ti/p/@hannacare', '_blank')
         } finally {
             setLoading(false)
