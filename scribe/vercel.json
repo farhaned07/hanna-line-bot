@@ -1,12 +1,17 @@
 {
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": "vite",
   "rewrites": [
     {
       "source": "/api/scribe/:path*",
       "destination": "https://hanna-line-bot-production.up.railway.app/api/scribe/:path*"
     },
     {
-      "source": "/scribe/app/(.*)",
-      "destination": "/scribe/app/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
   "headers": [
