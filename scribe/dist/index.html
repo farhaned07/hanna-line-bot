@@ -5,19 +5,41 @@
   <meta charset="UTF-8" />
   <meta name="viewport"
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta name="theme-color" content="#ffffff" />
+  <meta name="theme-color" content="#FAFAFA" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0F0F1A" media="(prefers-color-scheme: dark)" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Hanna Scribe" />
-  <meta name="description" content="Intelligent clinical documentation — voice to structured notes in seconds" />
+  <meta name="description" content="Voice-first clinical documentation — Generate SOAP notes from patient conversations in seconds" />
+  <meta name="keywords" content="clinical documentation, SOAP notes, healthcare AI, medical transcription, Thailand" />
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/scribe/manifest.json" />
+  
+  <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="/scribe/favicon.svg" />
-  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
-  <title>Hanna Scribe</title>
-  <script type="module" crossorigin src="/scribe/assets/index-CGw6EuRp.js"></script>
-  <link rel="stylesheet" crossorigin href="/scribe/assets/index-BGtdk-ri.css">
-<link rel="manifest" href="/scribe/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/scribe/registerSW.js"></script></head>
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192.png" />
+  
+  <!-- Preconnect to API -->
+  <link rel="preconnect" href="/api" />
+  
+  <title>Hanna Scribe — Clinical Documentation</title>
+  <script type="module" crossorigin src="/scribe/assets/index-C3qYLIbx.js"></script>
+  <link rel="modulepreload" crossorigin href="/scribe/assets/react-vendor-BGHYeCi2.js">
+  <link rel="modulepreload" crossorigin href="/scribe/assets/ui-vendor-C2Ccslqu.js">
+  <link rel="modulepreload" crossorigin href="/scribe/assets/editor-vendor-BV70oX1Y.js">
+  <link rel="stylesheet" crossorigin href="/scribe/assets/index-De72-hyA.css">
+<script id="vite-plugin-pwa:register-sw" src="/scribe/registerSW.js"></script></head>
 
 <body>
+  <noscript>
+    <div style="padding: 40px; text-align: center; font-family: system-ui; max-width: 500px; margin: 0 auto;">
+      <h1 style="color: #111827; margin-bottom: 16px;">Hanna Scribe requires JavaScript</h1>
+      <p style="color: #6B7280; line-height: 1.6;">
+        Please enable JavaScript in your browser settings to use Hanna Scribe's clinical documentation features.
+      </p>
+    </div>
+  </noscript>
   <div id="root"></div>
 </body>
 

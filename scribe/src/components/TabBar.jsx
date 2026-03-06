@@ -15,7 +15,7 @@ export default function TabBar() {
     if (hiddenPaths.some(p => location.pathname.startsWith(p))) return null
 
     return (
-        <nav className="tab-bar">
+        <nav className="tab-bar" role="navigation" aria-label="Main navigation">
             {tabs.map(({ path, icon: Icon, label }) => {
                 const isActive = path === '/'
                     ? location.pathname === '/'
@@ -26,11 +26,13 @@ export default function TabBar() {
                         to={path}
                         className={`tab-item ${isActive ? 'active' : ''}`}
                         aria-label={label}
+                        aria-current={isActive ? 'page' : undefined}
                     >
                         <Icon
-                            size={22}
-                            strokeWidth={isActive ? 2 : 1.5}
+                            size={24}
+                            strokeWidth={isActive ? 2.5 : 2}
                             style={{ color: isActive ? 'var(--color-accent)' : 'var(--color-ink3)' }}
+                            aria-hidden="true"
                         />
                         <span className="tab-label">{label}</span>
                     </NavLink>

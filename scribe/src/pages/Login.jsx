@@ -1,8 +1,9 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../hooks/useAuth'
 import { t, getLocale, setLocale } from '../i18n'
+import PDPAConsentModal from '../components/PDPAConsentModal'
 
 export default function Login() {
     const [isRegister, setIsRegister] = useState(false)
@@ -11,8 +12,16 @@ export default function Login() {
     const [error, setError] = useState(null)
     const [shake, setShake] = useState(false)
     const [lang, setLang] = useState(getLocale())
+    const [showPDPA, setShowPDPA] = useState(false)
     const navigate = useNavigate()
     const { login, register, loading } = useAuth()
+
+    useEffect(() => {
+        const consent = localStorage.getItem('scribe_pdpa_consent')
+        if (!consent) {
+            setShowPDPA(true)
+        }
+    }, [])
 
     const toggleLang = () => {
         const next = lang === 'en' ? 'th' : 'en'
@@ -23,6 +32,13 @@ export default function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault()
         setError(null)
+
+        // Check PDPA consent
+        const consent = localStorage.getItem('scribe_pdpa_consent')
+        if (!consent) {
+            setShowPDPA(true)
+            return
+        }
 
         try {
             if (isRegister) {
@@ -240,6 +256,16 @@ export default function Login() {
             >
                 Secured with end-to-end encryption
             </motion.p>
+
+            {/* PDPA Consent Modal */}
+            <PDPAConsentModal
+                isOpen={showPDPA}
+                onAccept={() => setShowPDPA(false)}
+                onDecline={() => {
+                    setShowPDPA(false)
+                    setError('You must accept the privacy policy to continue')
+                }}
+            />
 
             <style>{`
                 @keyframes login-breathe {

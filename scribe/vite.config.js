@@ -10,24 +10,13 @@ export default defineConfig({
         tailwindcss(),
         VitePWA({
             registerType: 'autoUpdate',
-            includeAssets: ['favicon.svg', 'icons/*.png'],
-            manifest: {
-                name: 'Hanna Scribe',
-                short_name: 'Scribe',
-                description: 'Intelligent clinical documentation',
-                theme_color: '#ffffff',
-                background_color: '#ffffff',
-                display: 'standalone',
-                orientation: 'portrait',
-                start_url: '/scribe/',
-                icons: [
-                    { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
-                    { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
-                    { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }
-                ]
-            },
+            includeAssets: ['favicon.svg', 'icons/*.png', 'manifest.json'],
+            useCredentials: true,
+            manifest: false, // Use the static manifest.json in public folder
             workbox: {
-                globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+                globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,json}'],
+                navigateFallback: '/scribe/index.html',
+                navigateFallbackDenylist: [/^\/api\//],
                 runtimeCaching: [
                     {
                         urlPattern: /^https:\/\/fonts\.googleapis\.com/,
@@ -41,17 +30,43 @@ export default defineConfig({
                             cacheName: 'google-fonts-webfonts',
                             expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 }
                         }
+                    },
+                    {
+                        urlPattern: /^\/api\//,
+                        handler: 'NetworkFirst',
+                        options: {
+                            cacheName: 'api-cache',
+                            expiration: { maxEntries: 50, maxAgeSeconds: 60 * 5 },
+                            cacheableResponse: { statuses: [0, 200] }
+                        }
                     }
                 ],
-                // Force update on every load
                 cleanupOutdatedCaches: true,
                 skipWaiting: true,
                 clientsClaim: true
+            },
+            devOptions: {
+                enabled: false,
+                type: 'module'
             }
         })
     ],
+    build: {
+        target: 'esnext',
+        minify: 'esbuild',
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+                    'ui-vendor': ['framer-motion', 'lucide-react'],
+                    'editor-vendor': ['@tiptap/react', '@tiptap/starter-kit', '@tiptap/extension-placeholder']
+                }
+            }
+        }
+    },
     server: {
         port: 5174,
+        host: true,
         proxy: {
             '/api': {
                 target: 'http://localhost:3000',

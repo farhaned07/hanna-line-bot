@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366F1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8B5CF6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="512" height="512" rx="102" fill="url(#grad)"/>
+  
+  <!-- Phone outline -->
+  <rect x="156" y="80" width="200" height="352" rx="24" fill="white" opacity="0.15"/>
+  <rect x="164" y="88" width="184" height="336" rx="16" fill="white" opacity="0.2"/>
+  
+  <!-- Screen -->
+  <rect x="172" y="110" width="168" height="290" rx="8" fill="white"/>
+  
+  <!-- Mic icon -->
+  <circle cx="256" cy="230" r="50" fill="#6366F1" opacity="0.9"/>
+  <rect x="244" y="205" width="24" height="36" rx="12" fill="white"/>
+  <rect x="250" y="245" width="12" height="20" rx="4" fill="white"/>
+  
+  <!-- Sound waves -->
+  <path d="M200 230 Q190 230 190 230" stroke="white" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+  <path d="M215 215 Q200 215 200 230" stroke="white" stroke-width="4" stroke-linecap="round" opacity="0.5"/>
+  <path d="M312 230 Q322 230 322 230" stroke="white" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+  <path d="M297 215 Q312 215 312 230" stroke="white" stroke-width="4" stroke-linecap="round" opacity="0.5"/>
+  
+  <!-- Text lines -->
+  <rect x="190" y="280" width="132" height="8" rx="4" fill="#E5E7EB"/>
+  <rect x="190" y="294" width="100" height="8" rx="4" fill="#F3F4F6"/>
+  <rect x="190" y="308" width="120" height="8" rx="4" fill="#F3F4F6"/>
+  <rect x="190" y="322" width="90" height="8" rx="4" fill="#E5E7EB"/>
+  
+  <!-- Home indicator -->
+  <rect x="236" y="410" width="40" height="4" rx="2" fill="white" opacity="0.5"/>
+</svg>

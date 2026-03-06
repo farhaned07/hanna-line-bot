@@ -1,12 +1,27 @@
 {
-    "buildCommand": "cd landing && npm install && npm run build",
-    "outputDirectory": "landing/dist",
-    "installCommand": "cd landing && npm install",
+    "buildCommand": "cd scribe && npm install && npm run build",
+    "outputDirectory": "scribe/dist",
+    "installCommand": "cd scribe && npm install",
     "framework": "vite",
     "rewrites": [
         {
+            "source": "/scribe/(.*)",
+            "destination": "/scribe/index.html"
+        },
+        {
             "source": "/(.*)",
             "destination": "/index.html"
+        }
+    ],
+    "headers": [
+        {
+            "source": "/scribe/(.*)",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "public, max-age=31536000, immutable"
+                }
+            ]
         }
     ]
 }

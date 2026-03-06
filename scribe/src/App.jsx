@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
+import { useState, useCallback } from 'react'
 import AuthGuard from './components/AuthGuard'
 import Login from './pages/Login'
 import Onboarding from './pages/Onboarding'
@@ -9,8 +10,22 @@ import NoteView from './pages/NoteView'
 import NoteEditor from './pages/NoteEditor'
 import Handover from './pages/Handover'
 import Settings from './pages/Settings'
+import SessionTimeoutWarning from './components/SessionTimeoutWarning'
+import { useAuth } from './hooks/useAuth'
 
 export default function App() {
+    const { logout } = useAuth()
+
+    const handleLogout = useCallback(() => {
+        logout()
+        window.location.href = '/scribe/login'
+    }, [logout])
+
+    const handleExtendSession = useCallback(() => {
+        // Session extended - user was active
+        console.log('Session extended')
+    }, [])
+
     return (
         <div className="min-h-dvh bg-bg">
             <Routes>
@@ -28,6 +43,12 @@ export default function App() {
                 <Route path="/settings" element={<AuthGuard><Settings /></AuthGuard>} />
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
+
+            {/* Session Timeout Warning (only on protected routes) */}
+            <SessionTimeoutWarning
+                onLogout={handleLogout}
+                onExtend={handleExtendSession}
+            />
         </div>
     )
 }
