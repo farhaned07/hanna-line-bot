@@ -1,14 +1,21 @@
 const { Pool } = require('pg');
 
 // ─── In-Memory MockDB for Demo Mode ───
+const crypto = require('crypto');
 const now = new Date();
 const hourAgo = new Date(now - 3600000);
 const twoHoursAgo = new Date(now - 7200000);
 const yesterday = new Date(now - 86400000);
 
+// Helper to hash PIN (must match the hashPin function in scribe.js)
+function hashPin(pin) {
+    return crypto.createHash('sha256').update(pin).digest('hex');
+}
+
 const MOCK_DATA = {
     clinicians: [
-        { id: 1, email: 'demo@hanna.care', display_name: 'Dr. Somchai', pin_hash: '', role: 'nurse', hospital_name: 'Demo Hospital', created_at: yesterday }
+        { id: 1, email: 'demo@hanna.care', display_name: 'Dr. Somchai', pin_hash: hashPin('123456'), role: 'nurse', hospital_name: 'Demo Hospital', created_at: yesterday },
+        { id: 2, email: 'test@hanna.care', display_name: 'Dr. Test User', pin_hash: hashPin('000000'), role: 'nurse', hospital_name: 'Test Hospital', created_at: yesterday }
     ],
     scribe_sessions: [
         { id: 1, clinician_id: 1, patient_name: 'คุณสมชาย ใจดี', patient_hn: '64-001234', template_type: 'soap', transcript: 'Patient Somchai presents with fever 38.5C for 2 days, headache, body aches. No cough or rhinorrhea. Vitals stable.', status: 'noted', audio_duration_seconds: 180, created_at: twoHoursAgo, updated_at: twoHoursAgo },

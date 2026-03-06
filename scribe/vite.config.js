@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
-    base: '/scribe/app/',
+    base: '/scribe/',
     plugins: [
         react(),
         tailwindcss(),

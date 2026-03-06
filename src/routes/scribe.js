@@ -58,6 +58,8 @@ router.post('/auth/register', async (req, res) => {
             return res.status(400).json({ error: 'Email, PIN, and display name are required' });
         }
 
+        console.log('[Scribe] Register attempt:', { email, displayName, role, hospitalName });
+
         const pinHash = hashPin(pin);
         const result = await db.query(
             `INSERT INTO clinicians (email, display_name, pin_hash, role, hospital_name)
@@ -72,6 +74,8 @@ router.post('/auth/register', async (req, res) => {
             JWT_SECRET,
             { expiresIn: '30d' }
         );
+
+        console.log('[Scribe] Registration successful:', user.email);
 
         res.json({
             token,
@@ -103,11 +107,15 @@ router.post('/auth/login', async (req, res) => {
         }
 
         const pinHash = hashPin(pin);
+        console.log('[Scribe] Login attempt:', { email, pinLength: pin.length });
+        
         const result = await db.query(
             `SELECT id, email, display_name, role, hospital_name, plan, notes_count_this_month
        FROM clinicians WHERE email = $1 AND pin_hash = $2`,
             [email, pinHash]
         );
+
+        console.log('[Scribe] Login query result:', { found: result.rows.length > 0 });
 
         if (result.rows.length === 0) {
             return res.status(401).json({ error: 'Invalid email or PIN' });
@@ -119,6 +127,8 @@ router.post('/auth/login', async (req, res) => {
             JWT_SECRET,
             { expiresIn: '30d' }
         );
+
+        console.log('[Scribe] Login successful:', user.email);
 
         res.json({
             token,
