@@ -18,7 +18,7 @@ export default function App() {
 
     const handleLogout = useCallback(() => {
         logout()
-        window.location.href = '/scribe/login'
+        window.location.href = '/login'
     }, [logout])
 
     const handleExtendSession = useCallback(() => {

@@ -32,7 +32,7 @@ export default class ErrorBoundary extends Component {
                     <button
                         onClick={() => {
                             this.setState({ hasError: false, error: null })
-                            window.location.href = '/scribe/app/'
+                            window.location.href = '/'
                         }}
                         style={{
                             padding: '14px 32px', borderRadius: 12,
