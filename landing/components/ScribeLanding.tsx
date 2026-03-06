@@ -42,7 +42,7 @@ const ScribeLanding: React.FC = () => {
                         </span>
                     </div>
                     <a
-                        href="https://scribe.hanna.care"
+                        href="https://hanna-line-bot-production.up.railway.app/scribe/"
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{
@@ -77,7 +77,7 @@ const ScribeLanding: React.FC = () => {
                         </p>
                         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
                             <a
-                                href="https://scribe.hanna.care"
+                                href="https://hanna-line-bot-production.up.railway.app/scribe/"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 style={{
@@ -386,7 +386,7 @@ const ScribeLanding: React.FC = () => {
                                     ))}
                                 </ul>
                                 <a
-                                    href="https://scribe.hanna.care"
+                                    href="https://hanna-line-bot-production.up.railway.app/scribe/"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     style={{
@@ -422,7 +422,7 @@ const ScribeLanding: React.FC = () => {
                         Your first 10 notes are free. No credit card. No installation. Works on your phone.
                     </p>
                     <a
-                        href="https://scribe.hanna.care"
+                        href="https://hanna-line-bot-production.up.railway.app/scribe/"
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{
