@@ -19,7 +19,7 @@ export default defineConfig({
                 background_color: '#ffffff',
                 display: 'standalone',
                 orientation: 'portrait',
-                start_url: '/scribe/app/',
+                start_url: '/scribe/',
                 icons: [
                     { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
                     { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
@@ -42,7 +42,11 @@ export default defineConfig({
                             expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 }
                         }
                     }
-                ]
+                ],
+                // Force update on every load
+                cleanupOutdatedCaches: true,
+                skipWaiting: true,
+                clientsClaim: true
             }
         })
     ],
