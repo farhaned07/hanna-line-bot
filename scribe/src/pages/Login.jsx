@@ -7,12 +7,10 @@ import { t, getLocale, setLocale } from '../i18n'
 export default function Login() {
     const [isRegister, setIsRegister] = useState(false)
     const [email, setEmail] = useState('')
-    const [pin, setPin] = useState(['', '', '', '', '', ''])
     const [displayName, setDisplayName] = useState('')
     const [error, setError] = useState(null)
     const [shake, setShake] = useState(false)
     const [lang, setLang] = useState(getLocale())
-    const pinRefs = useRef([])
     const navigate = useNavigate()
     const { login, register, loading } = useAuth()
 
@@ -22,38 +20,17 @@ export default function Login() {
         setLang(next)
     }
 
-    const handlePinChange = (index, value) => {
-        if (!/^\d*$/.test(value)) return
-        const newPin = [...pin]
-        newPin[index] = value.slice(-1)
-        setPin(newPin)
-        if (value && index < 5) {
-            pinRefs.current[index + 1]?.focus()
-        }
-    }
-
-    const handlePinKeyDown = (index, e) => {
-        if (e.key === 'Backspace' && !pin[index] && index > 0) {
-            pinRefs.current[index - 1]?.focus()
-        }
-    }
-
     const handleSubmit = async (e) => {
         e.preventDefault()
         setError(null)
-        const pinStr = pin.join('')
-        if (pinStr.length < 6) return
 
         try {
-            // Use simple token-based auth
-            const authToken = 'hanna2026'
-            
             if (isRegister) {
-                await register({ email, pin: authToken, displayName, token: authToken })
+                await register({ email, displayName })
                 localStorage.setItem('scribe_onboarded', 'true')
                 navigate('/', { replace: true })
             } else {
-                await login(email, authToken)
+                await login(email)
                 localStorage.setItem('scribe_onboarded', 'true')
                 navigate('/', { replace: true })
             }
@@ -64,8 +41,7 @@ export default function Login() {
         }
     }
 
-    const pinFilled = pin.filter(d => d !== '').length
-    const canSubmit = pin.join('').length >= 6
+    const canSubmit = email.includes('@') && (!isRegister || displayName)
 
     return (
         <div style={{
@@ -171,7 +147,7 @@ export default function Login() {
                 </AnimatePresence>
 
                 {/* Email */}
-                <div style={{ marginBottom: 14 }}>
+                <div style={{ marginBottom: 20 }}>
                     <label style={labelStyle}>{t('login.email')}</label>
                     <input
                         type="email"
@@ -182,71 +158,6 @@ export default function Login() {
                         autoComplete="email"
                         required
                     />
-                </div>
-
-                {/* PIN */}
-                <div style={{ marginBottom: 20 }}>
-                    <label style={labelStyle}>{t('login.pin')}</label>
-                    <motion.div
-                        animate={shake ? { x: [-10, 10, -8, 8, -4, 4, 0] } : {}}
-                        transition={{ duration: 0.5 }}
-                        style={{
-                            display: 'flex', gap: 8, justifyContent: 'center',
-                            marginTop: 4,
-                        }}
-                    >
-                        {pin.map((digit, i) => (
-                            <input
-                                key={i}
-                                ref={el => pinRefs.current[i] = el}
-                                type="password"
-                                inputMode="numeric"
-                                maxLength={1}
-                                value={digit}
-                                onChange={(e) => handlePinChange(i, e.target.value)}
-                                onKeyDown={(e) => handlePinKeyDown(i, e)}
-                                style={{
-                                    width: 44, height: 52,
-                                    textAlign: 'center',
-                                    fontSize: 20, fontWeight: 700,
-                                    borderRadius: 12,
-                                    border: `1.5px solid ${error ? 'rgba(239,68,68,0.4)' : digit ? 'rgba(99,102,241,0.4)' : '#F0F0F0'}`,
-                                    background: digit ? 'rgba(99,102,241,0.04)' : '#F3F4F6',
-                                    color: '#111827',
-                                    outline: 'none',
-                                    transition: 'all 0.2s ease',
-                                    boxShadow: digit ? '0 0 0 3px rgba(99,102,241,0.08)' : 'none',
-                                }}
-                                onFocus={(e) => {
-                                    e.target.style.borderColor = 'rgba(99,102,241,0.5)'
-                                    e.target.style.boxShadow = '0 0 0 3px rgba(99,102,241,0.1)'
-                                    e.target.style.background = '#fff'
-                                }}
-                                onBlur={(e) => {
-                                    if (!digit) {
-                                        e.target.style.borderColor = error ? 'rgba(239,68,68,0.4)' : '#F0F0F0'
-                                        e.target.style.boxShadow = 'none'
-                                        e.target.style.background = '#F3F4F6'
-                                    }
-                                }}
-                            />
-                        ))}
-                    </motion.div>
-
-                    {/* PIN progress dots */}
-                    <div style={{
-                        display: 'flex', justifyContent: 'center', gap: 5,
-                        marginTop: 10,
-                    }}>
-                        {[0, 1, 2, 3, 4, 5].map(i => (
-                            <div key={i} style={{
-                                width: 5, height: 5, borderRadius: 3,
-                                background: i < pinFilled ? '#6366F1' : '#F0F0F0',
-                                transition: 'all 0.2s ease',
-                                transform: i < pinFilled ? 'scale(1.3)' : 'scale(1)',
-                            }} />
-                        ))}
-                    </div>
                 </div>
 
                 {/* Error */}

@@ -57,31 +57,25 @@ function hashPin(pin) {
 }
 
 // ══════════════════════════════
-//  AUTH ROUTES
+//  AUTH ROUTES - EMAIL ONLY (Simplest)
 // ══════════════════════════════
 
-// POST /auth/login - Simple token-based authentication
+// POST /auth/login - Email only, no password/PIN
 router.post('/auth/login', async (req, res) => {
     try {
-        const { email, pin, token, access_token } = req.body;
+        const { email } = req.body;
         
-        console.log('[Scribe] Login attempt:', { email, pinLength: pin?.length, hasToken: !!token, hasAccessToken: !!access_token });
-        
-        // Simple token-based auth (primary method)
-        const validToken = token === 'hanna2026' || access_token === 'hanna2026' || pin === 'hanna2026';
-        
-        // Fallback to demo token
-        const isDemoToken = token === 'demo' || access_token === 'demo';
-        
-        if (!validToken && !isDemoToken) {
-            return res.status(401).json({ error: 'Invalid access token. Use: hanna2026' });
+        if (!email || !email.includes('@')) {
+            return res.status(400).json({ error: 'Valid email required' });
         }
 
-        // Create user session
+        console.log('[Scribe] Login attempt:', email);
+
+        // Create user session (auto-register if new)
         const user = {
             id: DEMO_USER_ID,
-            email: email || 'scribe@hanna.care',
-            display_name: 'Scribe User',
+            email: email,
+            display_name: email.split('@')[0],
             role: 'clinician',
             hospital_name: 'Hanna Hospital',
             plan: 'pro',
@@ -94,11 +88,10 @@ router.post('/auth/login', async (req, res) => {
             { expiresIn: '30d' }
         );
 
-        console.log('[Scribe] Login successful:', user.email);
+        console.log('[Scribe] Login successful:', email);
 
         res.json({
             token: jwtToken,
-            access_token: 'hanna2026',
             user
         });
     } catch (err) {
@@ -107,25 +100,21 @@ router.post('/auth/login', async (req, res) => {
     }
 });
 
-// POST /auth/register - Same as login (auto-register)
+// POST /auth/register - Same as login (email only)
 router.post('/auth/register', async (req, res) => {
     try {
-        const { email, pin, token, access_token, displayName } = req.body;
+        const { email, displayName } = req.body;
         
-        console.log('[Scribe] Register attempt:', { email, displayName });
-        
-        // Simple token-based auth
-        const validToken = token === 'hanna2026' || access_token === 'hanna2026' || pin === 'hanna2026';
-        const isDemoToken = token === 'demo' || access_token === 'demo';
-        
-        if (!validToken && !isDemoToken) {
-            return res.status(401).json({ error: 'Invalid access token. Use: hanna2026' });
+        if (!email || !email.includes('@')) {
+            return res.status(400).json({ error: 'Valid email required' });
         }
+
+        console.log('[Scribe] Register attempt:', email, displayName);
 
         const user = {
             id: DEMO_USER_ID,
-            email: email || 'scribe@hanna.care',
-            display_name: displayName || 'Scribe User',
+            email: email,
+            display_name: displayName || email.split('@')[0],
             role: 'clinician',
             hospital_name: 'Hanna Hospital',
             plan: 'pro',
@@ -138,11 +127,10 @@ router.post('/auth/register', async (req, res) => {
             { expiresIn: '30d' }
         );
 
-        console.log('[Scribe] Registration successful:', user.email);
+        console.log('[Scribe] Registration successful:', email);
 
         res.json({
             token: jwtToken,
-            access_token: 'hanna2026',
             user
         });
     } catch (err) {

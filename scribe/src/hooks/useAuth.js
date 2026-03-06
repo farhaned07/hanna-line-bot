@@ -9,11 +9,11 @@ export function useAuth() {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
 
-    const login = useCallback(async (email, pin) => {
+    const login = useCallback(async (email) => {
         setLoading(true)
         setError(null)
         try {
-            const res = await api.login({ email, pin })
+            const res = await api.login({ email })
             localStorage.setItem('scribe_token', res.token)
             localStorage.setItem('scribe_user', JSON.stringify(res.user))
             setUser(res.user)
