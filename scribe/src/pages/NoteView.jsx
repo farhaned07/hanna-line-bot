@@ -458,16 +458,14 @@ export default function NoteView() {
                     )}
                 </div>
             </div>
-        </div>
 
-        {/* Follow-up Enrollment Modal */}
-        <AnimatePresence>
+            {/* Follow-up Enrollment Modal */}
             {showFollowupModal && session && (
                 <FollowupEnrollmentModal
                     session={session}
                     onClose={() => setShowFollowupModal(false)}
                 />
             )}
-        </AnimatePresence>
+        </div>
     )
 }
