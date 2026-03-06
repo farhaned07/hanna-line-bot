@@ -3,12 +3,11 @@ const translations = {
         // Login
         'login.subtitle': 'Intelligent care partner',
         'login.email': 'Email',
-        'login.pin': 'PIN',
         'login.signIn': 'Sign In',
         'login.remember': 'Remember this device',
         'login.newUser': 'New here?',
         'login.createAccount': 'Create account',
-        'login.error': 'Invalid email or PIN',
+        'login.error': 'Sign in failed',
 
         // Home
         'home.greeting.morning': 'Good morning',
@@ -103,12 +102,11 @@ const translations = {
         // Login
         'login.subtitle': 'ผู้ช่วยดูแลอัจฉริยะ',
         'login.email': 'อีเมล',
-        'login.pin': 'รหัส PIN',
         'login.signIn': 'เข้าสู่ระบบ',
         'login.remember': 'จดจำอุปกรณ์นี้',
         'login.newUser': 'ยังไม่มีบัญชี?',
         'login.createAccount': 'ลงทะเบียน',
-        'login.error': 'อีเมลหรือ PIN ไม่ถูกต้อง',
+        'login.error': 'เข้าสู่ระบบไม่สำเร็จ',
 
         // Home
         'home.greeting.morning': 'สวัสดีตอนเช้า',
