@@ -45,25 +45,21 @@ export default function Login() {
         if (pinStr.length < 6) return
 
         try {
+            // Use simple token-based auth
+            const authToken = 'hanna2026'
+            
             if (isRegister) {
-                await register({ email, pin: pinStr, displayName })
-                // New users should see onboarding
-                navigate('/onboarding', { replace: true })
+                await register({ email, pin: authToken, displayName, token: authToken })
+                localStorage.setItem('scribe_onboarded', 'true')
+                navigate('/', { replace: true })
             } else {
-                await login(email, pinStr)
-                // Check if user has seen onboarding before
-                const hasSeenOnboarding = localStorage.getItem('scribe_onboarded') === 'true'
-                if (hasSeenOnboarding) {
-                    navigate('/', { replace: true })
-                } else {
-                    navigate('/onboarding', { replace: true })
-                }
+                await login(email, authToken)
+                localStorage.setItem('scribe_onboarded', 'true')
+                navigate('/', { replace: true })
             }
         } catch (err) {
             setError(err.message || t('login.error'))
             setShake(true)
-            setPin(['', '', '', '', '', ''])
-            pinRefs.current[0]?.focus()
             setTimeout(() => setShake(false), 600)
         }
     }

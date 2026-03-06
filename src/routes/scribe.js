@@ -18,11 +18,21 @@ const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 
 // ─── Auth Middleware ───
 const DEMO_USER_ID = '00000000-0000-0000-0000-000000000001';
 
+// Simple token-based auth for demo/production
+const DEMO_TOKENS = ['demo', 'hanna2026', 'scribe-access'];
+
 function authMiddleware(req, res, next) {
     const token = req.headers.authorization?.replace('Bearer ', '');
 
-    // Allow requests without tokens (Guest Mode Bypass) or with 'demo' tokens
-    if (!token || token === 'demo' || token === 'null') {
+    // Allow requests with demo tokens
+    if (token && DEMO_TOKENS.includes(token)) {
+        req.clinicianId = DEMO_USER_ID;
+        req.clinician = { id: DEMO_USER_ID, email: 'demo@hanna.care', displayName: 'Demo Doctor', plan: 'pro', notes_count_this_month: 0 };
+        return next();
+    }
+
+    // Allow requests without tokens (Guest Mode)
+    if (!token || token === 'null') {
         req.clinicianId = DEMO_USER_ID;
         req.clinician = { id: DEMO_USER_ID, email: 'demo@hanna.care', displayName: 'Demo Doctor', plan: 'pro', notes_count_this_month: 0 };
         return next();
@@ -34,10 +44,10 @@ function authMiddleware(req, res, next) {
         req.clinician = decoded;
         next();
     } catch (err) {
-        // Fallback to guest for demo purposes if invalid token
+        // Fallback to guest for demo purposes
         req.clinicianId = DEMO_USER_ID;
         req.clinician = { id: DEMO_USER_ID, email: 'demo@hanna.care', displayName: 'Demo Doctor', plan: 'pro', notes_count_this_month: 0 };
-        return next();
+        next();
     }
 }
 
@@ -50,79 +60,35 @@ function hashPin(pin) {
 //  AUTH ROUTES
 // ══════════════════════════════
 
-// POST /auth/register
-router.post('/auth/register', async (req, res) => {
-    try {
-        const { email, pin, displayName, role, hospitalName } = req.body;
-        if (!email || !pin || !displayName) {
-            return res.status(400).json({ error: 'Email, PIN, and display name are required' });
-        }
-
-        console.log('[Scribe] Register attempt:', { email, displayName, role, hospitalName });
-
-        const pinHash = hashPin(pin);
-        const result = await db.query(
-            `INSERT INTO clinicians (email, display_name, pin_hash, role, hospital_name)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING id, email, display_name, role, hospital_name, plan, notes_count_this_month, created_at`,
-            [email, displayName, pinHash, role || 'nurse', hospitalName || null]
-        );
-
-        const user = result.rows[0];
-        const token = jwt.sign(
-            { id: user.id, email: user.email, displayName: user.display_name },
-            JWT_SECRET,
-            { expiresIn: '30d' }
-        );
-
-        console.log('[Scribe] Registration successful:', user.email);
-
-        res.json({
-            token,
-            user: {
-                id: user.id,
-                email: user.email,
-                display_name: user.display_name,
-                role: user.role,
-                hospital_name: user.hospital_name,
-                plan: user.plan,
-                notes_count_this_month: user.notes_count_this_month
-            }
-        });
-    } catch (err) {
-        if (err.code === '23505') {
-            return res.status(409).json({ error: 'Email already registered' });
-        }
-        console.error('[Scribe] Registration error:', err);
-        res.status(500).json({ error: 'Registration failed' });
-    }
-});
-
-// POST /auth/login
+// POST /auth/login - Simple token-based authentication
 router.post('/auth/login', async (req, res) => {
     try {
-        const { email, pin } = req.body;
-        if (!email || !pin) {
-            return res.status(400).json({ error: 'Email and PIN are required' });
-        }
-
-        const pinHash = hashPin(pin);
-        console.log('[Scribe] Login attempt:', { email, pinLength: pin.length });
+        const { email, pin, token, access_token } = req.body;
         
-        const result = await db.query(
-            `SELECT id, email, display_name, role, hospital_name, plan, notes_count_this_month
-       FROM clinicians WHERE email = $1 AND pin_hash = $2`,
-            [email, pinHash]
-        );
-
-        console.log('[Scribe] Login query result:', { found: result.rows.length > 0 });
-
-        if (result.rows.length === 0) {
-            return res.status(401).json({ error: 'Invalid email or PIN' });
+        console.log('[Scribe] Login attempt:', { email, pinLength: pin?.length, hasToken: !!token, hasAccessToken: !!access_token });
+        
+        // Simple token-based auth (primary method)
+        const validToken = token === 'hanna2026' || access_token === 'hanna2026' || pin === 'hanna2026';
+        
+        // Fallback to demo token
+        const isDemoToken = token === 'demo' || access_token === 'demo';
+        
+        if (!validToken && !isDemoToken) {
+            return res.status(401).json({ error: 'Invalid access token. Use: hanna2026' });
         }
 
-        const user = result.rows[0];
-        const token = jwt.sign(
+        // Create user session
+        const user = {
+            id: DEMO_USER_ID,
+            email: email || 'scribe@hanna.care',
+            display_name: 'Scribe User',
+            role: 'clinician',
+            hospital_name: 'Hanna Hospital',
+            plan: 'pro',
+            notes_count_this_month: 0
+        };
+
+        const jwtToken = jwt.sign(
             { id: user.id, email: user.email, displayName: user.display_name },
             JWT_SECRET,
             { expiresIn: '30d' }
@@ -131,20 +97,57 @@ router.post('/auth/login', async (req, res) => {
         console.log('[Scribe] Login successful:', user.email);
 
         res.json({
-            token,
-            user: {
-                id: user.id,
-                email: user.email,
-                display_name: user.display_name,
-                role: user.role,
-                hospital_name: user.hospital_name,
-                plan: user.plan,
-                notes_count_this_month: user.notes_count_this_month
-            }
+            token: jwtToken,
+            access_token: 'hanna2026',
+            user
         });
     } catch (err) {
         console.error('[Scribe] Login error:', err);
         res.status(500).json({ error: 'Login failed' });
+    }
+});
+
+// POST /auth/register - Same as login (auto-register)
+router.post('/auth/register', async (req, res) => {
+    try {
+        const { email, pin, token, access_token, displayName } = req.body;
+        
+        console.log('[Scribe] Register attempt:', { email, displayName });
+        
+        // Simple token-based auth
+        const validToken = token === 'hanna2026' || access_token === 'hanna2026' || pin === 'hanna2026';
+        const isDemoToken = token === 'demo' || access_token === 'demo';
+        
+        if (!validToken && !isDemoToken) {
+            return res.status(401).json({ error: 'Invalid access token. Use: hanna2026' });
+        }
+
+        const user = {
+            id: DEMO_USER_ID,
+            email: email || 'scribe@hanna.care',
+            display_name: displayName || 'Scribe User',
+            role: 'clinician',
+            hospital_name: 'Hanna Hospital',
+            plan: 'pro',
+            notes_count_this_month: 0
+        };
+
+        const jwtToken = jwt.sign(
+            { id: user.id, email: user.email, displayName: user.display_name },
+            JWT_SECRET,
+            { expiresIn: '30d' }
+        );
+
+        console.log('[Scribe] Registration successful:', user.email);
+
+        res.json({
+            token: jwtToken,
+            access_token: 'hanna2026',
+            user
+        });
+    } catch (err) {
+        console.error('[Scribe] Register error:', err);
+        res.status(500).json({ error: 'Registration failed' });
     }
 });
 
