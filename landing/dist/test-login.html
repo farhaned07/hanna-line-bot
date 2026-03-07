@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Test</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #6366F1;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #4F46E5;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            font-size: 13px;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #DCFCE7;
+            border: 1px solid #16A34A;
+            color: #166534;
+        }
+        .error {
+            background: #FEE2E2;
+            border: 1px solid #DC2626;
+            color: #991B1B;
+        }
+    </style>
+</head>
+<body>
+    <h1>Login Test</h1>
+    <p>Testing API connection to Railway backend</p>
+    
+    <input type="email" id="email" placeholder="Email" value="demo@hanna.care" />
+    <input type="password" id="password" placeholder="Access Key (optional)" />
+    <button onclick="testLogin()">Test Login</button>
+    
+    <div id="result"></div>
+
+    <script>
+        async function testLogin() {
+            const email = document.getElementById('email').value;
+            const resultDiv = document.getElementById('result');
+            
+            resultDiv.className = '';
+            resultDiv.textContent = 'Testing...';
+            
+            try {
+                const response = await fetch('/api/scribe/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email: email })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.className = 'success';
+                    resultDiv.textContent = '✅ LOGIN SUCCESS!\n\nToken: ' + data.token.substring(0, 50) + '...\n\nUser: ' + JSON.stringify(data.user, null, 2);
+                    localStorage.setItem('scribe_token', data.token);
+                    localStorage.setItem('scribe_user', JSON.stringify(data.user));
+                } else {
+                    resultDiv.className = 'error';
+                    resultDiv.textContent = '❌ Login failed: ' + JSON.stringify(data, null, 2);
+                }
+            } catch (error) {
+                resultDiv.className = 'error';
+                resultDiv.textContent = '❌ Error: ' + error.message + '\n\nCheck browser console for details.';
+                console.error('Login error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

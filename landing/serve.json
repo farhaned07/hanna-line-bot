@@ -1,0 +1,23 @@
+{
+    "rewrites": [
+        {
+            "source": "/scribe/app/(.*)",
+            "destination": "/scribe/app/index.html"
+        },
+        {
+            "source": "/api/(.*)",
+            "destination": "https://hanna-line-bot-production.up.railway.app/api/$1"
+        }
+    ],
+    "headers": [
+        {
+            "source": "/scribe/app/assets/(.*)",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "no-cache"
+                }
+            ]
+        }
+    ]
+}
