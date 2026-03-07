@@ -10,5 +10,11 @@
     "deploymentProtection": {
         "preview": "none",
         "production": "none"
-    }
+    },
+    "rewrites": [
+        {
+            "source": "/scribe/(.*)",
+            "destination": "/scribe/index.html"
+        }
+    ]
 }
