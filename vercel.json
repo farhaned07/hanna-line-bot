@@ -4,6 +4,11 @@
     "installCommand": "cd scribe && npm install",
     "framework": "vite",
     "github": {
-        "silent": false
+        "silent": false,
+        "autoJobCancelation": true
+    },
+    "deploymentProtection": {
+        "preview": "none",
+        "production": "none"
     }
 }
