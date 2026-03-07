@@ -8,7 +8,7 @@ import './index.css'
 createRoot(document.getElementById('root')).render(
     <StrictMode>
         <ErrorBoundary>
-            <BrowserRouter>
+            <BrowserRouter basename="/scribe/app">
                 <App />
             </BrowserRouter>
         </ErrorBoundary>

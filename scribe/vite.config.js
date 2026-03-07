@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
-    base: '/',
+    base: '/scribe/app/',
     plugins: [
         react(),
         tailwindcss(),
@@ -15,7 +15,7 @@ export default defineConfig({
             manifest: false, // Use the static manifest.json in public folder
             workbox: {
                 globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,json}'],
-                navigateFallback: '/index.html',
+                navigateFallback: '/scribe/app/index.html',
                 navigateFallbackDenylist: [/^\/api\//],
                 runtimeCaching: [
                     {

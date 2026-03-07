@@ -1,0 +1,74 @@
+{
+  "name": "Hanna Scribe — Clinical Documentation",
+  "short_name": "Scribe",
+  "description": "Voice-first clinical documentation assistant. Generate SOAP notes from patient conversations in seconds.",
+  "start_url": "/scribe/",
+  "scope": "/scribe/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#FAFAFA",
+  "background_color": "#FAFAFA",
+  "lang": "en",
+  "categories": ["medical", "productivity", "health"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/home.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Home screen with patient sessions"
+    },
+    {
+      "src": "/screenshots/record.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Recording patient consultation"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Session",
+      "short_name": "Record",
+      "description": "Start a new patient consultation recording",
+      "url": "/scribe/?action=new",
+      "icons": [{ "src": "/icons/icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Handover",
+      "short_name": "Handover",
+      "description": "View shift handover summary",
+      "url": "/scribe/handover",
+      "icons": [{ "src": "/icons/icon-96.png", "sizes": "96x96" }]
+    }
+  ],
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "handle_links": "preferred"
+}
