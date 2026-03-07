@@ -1,11 +1,11 @@
 {
-    "buildCommand": "cd scribe && npm install && npm run build",
-    "outputDirectory": "scribe/dist",
-    "installCommand": "cd scribe && npm install",
+    "buildCommand": "cd .. && cd landing && npm install && npm run build",
+    "outputDirectory": "landing/dist",
+    "installCommand": "cd .. && cd landing && npm install",
     "framework": "vite",
     "github": {
         "silent": false,
-        "autoJobCancelation": true
+        "autoJobCancelation": false
     },
     "deploymentProtection": {
         "preview": "none",
@@ -13,8 +13,12 @@
     },
     "rewrites": [
         {
-            "source": "/scribe/(.*)",
-            "destination": "/scribe/index.html"
+            "source": "/api/scribe/:path*",
+            "destination": "https://hanna-line-bot-production.up.railway.app/api/scribe/:path*"
+        },
+        {
+            "source": "/scribe/app/:path*",
+            "destination": "/scribe/app/index.html"
         }
     ]
 }
