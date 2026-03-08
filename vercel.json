@@ -1,7 +1,4 @@
 {
-    "buildCommand": "cd .. && cd landing && npm install && npm run build",
-    "outputDirectory": "landing/dist",
-    "installCommand": "cd .. && cd landing && npm install",
     "framework": "vite",
     "github": {
         "silent": false,
