@@ -6,7 +6,11 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "test": "node tests/critical-paths.test.js"
+    "test": "node tests/critical-paths.test.js",
+    "build:all": "npm run build:landing && npm run build:scribe && npm run combine-builds",
+    "build:landing": "cd landing && npm install && npm run build",
+    "build:scribe": "cd scribe && npm install && npm run build",
+    "combine-builds": "node scripts/combine-builds.js"
   },
   "keywords": [],
   "author": "",

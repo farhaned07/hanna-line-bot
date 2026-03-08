@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hanna — Care That Scales Without Burning Out Nurses</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #050505;
+            --bg-secondary: #0A0A0A;
+            --text-primary: #E5E5E5;
+            --text-secondary: #888888;
+            --text-tertiary: #666666;
+            --border: #222222;
+            --accent: #0047FF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding-bottom: 4rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 4rem;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 600;
+            letter-spacing: -0.03em;
+            margin-bottom: 1rem;
+            line-height: 1.1;
+        }
+
+        .header-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 4rem;
+            padding-bottom: 4rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section h2 {
+            font-size: 2rem;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            margin-bottom: 2rem;
+            color: var(--text-primary);
+        }
+
+        .section p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 1.05rem;
+        }
+
+        .section strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .section ul,
+        .section ol {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .section li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .section ul li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--text-tertiary);
+        }
+
+        .section ol {
+            counter-reset: item;
+        }
+
+        .section ol li {
+            padding-left: 2rem;
+        }
+
+        .section ol li::before {
+            content: counter(item) ".";
+            counter-increment: item;
+            position: absolute;
+            left: 0;
+            color: var(--text-tertiary);
+            font-family: 'Menlo', monospace;
+        }
+
+        /* Quote Box */
+        .quote-box {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-left: 2px solid var(--accent);
+            margin: 2rem 0;
+        }
+
+        .quote-box p {
+            margin: 0;
+            color: var(--text-primary);
+            font-weight: 500;
+            font-size: 1.125rem;
+            line-height: 1.6;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            font-size: 0.95rem;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 1.25rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            font-family: 'Menlo', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-tertiary);
+            font-weight: 400;
+        }
+
+        td {
+            color: var(--text-secondary);
+        }
+
+        td:first-child {
+            color: var(--text-primary);
+            font-weight: 500;
+            width: 30%;
+        }
+
+        /* Contact */
+        .contact {
+            text-align: center;
+            padding: 4rem 0;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+
+        .contact-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .contact-role {
+            font-family: 'Menlo', monospace;
+            font-size: 0.875rem;
+            color: var(--text-tertiary);
+            margin-bottom: 2rem;
+        }
+
+        .contact a {
+            color: var(--text-primary);
+            text-decoration: none;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2px;
+            transition: color 0.2s;
+        }
+
+        .contact a:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding-top: 4rem;
+            margin-top: 4rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer p {
+            font-size: 0.875rem;
+            color: var(--text-tertiary);
+        }
+
+        .emphasized-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: 2rem;
+            display: block;
+        }
+
+        /* ----- PRINT OPTIMIZATION ----- */
+        @media print {
+            @page {
+                size: A4;
+                margin: 0;
+            }
+
+            body {
+                background-color: #050505 !important;
+                color: #E5E5E5 !important;
+                margin: 0;
+                width: 100%;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .container {
+                max-width: 100% !important;
+                width: 100% !important;
+                padding: 2.5cm !important;
+                margin: 0 !important;
+            }
+
+            .section {
+                page-break-inside: auto;
+                border-color: #222 !important;
+            }
+
+            h1,
+            h2,
+            h3,
+            h4 {
+                break-after: avoid;
+                page-break-after: avoid;
+            }
+
+            /* Ensure cards look good and stay together */
+            .stakeholder-card,
+            .trust-card,
+            .quote-box,
+            .contact {
+                border: 1px solid #222 !important;
+                background-color: #0A0A0A !important;
+                color: #E5E5E5 !important;
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
+            .header {
+                break-inside: avoid;
+            }
+
+            .container {
+                background-color: #050505 !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <img src="/hanna-logo.png" alt="Hanna Logo" style="height: 100px; margin-bottom: 2rem;">
+            <h1>Hanna</h1>
+            <p class="header-subtitle">Care That Scales Without Burning Out Nurses</p>
+        </header>
+
+        <!-- The Problem -->
+        <section class="section">
+            <h2>The Problem</h2>
+            <p>Thailand is facing a growing nurse shortage. Hospitals cannot hire their way out of it.</p>
+            <p><strong>What this looks like on the ground:</strong></p>
+            <ul>
+                <li>Nurses overwhelmed with follow-ups, calls, and admin work</li>
+                <li>Patients going silent between visits</li>
+                <li>Missed medication, unmanaged symptoms</li>
+                <li>No visibility into patient health once they leave the hospital</li>
+            </ul>
+            <p class="emphasized-text">Care stops after the visit. Problems show up too late.</p>
+        </section>
+
+        <!-- The Solution -->
+        <section class="section">
+            <h2>The Solution</h2>
+            <p>Hanna is supervised care infrastructure that helps nurses care for many more patients safely, without
+                increasing workload.</p>
+
+            <div class="quote-box">
+                <p><strong>Hanna handles daily patient follow-up.</strong><br>
+                    <strong>Nurses focus only on what needs human attention.</strong>
+                </p>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>What Hanna Does</th>
+                        <th>How It Works</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Daily patient check-ins</td>
+                        <td>Automated follow-ups via LINE (no app needed)</td>
+                    </tr>
+                    <tr>
+                        <td>Medication reminders</td>
+                        <td>Simple, consistent prompts patients actually respond to</td>
+                    </tr>
+                    <tr>
+                        <td>Symptom monitoring</td>
+                        <td>Patients report vitals and symptoms every day</td>
+                    </tr>
+                    <tr>
+                        <td>Risk detection</td>
+                        <td>Hanna flags early warning signs automatically</td>
+                    </tr>
+                    <tr>
+                        <td>Nurse command center</td>
+                        <td>Nurses see a prioritized list of patients who need attention</td>
+                    </tr>
+                    <tr>
+                        <td>Human-in-the-loop</td>
+                        <td>AI assists. Nurses decide and act.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p style="text-align: center; margin-top: 1rem; color: var(--text-tertiary); font-style: italic;">
+                We don't replace nurses. We protect their time and attention.
+            </p>
+        </section>
+
+        <!-- Why Hospitals Trust Hanna -->
+        <section class="section">
+            <h2>Why Hospitals Trust Hanna</h2>
+
+            <style>
+                .trust-grid {
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 1.5rem;
+                }
+
+                .trust-card {
+                    border: 1px solid var(--border);
+                    padding: 2rem;
+                    background: transparent;
+                }
+
+                .trust-card h3 {
+                    margin-top: 0;
+                    margin-bottom: 1rem;
+                    font-size: 1.1rem;
+                    color: var(--text-primary);
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                }
+
+                .trust-card h3::before {
+                    content: "";
+                    display: block;
+                    width: 6px;
+                    height: 6px;
+                    background: var(--accent);
+                    border-radius: 50%;
+                }
+
+                .trust-card p {
+                    margin: 0;
+                    font-size: 0.95rem;
+                    color: var(--text-secondary);
+                    line-height: 1.6;
+                }
+
+                @media (max-width: 768px) {
+                    .trust-grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
+            </style>
+
+            <div class="trust-grid">
+                <div class="trust-card">
+                    <h3>AI Assisted, Not AI Decided</h3>
+                    <p>All clinical decisions remain with your staff. Hanna surfaces patterns; nurses make the call.</p>
+                </div>
+                <div class="trust-card">
+                    <h3>Clear Escalation Protocols</h3>
+                    <p>Risk signals trigger immediate alerts to nurses, recommending emergency escalation when vital
+                        signs drift.</p>
+                </div>
+                <div class="trust-card">
+                    <h3>Full Audit Trails</h3>
+                    <p>Every interaction is logged for governance, ensuring complete visibility into the patient
+                        journey.</p>
+                </div>
+                <div class="trust-card">
+                    <h3>Supervised Infrastructure</h3>
+                    <p>Hanna supports care delivery; it never acts autonomously depending on the situation.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- The Pilot Program -->
+        <section class="section">
+            <h2>The Pilot Program</h2>
+            <p>A simple, low-risk way to see real impact.</p>
+
+            <table>
+                <tbody>
+                    <tr>
+                        <td>Duration</td>
+                        <td>90 days</td>
+                    </tr>
+                    <tr>
+                        <td>Patient cohort</td>
+                        <td>500–1,000 chronic patients (e.g. diabetes, hypertension)</td>
+                    </tr>
+                    <tr>
+                        <td>Monthly fee</td>
+                        <td>฿79,000</td>
+                    </tr>
+                    <tr>
+                        <td>Pilot cost</td>
+                        <td>฿237,000 (3 months)</td>
+                    </tr>
+                    <tr>
+                        <td>Includes</td>
+                        <td>Setup, staff training, weekly support, final report</td>
+                    </tr>
+                    <tr>
+                        <td>Measured outcomes</td>
+                        <td>Patient engagement, medication adherence, early interventions, nurse time saved</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Who Hanna Is For -->
+        <section class="section">
+            <h2>Who Hanna Is For</h2>
+
+            <style>
+                .stakeholder-grid {
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 1.5rem;
+                }
+
+                .stakeholder-card {
+                    border: 1px solid var(--border);
+                    padding: 2rem;
+                    background: var(--bg-secondary);
+                }
+
+                .stakeholder-card h3 {
+                    margin-top: 0;
+                    margin-bottom: 1.5rem;
+                    font-size: 1.1rem;
+                    border-bottom: 1px solid var(--border);
+                    padding-bottom: 1rem;
+                    letter-spacing: 0.02em;
+                }
+
+                .stakeholder-card ul {
+                    margin-bottom: 0;
+                }
+
+                .stakeholder-card li {
+                    font-size: 0.95rem;
+                    margin-bottom: 0.5rem;
+                }
+
+                @media (max-width: 768px) {
+                    .stakeholder-grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
+            </style>
+            <div class="stakeholder-grid">
+                <div class="stakeholder-card">
+                    <h3>Patients</h3>
+                    <ul>
+                        <li>Simple LINE messages</li>
+                        <li>Friendly Thai voice</li>
+                        <li>Daily guidance and reminders</li>
+                    </ul>
+                </div>
+                <div class="stakeholder-card">
+                    <h3>Nurses</h3>
+                    <ul>
+                        <li>No constant calling or chasing</li>
+                        <li>Only exceptions surface</li>
+                        <li>Full context when action is needed</li>
+                    </ul>
+                </div>
+                <div class="stakeholder-card">
+                    <h3>Clinical Leaders</h3>
+                    <ul>
+                        <li>Visibility into care outside the hospital</li>
+                        <li>Clear operational metrics</li>
+                        <li>Confidence care is not slipping between visits</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Next Steps -->
+        <section class="section">
+            <h2>Next Steps</h2>
+            <ol>
+                <li><strong>Discovery call</strong> — 30 minutes to understand your care workflow</li>
+                <li><strong>Live demo</strong> — See real patient scenarios</li>
+                <li><strong>Pilot proposal</strong> — Scoped for your hospital</li>
+            </ol>
+        </section>
+
+        <!-- Contact -->
+        <div class="contact">
+            <h2 style="margin-bottom: 0.5rem; font-size: 1.5rem;">Hanna</h2>
+            <p style="margin-bottom: 2rem; font-style: italic; color: var(--text-secondary);">10x Nurse Capacity</p>
+
+            <div class="contact-name">Farhan Sabbir</div>
+            <div style="margin-bottom: 0.5rem;"><a href="mailto:farhan@hanna.care">farhan@hanna.care</a></div>
+            <div><a href="tel:0926867042">092-686-7042</a></div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Hanna is a product of Archangel Co., Ltd.</p>
+        </footer>
+    </div>
+</body>
+
+</html>

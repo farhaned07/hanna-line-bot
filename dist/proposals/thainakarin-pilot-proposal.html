@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hanna Pilot Proposal — Thainakarin Hospital</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #050505;
+            --bg-secondary: #0A0A0A;
+            --text-primary: #E5E5E5;
+            --text-secondary: #888888;
+            --text-tertiary: #666666;
+            --border: #222222;
+            --accent: #0047FF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding-bottom: 4rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 4rem;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 600;
+            letter-spacing: -0.03em;
+            margin-bottom: 1rem;
+            line-height: 1.1;
+        }
+
+        .header-subtitle {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .header-meta {
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            margin-top: 2rem;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 4rem;
+            padding-bottom: 4rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section-number {
+            font-family: 'Menlo', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-tertiary);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .section h2 {
+            font-size: 2rem;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            margin-bottom: 2rem;
+            color: var(--text-primary);
+        }
+
+        .section h3 {
+            font-size: 1.25rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            margin-top: 2rem;
+            color: var(--text-primary);
+        }
+
+        .section p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 1.05rem;
+        }
+
+        .section ul {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .section ul li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .section ul li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--text-tertiary);
+        }
+
+        /* Executive Summary Box */
+        .exec-summary {
+            background: var(--bg-secondary);
+            padding: 2.5rem;
+            border: 1px solid var(--border);
+            margin-bottom: 4rem;
+        }
+
+        .exec-summary h2 {
+            margin-top: 0;
+            font-size: 1.75rem;
+        }
+
+        .highlight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .highlight-item span {
+            display: block;
+            font-family: 'Menlo', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-tertiary);
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight-item strong {
+            font-size: 1.125rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        /* Tables (Pricing/Timeline) */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            font-size: 0.95rem;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 1.25rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            font-family: 'Menlo', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-tertiary);
+            font-weight: 400;
+        }
+
+        td {
+            color: var(--text-secondary);
+        }
+
+        td:first-child {
+            color: var(--text-primary);
+            font-weight: 500;
+            width: 30%;
+        }
+
+        /* Pricing Box */
+        .pricing-box {
+            border: 1px solid var(--border);
+            padding: 2rem;
+            background: var(--bg-secondary);
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .pricing-amount {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .pricing-sub {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* Contact Section */
+        .contact {
+            text-align: center;
+            padding: 4rem 0;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+
+        .contact-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .contact-role {
+            font-family: 'Menlo', monospace;
+            font-size: 0.875rem;
+            color: var(--text-tertiary);
+            margin-bottom: 2rem;
+        }
+
+        .contact a {
+            color: var(--text-primary);
+            text-decoration: none;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2px;
+            transition: color 0.2s;
+        }
+
+        .contact a:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding-top: 4rem;
+            margin-top: 4rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer p {
+            font-size: 0.875rem;
+            color: var(--text-tertiary);
+        }
+
+        /* ----- PRINT OPTIMIZATION ----- */
+        @media print {
+            @page {
+                size: A4;
+                margin: 0;
+            }
+
+            body {
+                background-color: #050505 !important;
+                color: #E5E5E5 !important;
+                margin: 0;
+                width: 100%;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .container {
+                max-width: 100% !important;
+                width: 100% !important;
+                padding: 2.5cm !important;
+                margin: 0 !important;
+            }
+
+            .section {
+                border-color: #222 !important;
+                page-break-inside: auto;
+            }
+
+            h1,
+            h2,
+            h3,
+            h4,
+            .section-number {
+                break-after: avoid;
+                page-break-after: avoid;
+            }
+
+            p,
+            li {
+                orphans: 3;
+                widows: 3;
+            }
+
+            .exec-summary,
+            .pricing-box,
+            .contact,
+            table,
+            .highlight-grid,
+            .pricing-card,
+            .timeline-item,
+            .metric-card {
+                break-inside: avoid;
+                page-break-inside: avoid;
+                border: 1px solid #222 !important;
+                background-color: #0A0A0A !important;
+                color: #E5E5E5 !important;
+            }
+
+            .header {
+                break-inside: avoid;
+            }
+
+            .container {
+                background-color: #050505 !important;
+            }
+
+            .page-break {
+                page-break-after: always;
+                display: block;
+                height: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- Header -->
+        <header class="header">
+            <img src="/hanna-logo.png" alt="Hanna Logo" style="height: 100px; margin-bottom: 2rem;">
+            <h1>Hanna Pilot Proposal</h1>
+            <p class="header-subtitle">Thainakarin Hospital</p>
+            <div class="header-meta">Prepared for Executive Review</div>
+        </header>
+
+        <!-- Executive Summary -->
+        <div class="exec-summary">
+            <span class="section-number">Executive Summary</span>
+            <p style="margin-top: 1rem;">
+                Hanna is a supervised care intelligence platform designed to support safe scale in chronic disease
+                management.
+                This proposal outlines a 90-day pilot program to demonstrate improvements in patient engagement,
+                medication adherence, and nurse efficiency—without changing existing clinical authority or workflows.
+            </p>
+
+            <div class="highlight-grid">
+                <div class="highlight-item">
+                    <span>Pilot Cost (Total)</span>
+                    <strong>฿237,000</strong>
+                </div>
+                <div class="highlight-item">
+                    <span>Duration</span>
+                    <strong>90 Days</strong>
+                </div>
+                <div class="highlight-item">
+                    <span>Cohort Size</span>
+                    <strong>Up to 1,000 Patients</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. The Opportunity -->
+        <section class="section">
+            <span class="section-number">01 / The Opportunity</span>
+            <h2>Why Now?</h2>
+            <p>Chronic care follow-up today relies heavily on manual phone calls and ad-hoc LINE messages. This creates
+                three persistent constraints:</p>
+            <ul>
+                <li><strong>High nurse workload</strong> spent on routine follow-ups rather than clinical care.</li>
+                <li><strong>Inconsistent patient coverage</strong> means patient status is unknown between visits.</li>
+                <li><strong>Late detection of issues</strong> often happens only once patients return to the clinic with
+                    complications.</li>
+            </ul>
+            <p><strong>As patient volumes grow, this model does not scale.</strong> Hanna is designed to work with your
+                existing nurses and workflows—supporting continuity of care without adding staff or disrupting delivery.
+            </p>
+        </section>
+
+        <!-- 2. What Hanna Delivers -->
+        <section class="section">
+            <span class="section-number">02 / What Hanna Delivers</span>
+            <h2>Platform Capabilities</h2>
+
+            <h3>For Patients</h3>
+            <ul>
+                <li>Daily check-ins via LINE (no new app required) to maximize adoption.</li>
+                <li>Natural Thai voice and chat interactions, suitable for elderly patients.</li>
+                <li>Medication reminders and daily encouragement.</li>
+                <li>Simple symptom and vitals reporting outside clinic hours.</li>
+            </ul>
+
+            <h3>For Nurses</h3>
+            <ul>
+                <li>A single dashboard showing <em>only</em> patients who need attention.</li>
+                <li>Risk prioritization (Critical vs High vs Low) to guide outreach.</li>
+                <li>One-click call or message with full patient context.</li>
+                <li>Less routine chasing, more clinical focus.</li>
+            </ul>
+
+            <h3>For Hospital Leadership</h3>
+            <ul>
+                <li>Visibility into patient care between visits.</li>
+                <li>Clear operational metrics (engagement, adherence, interventions).</li>
+                <li>Evidence to support scale-up decisions based on data.</li>
+            </ul>
+        </section>
+
+        <!-- 3. Pilot Scope -->
+        <section class="section">
+            <span class="section-number">03 / Pilot Scope</span>
+            <h2>Implementation Plan</h2>
+
+            <table>
+                <tbody>
+                    <tr>
+                        <td>Patient Cohort</td>
+                        <td>Up to 1,000 chronic patients (phased enrollment)</td>
+                    </tr>
+                    <tr>
+                        <td>Conditions</td>
+                        <td>Diabetes, hypertension, or mixed cohort</td>
+                    </tr>
+                    <tr>
+                        <td>Duration</td>
+                        <td>90 days (Weeks 1–12)</td>
+                    </tr>
+                    <tr>
+                        <td>Staff Involved</td>
+                        <td>CNO, 2–5 nurses, 1 admin / IT liaison</td>
+                    </tr>
+                    <tr>
+                        <td>Systems</td>
+                        <td>LINE bot + Nurse Dashboard (no EMR integration required)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Timeline</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Week</th>
+                        <th>Activity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Week 0</td>
+                        <td>Kickoff call, implementation materials delivered</td>
+                    </tr>
+                    <tr>
+                        <td>Week 1</td>
+                        <td>Staff training (nurses, admin)</td>
+                    </tr>
+                    <tr>
+                        <td>Week 2</td>
+                        <td>Patient cohort confirmed, enrollment begins</td>
+                    </tr>
+                    <tr>
+                        <td>Week 3–4</td>
+                        <td>Go-live and initial patient check-ins</td>
+                    </tr>
+                    <tr>
+                        <td>Week 5–10</td>
+                        <td>Ongoing operations, weekly check-ins</td>
+                    </tr>
+                    <tr>
+                        <td>Week 11–12</td>
+                        <td>Data review and pilot report preparation</td>
+                    </tr>
+                    <tr>
+                        <td>Week 12</td>
+                        <td>Pilot review and scale discussion</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 4. Success Metrics -->
+        <section class="section">
+            <span class="section-number">04 / Success Metrics</span>
+            <h2>Measuring Impact</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Target</th>
+                        <th>Measurement</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Patient engagement</td>
+                        <td>~70–80%</td>
+                        <td>Response rate to daily check-ins</td>
+                    </tr>
+                    <tr>
+                        <td>Medication adherence</td>
+                        <td>Improvement</td>
+                        <td>Self-reported adherence vs baseline</td>
+                    </tr>
+                    <tr>
+                        <td>Early interventions</td>
+                        <td>10+ cases</td>
+                        <td>Patients flagged and contacted early</td>
+                    </tr>
+                    <tr>
+                        <td>Nurse time</td>
+                        <td>Reduction</td>
+                        <td>Comparison vs baseline workflow</td>
+                    </tr>
+                    <tr>
+                        <td>Satisfaction</td>
+                        <td>≥8/10</td>
+                        <td>End-of-pilot survey</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 5. Pilot Cost -->
+        <section class="section">
+            <span class="section-number">05 / Commercials</span>
+            <h2>Pilot Investment</h2>
+
+            <div class="pricing-box">
+                <div class="pricing-amount">฿237,000</div>
+                <div class="pricing-sub">Total for 90 Days (฿79,000 / month)</div>
+            </div>
+
+            <p><strong>Includes:</strong></p>
+            <ul>
+                <li>Full platform access for pilot duration for up to 1,000 patients.</li>
+                <li>Unlimited nurse accounts.</li>
+                <li>Implementation and staff training with dedicated manager.</li>
+                <li>Weekly progress summaries and final 90-day performance report.</li>
+            </ul>
+
+            <p><strong>Clinical Governance Note:</strong> Hanna operates under a supervised care model. All clinical
+                decisions remain with licensed hospital staff. Patients are explicitly informed they are interacting
+                with an AI assistant. Defined escalation rules trigger nurse alerts.</p>
+        </section>
+
+        <!-- 8. Post-Pilot Path -->
+        <section class="section">
+            <span class="section-number">06 / Future Scale</span>
+            <h2>Post-Pilot Path</h2>
+            <p>If pilot outcomes meet agreed targets, Hanna can be expanded across programs.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tier</th>
+                        <th>Patients</th>
+                        <th>Monthly Fee</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Growth</td>
+                        <td>Up to 1,000</td>
+                        <td>฿149,000 / month</td>
+                    </tr>
+                    <tr>
+                        <td>Scale</td>
+                        <td>Up to 2,000</td>
+                        <td>฿299,000 / month</td>
+                    </tr>
+                    <tr>
+                        <td>Enterprise</td>
+                        <td>3,000+</td>
+                        <td>Custom Pricing</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 9. Next Steps -->
+        <section class="section">
+            <span class="section-number">07 / Next Steps</span>
+            <h2>Getting Started</h2>
+            <ol style="list-style-type: decimal; padding-left: 1.5rem; color: var(--text-secondary); margin-top: 1rem;">
+                <li style="margin-bottom: 0.5rem; padding-left: 0.5rem;">Internal review with nursing and leadership
+                    teams</li>
+                <li style="margin-bottom: 0.5rem; padding-left: 0.5rem;">30-minute live demo to confirm workflow fit
+                </li>
+                <li style="margin-bottom: 0.5rem; padding-left: 0.5rem;">Confirm pilot cohort selection</li>
+                <li style="margin-bottom: 0.5rem; padding-left: 0.5rem;">Sign pilot agreement</li>
+                <li style="margin-bottom: 0.5rem; padding-left: 0.5rem;">Kickoff and launch</li>
+            </ol>
+        </section>
+
+        <!-- Contact -->
+        <div class="contact">
+            <div class="contact-name">Farhan Sabbir</div>
+            <div class="contact-role">Hanna Care Team</div>
+            <div style="margin-bottom: 0.5rem;"><a href="mailto:farhan@hanna.care">farhan@hanna.care</a></div>
+            <div><a href="tel:0926867042">092-686-7042</a></div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Hanna is a product of Archangel Co., Ltd.</p>
+        </footer>
+
+    </div>
+
+</body>
+
+</html>

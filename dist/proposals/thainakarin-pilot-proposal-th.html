@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ข้อเสนอโครงการนำร่อง Hanna — โรงพยาบาลไทยนครินทร์</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #050505;
+            --bg-secondary: #0A0A0A;
+            --text-primary: #E5E5E5;
+            --text-secondary: #888888;
+            --text-tertiary: #666666;
+            --border: #222222;
+            --accent: #0047FF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Sarabun', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding-bottom: 4rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 4rem;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 600;
+            letter-spacing: -0.03em;
+            margin-bottom: 1rem;
+            line-height: 1.1;
+        }
+
+        .header-subtitle {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .header-meta {
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            margin-top: 2rem;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 4rem;
+            padding-bottom: 4rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section-number {
+            font-family: 'Menlo', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-tertiary);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .section h2 {
+            font-size: 2rem;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            margin-bottom: 2rem;
+            color: var(--text-primary);
+        }
+
+        .section h3 {
+            font-size: 1.25rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            margin-top: 2rem;
+            color: var(--text-primary);
+        }
+
+        .section p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 1.05rem;
+        }
+
+        .section ul {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .section ul li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .section ul li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--text-tertiary);
+        }
+
+        /* Executive Summary Box */
+        .exec-summary {
+            background: var(--bg-secondary);
+            padding: 2.5rem;
+            border: 1px solid var(--border);
+            margin-bottom: 4rem;
+        }
+
+        .exec-summary h2 {
+            margin-top: 0;
+            font-size: 1.75rem;
+        }
+
+        .highlight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .highlight-item span {
+            display: block;
+            font-family: 'Menlo', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-tertiary);
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight-item strong {
+            font-size: 1.125rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        /* Tables (Pricing/Timeline) */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            font-size: 0.95rem;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 1.25rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            font-family: 'Menlo', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-tertiary);
+            font-weight: 400;
+        }
+
+        td {
+            color: var(--text-secondary);
+        }
+
+        td:first-child {
+            color: var(--text-primary);
+            font-weight: 500;
+            width: 30%;
+        }
+
+        /* Pricing Box */
+        .pricing-box {
+            border: 1px solid var(--border);
+            padding: 2rem;
+            background: var(--bg-secondary);
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .pricing-amount {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .pricing-sub {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* Contact Section */
+        .contact {
+            text-align: center;
+            padding: 4rem 0;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+
+        .contact-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .contact-role {
+            font-family: 'Menlo', monospace;
+            font-size: 0.875rem;
+            color: var(--text-tertiary);
+            margin-bottom: 2rem;
+        }
+
+        .contact a {
+            color: var(--text-primary);
+            text-decoration: none;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2px;
+            transition: color 0.2s;
+        }
+
+        .contact a:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding-top: 4rem;
+            margin-top: 4rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer p {
+            font-size: 0.875rem;
+            color: var(--text-tertiary);
+        }
+
+        /* ----- PRINT OPTIMIZATION ----- */
+        @media print {
+            @page {
+                size: A4;
+                margin: 0;
+            }
+
+            body {
+                background-color: #050505 !important;
+                color: #E5E5E5 !important;
+                margin: 0;
+                width: 100%;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .container {
+                max-width: 100% !important;
+                width: 100% !important;
+                padding: 2.5cm !important;
+                margin: 0 !important;
+            }
+
+            .section {
+                border-color: #222 !important;
+                page-break-inside: auto;
+            }
+
+            h1,
+            h2,
+            h3,
+            h4,
+            .section-number {
+                break-after: avoid;
+                page-break-after: avoid;
+            }
+
+            p,
+            li {
+                orphans: 3;
+                widows: 3;
+            }
+
+            .exec-summary,
+            .pricing-box,
+            .contact,
+            table,
+            .highlight-grid,
+            .pricing-card,
+            .timeline-item,
+            .metric-card {
+                break-inside: avoid;
+                page-break-inside: avoid;
+                border: 1px solid #222 !important;
+                background-color: #0A0A0A !important;
+                color: #E5E5E5 !important;
+            }
+
+            .header {
+                break-inside: avoid;
+            }
+
+            .container {
+                background-color: #050505 !important;
+            }
+
+            .page-break {
+                page-break-after: always;
+                display: block;
+                height: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- Header -->
+        <header class="header">
+            <img src="/hanna-logo.png" alt="Hanna Logo" style="height: 100px; margin-bottom: 2rem;">
+            <h1>ข้อเสนอโครงการนำร่อง Hanna</h1>
+            <p class="header-subtitle">โรงพยาบาลไทยนครินทร์</p>
+            <div class="header-meta">เอกสารนำเสนอเพื่อการพิจารณาของผู้บริหาร</div>
+        </header>
+
+        <!-- Executive Summary -->
+        <div class="exec-summary">
+            <span class="section-number">บทสรุปผู้บริหาร</span>
+            <p style="margin-top: 1rem;">
+                Hanna คือแพลตฟอร์มอัจฉริยะสำหรับการดูแลภายใต้การกำกับ (Supervised Care Intelligence)
+                ที่ออกแบบมาเพื่อช่วยขยายขีดความสามารถในการจัดการโรคเรื้อรังอย่างปลอดภัย
+                ข้อเสนอนี้สรุปโครงการนำร่องระยะเวลา 90 วัน เพื่อแสดงให้เห็นถึงการปรับปรุงในด้านการมีส่วนร่วมของผู้ป่วย
+                (Engagement), ความร่วมมือในการใช้ยา (Adherence), และประสิทธิภาพการทำงานของพยาบาล
+                โดยไม่ต้องเปลี่ยนอำนาจการตัดสินใจทางคลินิกหรือขั้นตอนการทำงานที่มีอยู่
+            </p>
+
+            <div class="highlight-grid">
+                <div class="highlight-item">
+                    <span>งบประมาณรวม</span>
+                    <strong>฿237,000</strong>
+                </div>
+                <div class="highlight-item">
+                    <span>ระยะเวลา</span>
+                    <strong>90 วัน</strong>
+                </div>
+                <div class="highlight-item">
+                    <span>กลุ่มเป้าหมาย</span>
+                    <strong>ผู้ป่วยสูงสุด 1,000 ราย</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. The Opportunity -->
+        <section class="section">
+            <span class="section-number">01 / โอกาสและที่มา</span>
+            <h2>ทำไมต้องตอนนี้?</h2>
+            <p>ปัจจุบัน การติดตามผลผู้ป่วยโรคเรื้อรังยังคงพึ่งพาการโทรศัพท์และการส่งข้อความผ่าน LINE แบบรายกรณี
+                ซึ่งสร้างข้อจำกัดสามประการ:</p>
+            <ul>
+                <li><strong>ภาระงานของพยาบาลสูง</strong> เวลาส่วนใหญ่หมดไปกับการติดตามผลกิจวัตร
+                    แทนที่จะได้ใช้ทักษะทางคลินิกอย่างเต็มที่</li>
+                <li><strong>การดูแลไม่ต่อเนื่อง</strong> สถานะของผู้ป่วยระหว่างนัดหมายมักไม่ถูกรับรู้</li>
+                <li><strong>การตรวจพบปัญหาล่าช้า</strong> มักทราบปัญหาเมื่อผู้ป่วยกลับมาพบแพทย์พร้อมภาวะแทรกซ้อนแล้ว
+                </li>
+            </ul>
+            <p><strong>เมื่อจำนวนผู้ป่วยเพิ่มขึ้น โมเดลการดูแลแบบเดิมจึงไม่สามารถขยายได้</strong> Hanna
+                ออกแบบมาเพื่อทำงานร่วมกับพยาบาลและกระบวนการทำงานที่มีอยู่ของท่าน
+                สนับสนุนความต่อเนื่องในการดูแลรักษาโดยไม่ต้องเพิ่มบุคลากรหรือรบกวนการให้บริการ</p>
+        </section>
+
+        <!-- 2. What Hanna Delivers -->
+        <section class="section">
+            <span class="section-number">02 / สิ่งที่ Hanna มอบให้</span>
+            <h2>ความสามารถของแพลตฟอร์ม</h2>
+
+            <h3>สำหรับผู้ป่วย</h3>
+            <ul>
+                <li>เช็คอินประจำวันผ่าน LINE (ไม่ต้องโหลดแอปใหม่) เพื่อการใช้งานที่ง่ายที่สุด</li>
+                <li>การโต้ตอบด้วยเสียงและข้อความภาษาไทยที่เป็นธรรมชาติ เหมาะสำหรับผู้สูงอายุ</li>
+                <li>แจ้งเตือนการทานยาและให้กำลังใจประจำวัน</li>
+                <li>รายงานอาการและสัญญาณชีพได้ง่ายๆ นอกเวลางาน</li>
+            </ul>
+
+            <h3>สำหรับพยาบาล</h3>
+            <ul>
+                <li>แดชบอร์ดเดียวที่แสดง <em>เฉพาะ</em> ผู้ป่วยที่ต้องการความสนใจ</li>
+                <li>การจัดลำดับความสำคัญตามความเสี่ยง (Critical / High / Low) เพื่อชี้นำการติดตาม</li>
+                <li>โทรหรือส่งข้อความได้ในคลิกเดียว พร้อมข้อมูลบริบทของผู้ป่วยครบถ้วน</li>
+                <li>ลดการตามงานกิจวัตร เพิ่มเวลาโฟกัสทางคลินิก</li>
+            </ul>
+
+            <h3>สำหรับผู้บริหารโรงพยาบาล</h3>
+            <ul>
+                <li>มองเห็นภาพรวมการดูแลผู้ป่วยระหว่างนัดหมาย</li>
+                <li>ตัวชี้วัดการดำเนินงานที่ชัดเจน (การมีส่วนร่วม, ความร่วมมือในการรักษา, การเข้าแทรกแซง)</li>
+                <li>หลักฐานข้อมูลเพื่อสนับสนุนการตัดสินใจขยายผล</li>
+            </ul>
+        </section>
+
+        <!-- 3. Pilot Scope -->
+        <section class="section">
+            <span class="section-number">03 / ขอบเขตโครงการ</span>
+            <h2>แผนการดำเนินงาน</h2>
+
+            <table>
+                <tbody>
+                    <tr>
+                        <td>กลุ่มผู้ป่วย</td>
+                        <td>ผู้ป่วยโรคเรื้อรังสูงสุด 1,000 ราย (ทยอยลงทะเบียน)</td>
+                    </tr>
+                    <tr>
+                        <td>กลุ่มโรค</td>
+                        <td>เบาหวาน, ความดันโลหิตสูง หรือกลุ่มผสม</td>
+                    </tr>
+                    <tr>
+                        <td>ระยะเวลา</td>
+                        <td>90 วัน (สัปดาห์ที่ 1–12)</td>
+                    </tr>
+                    <tr>
+                        <td>บุคลากรที่เกี่ยวข้อง</td>
+                        <td>หัวหน้าพยาบาล (CNO), พยาบาล 2–5 ท่าน, ผู้ประสานงาน/IT 1 ท่าน</td>
+                    </tr>
+                    <tr>
+                        <td>ระบบ</td>
+                        <td>LINE bot + Nurse Dashboard (ไม่ต้องเชื่อมต่อ EMR ในช่วงนำร่อง)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>ตารางเวลา</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>สัปดาห์</th>
+                        <th>กิจกรรม</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>สัปดาห์ที่ 0</td>
+                        <td>ประชุมเริ่มต้นโครงการ (Kickoff), ส่งมอบเอกสารคู่มือ</td>
+                    </tr>
+                    <tr>
+                        <td>สัปดาห์ที่ 1</td>
+                        <td>อบรมบุคลากร (พยาบาล, แอดมิน)</td>
+                    </tr>
+                    <tr>
+                        <td>สัปดาห์ที่ 2</td>
+                        <td>ยืนยันกลุ่มผู้ป่วย, เริ่มลงทะเบียน</td>
+                    </tr>
+                    <tr>
+                        <td>สัปดาห์ที่ 3–4</td>
+                        <td>เริ่มใช้งานจริง (Go-live) และติดตามการเช็คอิน</td>
+                    </tr>
+                    <tr>
+                        <td>สัปดาห์ที่ 5–10</td>
+                        <td>ดำเนินงานต่อเนื่อง, ติดตามผลรายสัปดาห์</td>
+                    </tr>
+                    <tr>
+                        <td>สัปดาห์ที่ 11–12</td>
+                        <td>ทบทวนข้อมูลและจัดทำรายงานสรุป</td>
+                    </tr>
+                    <tr>
+                        <td>สัปดาห์ที่ 12</td>
+                        <td>นำเสนอผลสรุปและหารือการขยายผล</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 4. Success Metrics -->
+        <section class="section">
+            <span class="section-number">04 / ตัวชี้วัดความสำเร็จ</span>
+            <h2>การวัดผลลัพธ์</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ตัวชี้วัด</th>
+                        <th>เป้าหมาย</th>
+                        <th>วิธีการวัด</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>การมีส่วนร่วม (Engagement)</td>
+                        <td>~70–80%</td>
+                        <td>อัตราการตอบกลับการเช็คอินประจำวัน</td>
+                    </tr>
+                    <tr>
+                        <td>ความร่วมมือในการใช้ยา</td>
+                        <td>ดีขึ้น</td>
+                        <td>การรายงานการทานยาเทียบกับก่อนเริ่ม</td>
+                    </tr>
+                    <tr>
+                        <td>การช่วยเหลือได้ทันท่วงที</td>
+                        <td>10+ เคส</td>
+                        <td>ผู้ป่วยที่ถูกระบุความเสี่ยงและได้รับการติดต่อก่อนเกิดเหตุ</td>
+                    </tr>
+                    <tr>
+                        <td>เวลาของพยาบาล</td>
+                        <td>ลดลง</td>
+                        <td>เปรียบเทียบกับขั้นตอนการทำงานเดิม</td>
+                    </tr>
+                    <tr>
+                        <td>ความพึงพอใจ</td>
+                        <td>≥8/10</td>
+                        <td>แบบสำรวจหลังจบโครงการ</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 5. Pilot Cost -->
+        <section class="section">
+            <span class="section-number">05 / งบประมาณ</span>
+            <h2>การลงทุนช่วงนำร่อง</h2>
+
+            <div class="pricing-box">
+                <div class="pricing-amount">฿237,000</div>
+                <div class="pricing-sub">ยอดรวมสำหรับ 90 วัน (฿79,000 / เดือน)</div>
+            </div>
+
+            <p><strong>สิ่งที่รวมในบริการ:</strong></p>
+            <ul>
+                <li>สิทธิ์การใช้งานแพลตฟอร์มเต็มรูปแบบตลอดระยะเวลานำร่อง สำหรับผู้ป่วยสูงสุด 1,000 ราย</li>
+                <li>บัญชีผู้ใช้งานพยาบาลไม่จำกัด</li>
+                <li>การติดตั้งระบบและการอบรมบุคลากร พร้อมผู้จัดการโครงการดูแลเฉพาะ</li>
+                <li>สรุปความคืบหน้ารายสัปดาห์ และรายงานสรุปผลการดำเนินงาน 90 วัน</li>
+            </ul>
+
+            <p><strong>หมายเหตุเรื่องการกำกับดูแลทางคลินิก:</strong> Hanna ดำเนินการภายใต้โมเดลการดูแลแบบมีการกำกับดูแล
+                (Supervised Care) การตัดสินใจทางคลินิกทั้งหมดยังคงเป็นอำนาจของบุคลากรทางการแพทย์
+                ผู้ป่วยจะได้รับแจ้งอย่างชัดเจนว่ากำลังโต้ตอบกับระบบ AI ผู้ช่วย และมีกฎการส่งต่อเคส (Escalation Rules)
+                ที่ชัดเจนเพื่อแจ้งเตือนพยาบาล</p>
+        </section>
+
+        <!-- 8. Post-Pilot Path -->
+        <section class="section">
+            <span class="section-number">06 / แผนงานในอนาคต</span>
+            <h2>แผนการขยายผลหลังจบโครงการ</h2>
+            <p>หากผลลัพธ์ของโครงการนำร่องเป็นไปตามเป้าหมาย สามารถขยายผล Hanna ไปสู่กลุ่มผู้ป่วยอื่นๆ ได้</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ระดับ (Tier)</th>
+                        <th>จำนวนผู้ป่วย</th>
+                        <th>ค่าบริการรายเดือน</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Growth</td>
+                        <td>สูงสุด 1,000</td>
+                        <td>฿149,000 / เดือน</td>
+                    </tr>
+                    <tr>
+                        <td>Scale</td>
+                        <td>สูงสุด 2,000</td>
+                        <td>฿299,000 / เดือน</td>
+                    </tr>
+                    <tr>
+                        <td>Enterprise</td>
+                        <td>3,000+</td>
+                        <td>ราคาตามตกลง (Custom)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 9. Next Steps -->
+        <section class="section">
+            <span class="section-number">07 / ขั้นตอนถัดไป</span>
+            <h2>เริ่มต้นการดำเนินงาน</h2>
+            <ol style="list-style-type: decimal; padding-left: 1.5rem; color: var(--text-secondary); margin-top: 1rem;">
+                <li style="margin-bottom: 0.5rem; padding-left: 0.5rem;">ทบทวนภายในร่วมกับทีมพยาบาลและผู้บริหาร</li>
+                <li style="margin-bottom: 0.5rem; padding-left: 0.5rem;">สาธิตระบบ (Live Demo) 30 นาที
+                    เพื่อยืนยันความเหมาะสมของขั้นตอนการทำงาน</li>
+                <li style="margin-bottom: 0.5rem; padding-left: 0.5rem;">ยืนยันกลุ่มผู้ป่วยคัดเลือก</li>
+                <li style="margin-bottom: 0.5rem; padding-left: 0.5rem;">ลงนามสัญญาโครงการนำร่อง</li>
+                <li style="margin-bottom: 0.5rem; padding-left: 0.5rem;">เริ่มโครงการ (Kickoff)</li>
+            </ol>
+        </section>
+
+        <!-- Contact -->
+        <div class="contact">
+            <div class="contact-name">Farhan Sabbir</div>
+            <div class="contact-role">ทีมงาน Hanna Care</div>
+            <div style="margin-bottom: 0.5rem;"><a href="mailto:farhan@hanna.care">farhan@hanna.care</a></div>
+            <div><a href="tel:0926867042">092-686-7042</a></div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Hanna เป็นผลิตภัณฑ์ของ บริษัท อาร์คแองเจิล จำกัด (Archangel Co., Ltd.)</p>
+        </footer>
+
+    </div>
+
+</body>
+
+</html>
