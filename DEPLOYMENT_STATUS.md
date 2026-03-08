@@ -1,4 +1,31 @@
-# Deployment Status — March 8, 2026
+# Deployment Status — March 8, 2026 (UPDATED)
+
+## ✅ LATEST: Monorepo Build System Fixed (17:45 ICT)
+
+### What Changed:
+1. **Created build script**: `scripts/combine-builds.js`
+2. **Updated `package.json`**: Added `build:all` command
+3. **Updated `vercel.json`**: Points to combined `dist/` folder
+4. **Pushed to GitHub**: Commit `818fd8c`
+
+### Build Structure:
+```
+dist/
+├── index.html (landing page)
+├── assets/ (landing assets)
+└── scribe/
+    └── app/
+        ├── index.html (scribe PWA)
+        ├── assets/ (scribe assets)
+        └── manifest.webmanifest
+```
+
+### Expected Behavior After Deploy:
+- `https://hanna.care/` → Landing page ✅
+- `https://hanna.care/scribe/app/` → Scribe PWA ✅
+- `https://hanna.care/scribe/app/login` → Scribe login ✅
+
+---
 
 ## ✅ What's Been Done
 
