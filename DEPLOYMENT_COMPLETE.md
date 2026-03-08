@@ -1,128 +1,181 @@
-# ✅ DEPLOYMENT COMPLETE - CLEAN CODEBASE
+# ✅ Deployment Complete — Next Steps
 
-## What Was Fixed
+## What Was Done (March 8, 2026, 17:45 ICT)
 
-### 1. Removed Old/Confusing Files
-- ❌ Deleted old build artifacts
-- ❌ Removed Railway URL references
-- ✅ Clean codebase with only necessary files
+### 1. Pricing Updates ✅
+- **Pro Plan**: ฿990/month (was ฿1,990)
+- **Clinic Plan**: ฿9,990/month (was ฿4,990)
+- Updated across 10 documentation files
 
-### 2. Updated All CTA Buttons
-**Before:** Pointing to `https://hanna-line-bot-production.up.railway.app/scribe/` ❌  
-**After:** Pointing to `/scribe/app/` ✅
+### 2. Monorepo Build System ✅
+Created a unified build that combines:
+- **Landing Page** (`/landing/`) → Root of `dist/`
+- **Scribe PWA** (`/scribe/`) → `dist/scribe/app/`
 
-**Files Updated:**
-- `landing/components/ScribeLanding.tsx` - All 4 CTA buttons fixed
+**Files Created/Modified:**
+- `scripts/combine-builds.js` — Combines both builds
+- `package.json` — Added `build:all` script
+- `vercel.json` — Configured for monorepo deployment
 
-### 3. Correct Architecture Deployed
+### 3. Pushed to GitHub ✅
+- Latest commit: `a493da8`
+- Branch: `main`
+- Vercel GitHub integration: **Active**
 
+---
+
+## ⏳ Current Status: Vercel Building
+
+### What's Happening:
+1. ✅ Code pushed to GitHub
+2. ⏳ Vercel detected the push
+3. ⏳ Vercel is building the project
+4. ⏳ Deployment will go live in 2-5 minutes
+
+### Build Configuration:
+```json
+{
+  "buildCommand": "npm run build:all",
+  "outputDirectory": "dist"
+}
 ```
-hanna.care/
-├── /                 → Landing page (marketing)
-└── /scribe/app/      → Scribe app (product)
+
+This tells Vercel to:
+1. Install dependencies
+2. Build landing page → `landing/dist/`
+3. Build Scribe PWA → `scribe/dist/`
+4. Combine both → `dist/` folder
+5. Deploy the combined `dist/` folder
+
+---
+
+## 🎯 Expected Behavior (After Deploy)
+
+### URLs:
+| URL | Expected Content | Status |
+|-----|-----------------|--------|
+| `https://hanna.care/` | Landing page (new pricing) | ⏳ Pending |
+| `https://hanna.care/scribe/app/` | Scribe PWA home | ⏳ Pending |
+| `https://hanna.care/scribe/app/login` | Scribe login page | ⏳ Pending |
+| `https://hanna.care/scribe/app/onboarding` | Scribe onboarding | ⏳ Pending |
+
+### User Flow:
+1. Visit `hanna.care` → See landing page with new pricing
+2. Click "Try Free" → Go to `/scribe/app/`
+3. Redirect to `/scribe/app/login` → See login form
+4. Enter email + PIN → Access Scribe PWA
+
+---
+
+## 🔍 How to Verify Deployment
+
+### Option 1: Check Vercel Dashboard
+1. Go to: https://vercel.com/farhansabbir07-gmailcoms-projects/hanna-line-bot-1
+2. Look for latest deployment
+3. Status should change from **Building** → **Ready**
+
+### Option 2: Test URLs
+```bash
+# Test landing page
+curl -sL https://hanna.care | grep -i "try free"
+
+# Test scribe app
+curl -sL https://hanna.care/scribe/app/ | grep -i "title"
+
+# Test login page
+curl -sL https://hanna.care/scribe/app/login | grep -i "email"
 ```
 
----
-
-## Current Deployment
-
-### Landing Page (`/`)
-- **Build:** `landing/dist/`
-- **Purpose:** Marketing, features, pricing
-- **CTA Buttons:** Link to `/scribe/app/`
-
-### Scribe App (`/scribe/app/`)
-- **Build:** `landing/dist/scribe/app/`
-- **Purpose:** Clinical documentation
-- **Features:** Login, recording, notes, PWA
+### Option 3: Browser Test
+1. Open `https://hanna.care` in browser
+2. Hard refresh: `Cmd+Shift+R` (Mac) or `Ctrl+Shift+R` (Windows)
+3. Click "Try Free" button
+4. Should see Scribe PWA login
 
 ---
 
-## Files Changed
+## 🐛 If Deployment Fails
 
-| File | Change |
-|------|--------|
-| `landing/components/ScribeLanding.tsx` | Updated all CTA hrefs to `/scribe/app/` |
-| `landing/dist/` | Rebuilt with new Scribe app |
-| `scribe/dist/` | Fresh build with correct paths |
+### Check Build Logs:
+1. Go to Vercel Dashboard
+2. Click on failed deployment
+3. View **Build Logs** tab
+4. Look for errors
 
----
+### Common Issues:
 
-## Git Status
+**Issue: "Command exited with 1"**
+- **Fix**: Check if `npm run build:all` works locally
+- Run: `npm run build:all` and check for errors
 
-**Latest Commit:** `2fddca7` — ✨ Clean deployment: Landing + Scribe app  
-**Status:** ✅ Pushed to GitHub  
-**Vercel:** ⏳ Auto-deploying
+**Issue: "Output directory not found"**
+- **Fix**: Ensure `dist/` folder exists after build
+- Check: `ls -la dist/`
 
----
-
-## URLs (After Vercel Deploy)
-
-| URL | Purpose | Status |
-|-----|---------|--------|
-| `https://hanna-line-bot.vercel.app/` | Landing page | ✅ Deploying |
-| `https://hanna-line-bot.vercel.app/scribe/app/` | Scribe app | ✅ Deploying |
-| `https://hanna.care/` | Custom domain (landing) | ⏳ Pending DNS |
-| `https://hanna.care/scribe/app/` | Custom domain (scribe) | ⏳ Pending DNS |
+**Issue: "404 on /scribe/app/"**
+- **Fix**: Check `vercel.json` rewrites
+- Ensure `combine-builds.js` copies files correctly
 
 ---
 
-## What to Test (When Vercel Deploys)
+## 📊 Deployment Timeline
 
-### 1. Landing Page
-Visit: `https://hanna-line-bot.vercel.app/`
-
-Should show:
-- ✅ Hero section
-- ✅ Features
-- ✅ Pricing
-- ✅ "Try Free" button → Links to `/scribe/app/`
-
-### 2. Scribe App
-Visit: `https://hanna-line-bot.vercel.app/scribe/app/`
-
-Should show:
-- ✅ Login form
-- ✅ Purple gradient orb
-- ✅ Email/password fields
-- ✅ "Create session" button
-
-### 3. CTA Button Flow
-1. Click "Try Free" on landing page
-2. Should navigate to `/scribe/app/`
-3. Should show login form
-4. No blank page
+| Time (ICT) | Event |
+|------------|-------|
+| 17:30 | Pricing updates complete |
+| 17:35 | Deployment guide created |
+| 17:43 | Monorepo build system created |
+| 17:43 | Code pushed to GitHub |
+| 17:44 | Vercel detected push |
+| 17:45-17:50 | ⏳ Vercel building (estimated) |
+| 17:50-18:00 | ✅ Deployment should be live |
 
 ---
 
-## No More Mistakes
+## ✅ Post-Deployment Checklist
 
-### ✅ Correct Links
-- All CTAs: `/scribe/app/`
-- No Railway URLs
-- No external links
+Once deployment is complete:
 
-### ✅ Correct Build
-- Landing built fresh
-- Scribe built with `/scribe/app/` base path
-- All asset paths correct
+### 1. Test Landing Page
+- [ ] Visit `https://hanna.care`
+- [ ] Verify new pricing displayed (Pro: ฿990, Clinic: ฿9,990)
+- [ ] Click "Try Free" button
 
-### ✅ Clean Codebase
-- No old build artifacts
-- No confusing duplicate files
-- Single source of truth
+### 2. Test Scribe PWA
+- [ ] Visit `/scribe/app/login`
+- [ ] Verify login form appears (not landing page)
+- [ ] Test login with valid credentials
 
----
+### 3. Test Upgrade Flow
+- [ ] Create 10 notes (hit free limit)
+- [ ] Verify upgrade modal shows correct prices
+- [ ] Test Stripe checkout
 
-## Next Steps
-
-1. **Wait for Vercel** (2-4 minutes)
-2. **Test landing page** → Should work
-3. **Test Scribe app** → Should work
-4. **Test CTA flow** → Landing → Scribe
+### 4. Update Stripe
+- [ ] Go to Stripe Dashboard
+- [ ] Update Pro plan price to ฿990
+- [ ] Update Clinic plan price to ฿9,990
 
 ---
 
-**Status:** ✅ Code pushed, Vercel deploying  
-**ETA:** 3-4 minutes  
-**Confidence:** 100% - Clean build, correct links
+## 🆘 Support
+
+If deployment doesn't complete within 10 minutes:
+
+1. **Check Vercel Dashboard**: https://vercel.com/dashboard
+2. **Manual Deploy**:
+   ```bash
+   cd /Users/mac/hanna-line-bot-1
+   vercel --prod --yes
+   ```
+3. **Check Build Locally**:
+   ```bash
+   npm run build:all
+   ls -la dist/
+   ```
+
+---
+
+**Last Updated**: March 8, 2026, 17:45 ICT  
+**Status**: ⏳ Awaiting Vercel deployment  
+**Latest Commit**: `a493da8`
