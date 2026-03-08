@@ -7,10 +7,6 @@
         "silent": false,
         "autoJobCancelation": false
     },
-    "deploymentProtection": {
-        "preview": "none",
-        "production": "none"
-    },
     "rewrites": [
         {
             "source": "/api/scribe/:path*",
