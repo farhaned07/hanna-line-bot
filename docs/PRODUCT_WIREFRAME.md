@@ -172,8 +172,8 @@ HOME → Tab Bar (Settings) → SETTINGS PAGE
 ```
 SETTINGS → Plan → UPGRADE MODAL
 - Free: 10 notes/month (current)
-- Pro: ฿1,990/month (unlimited)
-- Clinic: ฿4,990/month (up to 5 providers)
+- Pro: ฿990/month (unlimited)
+- Clinic: ฿9,990/month (up to 5 providers)
 - Select → Stripe Checkout → Success → Back to Settings
 ```
 

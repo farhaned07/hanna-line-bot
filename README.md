@@ -18,7 +18,7 @@ We build **two products** with a clear upgrade path:
 
 | Product | Target | Price | Purpose |
 |---------|--------|-------|---------|
-| **Scribe** | Individual doctors, clinics | ฿1,990-4,990/mo | Voice-first documentation |
+| **Scribe** | Individual doctors, clinics | ฿0-9,990/mo | Voice-first documentation |
 | **Care Intelligence** | Hospitals, large clinics | ฿50,000+/mo | Chronic disease monitoring |
 
 **Upgrade Path**: Scribe → Care Plan → Care Intelligence
@@ -67,10 +67,10 @@ Hanna Scribe listens to your patient conversations and automatically generates s
 - **Multi-language**: Thai and English support
 - **PDF Export**: Professional formatted clinical notes
 - **Handover Summaries**: Automatic shift handover generation
-- **Pricing**: 
+- **Pricing**:
   - **Free**: 10 notes/month
-  - **Pro**: ฿1,990/month (unlimited)
-  - **Clinic**: ฿4,990/month (up to 5 providers)
+  - **Pro**: ฿990/month (unlimited)
+  - **Clinic**: ฿9,990/month (up to 5 providers)
 
 ### 📱 Care Intelligence (Production)
 **LINE-based chronic disease monitoring for Thai hospitals**
@@ -469,8 +469,8 @@ Response:
 | Plan | Price | Target | Features |
 |------|-------|--------|----------|
 | **Free** | ฿0 | Students, Trial | 10 notes/month |
-| **Pro** | ฿1,990/mo | Individual providers | Unlimited notes, PDF export, AI editing |
-| **Clinic** | ฿4,990/mo | Small clinics (2-5 providers) | Everything in Pro + shared templates |
+| **Pro** | ฿990/mo | Individual providers | Unlimited notes, PDF export, AI editing |
+| **Clinic** | ฿9,990/mo | Small clinics (2-5 providers) | Everything in Pro + shared templates |
 
 ### Care Intelligence Revenue
 | Plan | Price | Target | Features |

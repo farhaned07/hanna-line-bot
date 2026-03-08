@@ -612,7 +612,7 @@ Plan: Rest, hydration, paracetamol 500mg PRN. Follow up in 1 week.
 
 **Verify**:
 - [ ] Upgrade modal triggers at note 11
-- [ ] Pricing displayed (฿1,990/฿4,990)
+- [ ] Pricing displayed (฿990/฿9,990)
 - [ ] Features listed correctly
 - [ ] Modal cannot be dismissed (force upgrade)
 
@@ -646,13 +646,13 @@ Plan: Rest, hydration, paracetamol 500mg PRN. Follow up in 1 week.
 **Expected Behavior**:
 - Stripe Checkout opens (new tab or redirect)
 - Product details shown: "Hanna Scribe Pro"
-- Price: ฿1,990/month
+- Price: ฿990/month
 - Email pre-filled (from account)
 
 **Verify**:
 - [ ] Stripe Checkout loads: _____ seconds (target: < 3s)
 - [ ] Product name correct
-- [ ] Price correct (฿1,990)
+- [ ] Price correct (฿990)
 - [ ] Email pre-filled
 - [ ] Payment methods available (Card, PromptPay)
 

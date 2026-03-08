@@ -177,7 +177,7 @@ hanna-line-bot-3/
 
 | Product | Model | Price | Sales Motion |
 |---------|-------|-------|--------------|
-| **Scribe** | Self-serve SaaS | ฿1,990-4,990/mo | Online signup |
+| **Scribe** | Self-serve SaaS | ฿0-9,990/mo | Online signup |
 | **Care Intelligence** | B2B Enterprise | ฿50,000-60,000/mo | Hospital sales cycle |
 
 **Problem**: These are **fundamentally different businesses** with different:

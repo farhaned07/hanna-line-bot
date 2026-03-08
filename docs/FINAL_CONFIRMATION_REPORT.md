@@ -196,7 +196,7 @@ hanna-line-bot-3/
 
 | Product | Target | Price | Purpose | Status |
 |---------|--------|-------|---------|--------|
-| **Scribe** | Individual doctors, clinics | ฿1,990-4,990/mo | Voice-first documentation | ✅ **LAUNCH READY** |
+| **Scribe** | Individual doctors, clinics | ฿0-9,990/mo | Voice-first documentation | ✅ **LAUNCH READY** |
 | **Care Intelligence** | Hospitals, large clinics | ฿50,000+/mo | Chronic disease monitoring | ✅ **MAINTENANCE** |
 
 ### **Upgrade Path (Confirmed)**

@@ -238,7 +238,7 @@ Patients: 12   Urgent: 3   Total Time: 145 min
 - ❌ AI editing commands
 - ❌ Handover summaries
 
-### Pro Plan (฿1,990/month)
+### Pro Plan (฿990/month)
 - ✅ **Unlimited notes**
 - ✅ **PDF export**
 - ✅ **AI editing** (regenerate + commands)
@@ -246,7 +246,7 @@ Patients: 12   Urgent: 3   Total Time: 145 min
 - ✅ Priority processing
 - ✅ Email support
 
-### Clinic Plan (฿4,990/month)
+### Clinic Plan (฿9,990/month)
 - ✅ Everything in Pro
 - ✅ **Up to 5 team members**
 - ✅ **Shared templates**

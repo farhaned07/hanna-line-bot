@@ -36,7 +36,7 @@ We build **two products** with a clear upgrade path:
 
 | Product | Target | Price | Purpose |
 |---------|--------|-------|---------|
-| **Scribe** | Individual doctors, small clinics | ฿1,990-4,990/mo | Voice-first documentation |
+| **Scribe** | Individual doctors, small clinics | ฿0-9,990/mo | Voice-first documentation |
 | **Care Intelligence** | Hospitals, large clinics | ฿50,000+/mo | Chronic disease monitoring |
 
 ### **Business Model**
@@ -70,9 +70,9 @@ Care Intelligence (Full Platform)
 - Shift handover summaries
 
 **Pricing**:
-- Free: 10 notes/month
-- Pro: ฿1,990/month (unlimited)
-- Clinic: ฿4,990/month (up to 5 providers)
+- Free: 10 notes/month (฿0)
+- Pro: ฿990/month (unlimited)
+- Clinic: ฿9,990/month (up to 5 providers)
 
 **Target**: Individual doctors, small clinics (1-50 providers)
 

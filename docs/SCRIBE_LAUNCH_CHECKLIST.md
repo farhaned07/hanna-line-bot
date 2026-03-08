@@ -40,8 +40,8 @@
 ### 2. Stripe Configuration
 
 #### Product Setup
-- [ ] Pro plan product created (฿1,990/month)
-- [ ] Clinic plan product created (฿4,990/month)
+- [ ] Pro plan product created (฿990/month)
+- [ ] Clinic plan product created (฿9,990/month)
 - [ ] Price IDs added to environment variables
 - [ ] PromptPay enabled in Stripe dashboard
 - [ ] Card payments enabled
@@ -122,7 +122,7 @@ Decline: 4000 0000 0000 0002
 - [ ] Create 10 notes (Free plan limit)
 - [ ] Tap + button for 11th note
 - [ ] Upgrade modal appears
-- [ ] Pricing displayed correctly (฿1,990/฿4,990)
+- [ ] Pricing displayed correctly (฿990/฿9,990)
 - [ ] Features listed correctly
 - [ ] Tap "Select Pro"
 - [ ] Redirected to Stripe Checkout
