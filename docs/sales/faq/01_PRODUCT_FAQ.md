@@ -6,10 +6,10 @@
 ## About Hanna
 
 ### Q: What exactly is Hanna?
-**A:** Hanna is the financial risk engine for capitation-based hospitals. It continuously monitors chronic patients via LINE and voice between clinic visits, detects deterioration using our OneBrain™ engine, and surfaces at-risk patients to nurses before they become expensive complications.
+**A:** Hanna is a **Care Intelligence Platform** that transforms episodic clinical documentation into continuous patient monitoring. It starts with voice-to-SOAP notes (Scribe), then automatically enrolls patients in 14-day follow-up via LINE. Our OneBrain™ risk engine detects deterioration between visits and alerts nurses before complications occur.
 
 ### Q: Is Hanna an AI chatbot?
-**A:** Hanna is more than a chatbot—it's care infrastructure. While it uses AI (Groq Llama 3) for natural conversations, the core value is the OneBrain™ risk engine that filters routine interactions and escalates only what matters to nurses.
+**A:** Hanna is more than a chatbot—it's care intelligence infrastructure. While it uses AI (Groq Llama 3) for natural conversations and clinical documentation, the core value is continuous monitoring and early detection. The OneBrain™ risk engine filters routine interactions and escalates only what matters to nurses.
 
 ### Q: Is Hanna a medical device?
 **A:** No. Hanna is a care coordination platform, not a diagnostic tool. It does not diagnose, prescribe, or make clinical decisions. All clinical decisions remain with your licensed staff.

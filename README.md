@@ -50,6 +50,7 @@ We build **two products** with a clear upgrade path:
 |----------|---------|
 | **[docs/PRODUCTION_STATUS.md](./docs/PRODUCTION_STATUS.md)** | **Current deployment status (START HERE)** |
 | **[docs/DEPLOYMENT_RUNBOOK.md](./docs/DEPLOYMENT_RUNBOOK.md)** | **Step-by-step deployment guide** |
+| **[docs/FOLLOWUP_SYSTEM_GUIDE.md](./docs/FOLLOWUP_SYSTEM_GUIDE.md)** | **Follow-up system complete guide (NEW ✨)** |
 | **[tests/production-checklist.js](./tests/production-checklist.js)** | Automated production testing |
 
 ### Product Documentation

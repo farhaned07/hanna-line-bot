@@ -1,19 +1,19 @@
 # Hanna Messaging Guide
 
 > **Internal Document** — Language standards for all external communications
-> **Last Updated:** 2026-02-12
+> **Last Updated:** March 9, 2026
 > **Classification:** Strategic / Confidential
 
 ---
 
 ## Core Positioning Statement
 
-**Hanna is the financial risk engine for capitation-based hospitals. We provide supervised, automated follow-up that detects patient deterioration before it becomes a costly complication.**
+**Hanna is a Care Intelligence Platform that transforms episodic clinical documentation into continuous patient monitoring.**
 
 This positions Hanna as:
-- **Financial Protection** (for the hospital)
-- **Supervised Infrastructure** (for the nurses)
-- **Continuous Safety Net** (for the patients)
+- **Complete Platform** (4 tiers: Scribe → Care Plan → Follow-up → Care Intelligence)
+- **Continuous Care** (not just documentation, but ongoing monitoring)
+- **Better Outcomes** (for patients, providers, and hospitals)
 
 ---
 
@@ -23,19 +23,19 @@ This positions Hanna as:
 
 | Context | Use This |
 |---------|----------|
-| **What Hanna Is** | "Financial risk engine for NCDs" |
-| | "Supervised complication prevention system" |
-| | "Continuous monitoring infrastructure" |
-| **What Hanna Does** | "Closes the 90-day visibility gap" |
+| **What Hanna Is** | "Care Intelligence Platform" |
+| | "Voice-first clinical documentation + automated follow-up" |
+| | "Continuous patient monitoring infrastructure" |
+| **What Hanna Does** | "From episodic documentation to continuous intelligence" |
 | | "Detects deterioration early" |
-| | "Surfaces exceptions to nurses" |
-| | "Converts unmanaged risk into managed care" |
-| **Pricing Anchor** | "Cost of prevention vs. cost of complication" |
-| | "Pays for itself by avoiding 1 event" |
-| **Call-to-Action** | "Start Protecting Your Capitation Risk" |
-| | "Close the 90-Day Gap" |
-| **Relationship to Staff** | "Supervised by your team" |
-| | "Escalates to nurses" |
+| | "Converts notes into actionable care plans" |
+| | "Automates 14-day patient follow-up" |
+| **Pricing Anchor** | "4 hours back per day for doctors" |
+| | "60% patient engagement vs. 20% with apps" |
+| **Call-to-Action** | "Try Scribe Free" |
+| | "See the Platform" |
+| **Relationship to Staff** | "Augments your team" |
+| | "Automates documentation so you can focus on care" |
 
 ---
 
@@ -43,26 +43,39 @@ This positions Hanna as:
 
 | Never Say | Why It's Dangerous |
 |-----------|-------------------|
+| **"Financial risk engine"** | ❌ Outdated positioning — too narrow, CFO-only |
 | **"Hire Hanna"** | Implies employment, low-value labor replacement |
-| **"Your AI Nurse"** | Triggers scope-of-practice scrutiny, suggests independent practice |
 | **"10x Nurse Capacity"** | Old positioning. Sounds like "we will fire nurses." |
 | **"Works independently"** | Suggests unsupervised clinical decisions |
 | **"Diagnoses" / "Prescribes"** | Regulatory violation. Only doctors do this. |
 | **"Autonomous care"** | Implies no human oversight |
-| **"Chatbot"** | Sounds cheap and dumb. Hanna is a risk engine. |
+| **"Chatbot"** | Sounds cheap and dumb. Hanna is a platform. |
 
 ---
 
 ## Messaging by Audience
 
-### Hospital Executives (CEO, CFO)
+### Doctors (Scribe)
 
-**Key Message:** Hanna protects your capitation margin by preventing expensive complications.
+**Key Message:** Get 4 hours back per day. Focus on patients, not paperwork.
 
 **Talking Points:**
-- "How much did you lose on diabetic foot ulcers last year?"
-- "We close the 90-day black hole where those costs originate."
-- "The system pays for itself if we prevent just one admission per quarter."
+- "From 10 minutes per note to 30 seconds"
+- "Your voice → SOAP note → Care plan → Patient follow-up"
+- "8 languages supported, including Thai medical terminology"
+- "20-30 notes per day, no burnout"
+
+---
+
+### Hospital Executives (CEO, CFO)
+
+**Key Message:** Hanna improves care quality and operational efficiency.
+
+**Talking Points:**
+- "Continuous monitoring reduces complications"
+- "60% patient engagement vs. 20% with traditional apps"
+- "Early detection → Earlier intervention → Better outcomes"
+- "One platform: Documentation + Care Planning + Follow-up"
 
 ---
 
@@ -71,9 +84,22 @@ This positions Hanna as:
 **Key Message:** Hanna gives you visibility without adding work.
 
 **Talking Points:**
-- "You worry about patients between visits. We watch them for you."
-- "You don't call everyone. You only call the 5 patients who need you today."
-- "Hanna is your safety net, not your replacement."
+- "See which patients need attention today (exception-based triage)"
+- "Automated follow-up handles routine check-ins"
+- "You focus on the 10% who need you, not the 90% who are fine"
+- "Full context for every intervention"
+
+---
+
+### Patients
+
+**Key Message:** Someone is checking on you between visits.
+
+**Talking Points:**
+- "Your doctor uses Hanna to check on you between visits"
+- "Daily check-ins via LINE (no app download)"
+- "If something's wrong, your care team is notified"
+- "Feel cared for, stay engaged"
 
 ---
 
@@ -82,20 +108,44 @@ This positions Hanna as:
 ### Hero Section
 ```
 ❌ "Meet Hanna, Your AI Nurse"
-✅ "The Financial Risk Engine for Chronic Care"
+✅ "Care Intelligence for Modern Healthcare"
 ```
 
 ### Problem Statement
 ```
-❌ "Nurses are overworked"
-✅ "The 90-Day Black Hole is Costing You Millions"
+❌ "The 90-Day Black Hole is Costing You Millions"
+✅ "Patients Disappear Between Visits. Hanna Keeps Them Engaged."
 ```
 
 ### CTA Buttons
 ```
-❌ "Sign Up" / "Hire Hanna"
-✅ "Close the Gap" / "See the Risk Engine"
+❌ "Close the Gap" / "See the Risk Engine"
+✅ "Try Scribe Free" / "See the Platform"
 ```
+
+---
+
+## Product Tier Messaging
+
+### Scribe (Tier 1)
+**Tagline:** "Voice-first clinical documentation"
+**Value Prop:** "From 10 minutes per note to 30 seconds"
+**Price:** ฿0 → ฿990 → ฿9,990/mo
+
+### Care Plan (Tier 2)
+**Tagline:** "Turn notes into actionable care plans"
+**Value Prop:** "Save 10 minutes per patient on care planning"
+**Price:** +฿2,000/mo (add-on)
+
+### Follow-up (Tier 3)
+**Tagline:** "14-day automated patient monitoring"
+**Value Prop:** "60% patient engagement via LINE"
+**Price:** Included in Care Intelligence
+
+### Care Intelligence (Tier 4)
+**Tagline:** "Population health + risk scoring"
+**Value Prop:** "Prevent complications before they happen"
+**Price:** ฿50,000-60,000/mo
 
 ---
 
@@ -104,13 +154,13 @@ This positions Hanna as:
 If challenged by regulators or press:
 
 **Position Statement:**
-> "Hanna is non-clinical infrastructure designed to surface patient data to licensed medical professionals. It does not diagnose, treat, or prescribe. All clinical decisions are made by the hospital's existing medical team. Hanna simply ensures they have the data to make those decisions in time."
+> "Hanna is supervised care coordination infrastructure designed to support licensed medical professionals. It does not diagnose, treat, or prescribe. All clinical decisions are made by the healthcare provider's existing medical team. Hanna simply ensures they have the data to make those decisions in time."
 
 ---
 
-## Summary: The Shift
+## Summary: The Platform Strategy
 
-**Old Pitch:** "We help your nurses do more." (Efficiency)
-**New Pitch:** "We stop you from losing money on complications." (Financial Protection)
+**Old Pitch:** "Financial risk engine for capitation hospitals" (too narrow)
+**New Pitch:** "Care Intelligence Platform for continuous care" (broad, scalable)
 
-**Efficiency is a nice-to-have. Financial protection is a must-have.**
+**Documentation is the entry point. Intelligence is the endgame.**

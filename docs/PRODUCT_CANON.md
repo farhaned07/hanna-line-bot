@@ -1,13 +1,14 @@
 # Hanna Product Canon
 
 > **The Single Truth Document**
-> Last Updated: 2026-02-12
+> **Last Updated:** March 9, 2026
+> **Version:** 3.0 (Care Intelligence Platform)
 
 ---
 
 ## The Mission
 
-> **Build the financial risk engine for capitation-based hospitals by continuously monitoring chronic patients via LINE, predicting deterioration before it becomes a complication, and converting unmanaged diabetes risk into measurable cost avoidance for mid-tier Thai NCD clinics.**
+> **Build the leading Care Intelligence Platform for Southeast Asian healthcare — transforming episodic clinical documentation into continuous patient monitoring.**
 
 Everything we build, say, and measure serves this mission.
 
@@ -17,25 +18,26 @@ Everything we build, say, and measure serves this mission.
 
 | Word | Definition |
 |------|------------|
-| **Financial risk engine** | We save hospitals money by preventing complications they'd pay for under capitation |
-| **Capitation-based** | SSS/UCS patients where the hospital eats the complication cost |
-| **Continuously monitoring** | Daily LINE check-ins — not periodic clinic visits |
-| **Predicting deterioration** | AI risk scoring catches problems 90 days earlier than the next clinic visit |
-| **Measurable cost avoidance** | Every intervention tracked, every complication prevented has a ฿ value |
-| **Mid-tier Thai NCD clinics** | Kasemrad, Thainakarin, Paolo — not Bumrungrad, not public hospitals |
+| **Care Intelligence** | We combine documentation, care planning, and monitoring into one platform |
+| **Platform** | Four integrated tiers: Scribe → Care Plan → Follow-up → Care Intelligence |
+| **Continuous monitoring** | Daily LINE check-ins — not just periodic clinic visits |
+| **Early detection** | Catch problems in 24 hours vs. 30-90 days between visits |
+| **Measurable outcomes** | Every engagement, intervention, and outcome tracked |
+| **Southeast Asia** | Start with Thailand, expand to Laos, Cambodia, Myanmar |
 
 ---
 
 ## What We Are
 
-- **Financial protection** for hospitals against preventable chronic complications
-- **Between-visit monitoring** that fills the 90-day black hole after clinic visits
+- **Complete platform** for clinical documentation + patient monitoring
+- **Four integrated tiers** with clear upgrade path
+- **Between-visit monitoring** that fills the gap after clinic visits
 - **Exception detection** that tells nurses which patients need attention today
-- **Supervised system** — AI flags, nurses decide, hospitals save
+- **Supervised system** — AI flags, clinicians decide, patients benefit
 
 ## What We Are NOT
 
-- ❌ A replacement for nurses
+- ❌ A replacement for clinicians
 - ❌ A telemedicine platform
 - ❌ An EMR or patient app
 - ❌ A medical device that diagnoses
@@ -43,13 +45,41 @@ Everything we build, say, and measure serves this mission.
 
 ---
 
+## Product Hierarchy
+
+```
+Hanna Care Intelligence Platform
+│
+├── Level 1: Scribe (Entry Point)
+│   └── Voice-first clinical documentation
+│       ├── Free: 10 notes/month
+│       ├── Pro: ฿990/month (unlimited)
+│       └── Clinic: ฿9,990/month (up to 5 providers)
+│
+├── Level 2: Care Plan (Add-on)
+│   └── Automated care plan generation
+│       └── +฿2,000/month (for Scribe Pro/Clinic)
+│
+├── Level 3: Follow-up (Monitoring)
+│   └── 14-day automated patient monitoring
+│       └── Included in Care Intelligence
+│
+└── Level 4: Care Intelligence (Enterprise)
+    └── Chronic disease monitoring platform
+        ├── Pilot: ฿60,000/month (90 days)
+        └── Annual: ฿50,000/month (per clinic)
+```
+
+---
+
 ## Core Value Proposition
 
 | Buyer | Pain | Our Solution |
 |-------|------|--------------|
-| **VP Medical + CFO** | ฿2-4M/year lost to preventable complications under capitation | Pay ฿50K/month, avoid ฿700K+ in complication costs |
-| **NCD Clinic Nurse** | 400 patients, paper follow-up book, no visibility between visits | Dashboard shows which 20-30 patients need attention today |
-| **Patient** | Forgotten between visits, no one checks on them | Daily LINE check-in, feels cared for, stays engaged |
+| **Doctors** | 2+ hours daily on documentation | Voice-to-SOAP in 30 seconds → 4 hours back per day |
+| **Hospital Executives** | Complications, readmissions, poor outcomes | Continuous monitoring → Early detection → Better outcomes |
+| **Nurses** | No visibility between visits, alert fatigue | Exception-based triage → Focus on patients who need you |
+| **Patients** | Forgotten between visits, no one checks | Daily LINE check-ins → Feel cared for, stay engaged |
 
 ---
 
@@ -57,11 +87,12 @@ Everything we build, say, and measure serves this mission.
 
 | Metric | Before Hanna | Target | Why It Matters |
 |--------|-------------|--------|----------------|
-| **Patient visibility** (% of days with data) | 0% | >60% | Hospital can see patients between visits |
-| **Intervention latency** (issue → clinical action) | 30-90 days | <24 hours | Problems caught before they become complications |
+| **Time per note** | 10 minutes | 30 seconds | Doctor adoption, burnout reduction |
+| **Patient visibility** (% of days with data) | 0% | >60% | See patients between visits |
+| **Intervention latency** (issue → action) | 30-90 days | <24 hours | Catch problems early |
+| **Patient engagement** | 20% (apps) | >60% (LINE) | Better adherence, outcomes |
 | **Follow-up attendance** | ~68% | >80% | Fewer patients disappearing |
-| **Complications flagged early** | 0 | Track all | Each early flag = ฿175K complication avoided |
-| **Cost avoided** | ฿0 | Calculate | CFO proof that Hanna pays for itself |
+| **Complications flagged early** | 0 | Track all | Each flag = potential admission avoided |
 
 ---
 
@@ -69,40 +100,51 @@ Everything we build, say, and measure serves this mission.
 
 ### Always Say:
 
-- "Complication prevention"
-- "Financial protection"
-- "Between-visit monitoring"
-- "Cost avoidance"
+- "Care Intelligence Platform"
+- "Voice-first clinical documentation"
+- "Continuous patient monitoring"
+- "From episodic documentation to continuous intelligence"
+- "4 hours back per day"
+- "60% patient engagement"
 - "Supervised care infrastructure"
 - "Exception detection"
 
 ### Never Say:
 
-- "AI Nurse" (sounds like replacement)
-- "Virtual nurse" (regulatory risk)
-- "10x nurse capacity" (old positioning — retired)
-- "Autonomous" (implies no supervision)
-- "Chatbot" (undervalues the product)
-- "Diagnose" or "prescribe" (scope of practice violation)
+- ❌ "Financial risk engine" (outdated, too narrow)
+- ❌ "AI Nurse" (sounds like replacement)
+- ❌ "Virtual nurse" (regulatory risk)
+- ❌ "10x nurse capacity" (old positioning — retired)
+- ❌ "Autonomous" (implies no supervision)
+- ❌ "Chatbot" (undervalues the product)
+- ❌ "Diagnose" or "prescribe" (scope of practice violation)
 
 ---
 
 ## The Pitch (30 seconds)
 
-> "Your NCD clinic has 400 diabetic patients. After their visit, they disappear for 3 months. 54% come back still uncontrolled. Some come back with complications that cost you ฿175K each — and under capitation, you eat that cost.
+> "Doctors spend 2+ hours daily on documentation. Patients disappear between visits and come back with complications. Hanna solves both.
 >
-> Hanna checks in with every patient daily via LINE. When something is wrong, your nurse gets alerted. You catch problems in 24 hours instead of 90 days.
+> **For doctors:** Voice-to-SOAP notes in 30 seconds. Get 4 hours back per day.
 >
-> Pay ฿50,000 per month. Prevent 4 complications. Save ฿700,000."
+> **For patients:** Daily LINE check-ins. Someone checks on you between visits.
+>
+> **For hospitals:** One platform — documentation, care planning, and continuous monitoring. Better outcomes, fewer readmissions.
+>
+> Start with Scribe free. Grow into full Care Intelligence."
 
 ---
 
 ## Pricing
 
-| Model | Price | Structure |
-|-------|-------|-----------|
-| **Pilot** | ฿60,000/month | 3 months, auto-converts to annual |
-| **Annual** | ฿50,000/month | Per NCD clinic, up to 500 patients |
+| Tier | Price | Structure |
+|------|-------|-----------|
+| **Scribe Free** | ฿0/month | 10 notes/month |
+| **Scribe Pro** | ฿990/month | Unlimited notes |
+| **Scribe Clinic** | ฿9,990/month | Up to 5 providers |
+| **Care Plan** | +฿2,000/month | Add-on for Scribe |
+| **Care Intelligence Pilot** | ฿60,000/month | 90 days, 500 patients |
+| **Care Intelligence Annual** | ฿50,000/month | Per clinic, 500 patients |
 | **Overage** | ฿100/patient/month | Beyond 500 patients |
 
 ---
@@ -110,20 +152,80 @@ Everything we build, say, and measure serves this mission.
 ## Regulatory Posture (Summary)
 
 - Hanna is **infrastructure**, not a practitioner
-- All clinical decisions by **licensed nurses**
+- All clinical decisions by **licensed professionals**
 - We **surface**, never **advise**
 - Partner institution holds clinical responsibility
+- Mandatory disclosure: "I'm not a doctor/nurse"
+
+---
+
+## Success Metrics by Tier
+
+### Scribe (Individual/SMB)
+| Metric | Target |
+|--------|--------|
+| Time saved per note | 4-8 minutes |
+| Notes per provider/day | 20-30 |
+| Free → Pro conversion | 5-8% |
+| Monthly Active Users | 100+ |
+| Churn rate | <5%/month |
+
+### Care Plan (Add-on)
+| Metric | Target |
+|--------|--------|
+| Scribe → Care Plan conversion | 20% |
+| Care plans generated/month | 500+ |
+| Patient adherence rate | >70% |
+
+### Follow-up (Monitoring)
+| Metric | Target |
+|--------|--------|
+| Enrollment rate | >60% |
+| Response rate | >60% |
+| Day 1 response | >80% |
+| Day 14 completion | >50% |
+
+### Care Intelligence (Enterprise)
+| Metric | Target |
+|--------|--------|
+| Patient engagement | >60% |
+| Intervention latency | <24 hours |
+| Pilot → Annual conversion | >70% |
+| Hospital ROI | 5:1 |
+
+---
+
+## Roadmap
+
+### Q2 2026 (Apr-Jun): Foundation
+- [ ] Care Plan MVP (auto-generate from Scribe notes)
+- [ ] Outcomes Dashboard (prove value)
+- [ ] 5 Pilot Customers (validate market)
+- [ ] Hire: Customer Success Manager
+
+### Q3 2026 (Jul-Sep): Validation
+- [ ] Publish Pilot Outcomes (3 case studies)
+- [ ] EMR Integration: HosxP (distribution partner)
+- [ ] Care Plan: 50 condition templates
+- [ ] Raise: Pre-seed round (฿10-20M)
+
+### Q4 2026 (Oct-Dec): Scale
+- [ ] Regional Expansion: Laos pilot
+- [ ] Team: 5 people (founder + 4)
+- [ ] Revenue: ฿2M MRR run rate
+- [ ] Multi-clinic management (enterprise feature)
 
 ---
 
 ## Kill Criteria
 
-If any 2+ of these signals fire during pilot, pause everything:
+If any 2+ of these signals fire during pilot, pause and reassess:
 
+- Scribe adoption <10 notes/week/doctor
 - Patient check-in rate <30%
 - Hospital says "our nurses already do this"
-- CFO shrugs at ROI math
-- No auto-convert after 3 months
+- No pilot → annual conversion after 90 days
+- Churn rate >10%/month
 
 ---
 
@@ -131,6 +233,24 @@ If any 2+ of these signals fire during pilot, pause everything:
 
 When in doubt, remember:
 
-> **"Build the financial risk engine for capitation-based hospitals."**
+> **"From episodic documentation to continuous intelligence."**
 
 If a feature, message, or decision doesn't serve this, we don't do it.
+
+---
+
+## Related Documents
+
+| Document | Purpose | Location |
+|----------|---------|----------|
+| **PRODUCT_HIERARCHY.md** | Unified product structure | `/docs/PRODUCT_HIERARCHY.md` |
+| **CARE_PLAN_SPEC.md** | Care Plan specification | `/docs/CARE_PLAN_SPEC.md` |
+| **MESSAGING_GUIDE.md** | Language standards | `/docs/MESSAGING_GUIDE.md` |
+| **FOLLOWUP_SYSTEM_GUIDE.md** | Follow-up system guide | `/docs/FOLLOWUP_SYSTEM_GUIDE.md` |
+| **REGULATORY_POSTURE.md** | Legal positioning | `/docs/REGULATORY_POSTURE.md` |
+| **DEPLOYMENT_RUNBOOK.md** | Production deployment | `/docs/DEPLOYMENT_RUNBOOK.md` |
+
+---
+
+*Last Updated: March 9, 2026*
+*Next Review: June 9, 2026*
