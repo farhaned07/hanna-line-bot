@@ -1,0 +1,264 @@
+/*
+ * Hanna Scribe — Clinical Documentation
+ * Dark Mode Enterprise Design System
+ * Matches Nurse Command Center aesthetic
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base Styles */
+:root {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: dark;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: #0B0D12;
+  color: #F8FAFC;
+  overflow-x: hidden;
+}
+
+/* Mobile-safe areas */
+.safe-top {
+  padding-top: env(safe-area-inset-top, 20px);
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 20px);
+}
+
+/* Focus styles */
+*:focus-visible {
+  outline: 2px solid #60A5FA;
+  outline-offset: 2px;
+}
+
+/* Ambient background glow */
+.ambient-glow {
+  position: fixed;
+  top: -20%;
+  left: -10%;
+  width: 50%;
+  height: 50%;
+  background: radial-gradient(ellipse at center, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ambient-glow::after {
+  content: '';
+  position: fixed;
+  top: auto;
+  bottom: -20%;
+  left: auto;
+  right: -10%;
+  width: 50%;
+  height: 50%;
+  background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+  filter: blur(120px);
+  pointer-events: none;
+}
+
+/* Recording Orb Animations */
+.orb-container {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.orb-core {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #6366F1 100%);
+  box-shadow: 
+    0 0 60px rgba(99, 102, 241, 0.5),
+    0 0 100px rgba(99, 102, 241, 0.3),
+    inset 0 0 40px rgba(255, 255, 255, 0.1);
+  position: relative;
+  z-index: 1;
+}
+
+.orb-core::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), transparent, rgba(139, 92, 246, 0.3));
+  z-index: -1;
+  animation: orb-rotate 4s linear infinite;
+}
+
+@keyframes orb-rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Ripple rings */
+.orb-container > div:not(.orb-core) {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  animation: orb-pulse 2.5s ease-out infinite;
+}
+
+@keyframes orb-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.25;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+/* Recording indicator dot */
+.recording-dot {
+  animation: recording-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes recording-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.9);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1E293B;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #64748B;
+}
+
+/* Selection */
+::selection {
+  background-color: rgba(99, 102, 241, 0.3);
+  color: #FFFFFF;
+}
+
+/* Text shadows */
+.text-shadow-lg {
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #FFFFFF 0%, #E0E7FF 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Card hover effects */
+.card-hover {
+  transition: all 0.2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Button glow */
+.btn-glow {
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+  transition: all 0.2s ease;
+}
+
+.btn-glow:hover {
+  box-shadow: 0 0 30px rgba(99, 102, 241, 0.4);
+  transform: translateY(-1px);
+}
+
+/* Input focus glow */
+.input-focus:focus {
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+/* Loading shimmer */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Slide up animation */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-up {
+  animation: slideUp 0.4s ease-out;
+}

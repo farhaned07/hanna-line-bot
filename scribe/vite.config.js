@@ -13,7 +13,26 @@ export default defineConfig({
             registerType: 'autoUpdate',
             includeAssets: ['favicon.svg', 'icons/*.png', 'manifest.json'],
             useCredentials: true,
-            manifest: false,
+            manifest: {
+                name: 'Hanna Scribe',
+                short_name: 'Scribe',
+                description: 'Voice-first clinical documentation',
+                theme_color: '#0B0D12',
+                background_color: '#0B0D12',
+                display: 'standalone',
+                icons: [
+                    {
+                        src: '/icons/icon-192.png',
+                        sizes: '192x192',
+                        type: 'image/png'
+                    },
+                    {
+                        src: '/icons/icon-512.png',
+                        sizes: '512x512',
+                        type: 'image/png'
+                    }
+                ]
+            },
             workbox: {
                 globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,json}'],
                 navigateFallback: '/scribe/app/index.html',
@@ -60,13 +79,6 @@ export default defineConfig({
     build: {
         target: 'esnext',
         minify: 'terser',
-        terserOptions: {
-            compress: {
-                drop_console: true,
-                drop_debugger: true,
-                pure_funcs: ['console.log', 'console.debug', 'console.info', 'console.trace'],
-            },
-        },
         rollupOptions: {
             output: {
                 manualChunks: {

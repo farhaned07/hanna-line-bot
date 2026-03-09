@@ -1,218 +1,176 @@
-import { useState, useEffect } from 'react'
-import { useParams, useNavigate, useLocation } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { AlertCircle, RotateCcw, Home } from 'lucide-react'
-import { api } from '../api/client'
-import { t } from '../i18n'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
-import { Progress } from '@/components/ui/progress'
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { CheckCircle2, Loader2, Mic, FileText, Sparkles } from 'lucide-react';
+import { transcriptionApi, notesApi } from '@/lib/api';
+import { Button } from '@/components/ui/Button';
+import { Card, CardContent } from '@/components/ui/Card';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
-const STAGES = [
-    {
-        key: 'upload',
-        label: 'Uploading audio...',
-        sublabel: 'Preparing your recording',
-        timeEstimate: '1-2 seconds'
-    },
-    {
-        key: 'transcribe',
-        label: 'Transcribing...',
-        sublabel: 'AI is converting speech to text',
-        timeEstimate: '10-30 seconds',
-        detail: 'Recognizing medical terms in Thai, Bangla & English'
-    },
-    {
-        key: 'generate',
-        label: 'Generating SOAP note...',
-        sublabel: 'Creating structured clinical note',
-        timeEstimate: '5-15 seconds',
-        detail: 'Organizing into Subjective, Objective, Assessment, Plan'
-    }
-]
+const STEPS = [
+    { id: 'upload', label: 'Uploading audio', icon: Mic },
+    { id: 'transcribe', label: 'Transcribing conversation', icon: FileText },
+    { id: 'generate', label: 'Generating clinical note', icon: Sparkles },
+];
 
 export default function Processing() {
-    const { sessionId } = useParams()
-    const navigate = useNavigate()
-    const location = useLocation()
-    const [stage, setStage] = useState(0)
-    const [error, setError] = useState(null)
-    const [detectedLang, setDetectedLang] = useState(null)
-    const audioBlobRef = useState(() => location.state?.audioBlob)[0]
+    const { sessionId } = useParams();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const [currentStep, setCurrentStep] = useState(0);
+    const [error, setError] = useState(null);
+    const [noteId, setNoteId] = useState(null);
 
     useEffect(() => {
-        processAudio()
-    }, [])
-
-    const processAudio = async () => {
-        try {
-            const audioBlob = audioBlobRef
-            if (!audioBlob) {
-                setError('No audio recording found. Please try recording again.')
-                return
-            }
-
-            setStage(0)
-            await new Promise(r => setTimeout(r, 600))
-
-            setStage(1)
-            const { text: transcript } = await api.transcribe(audioBlob)
-            await api.updateSession(sessionId, { transcript, status: 'transcribed' })
-
-            const hasThai = /[ก-๙]/.test(transcript)
-            const hasBangla = /[ঀ-৿]/.test(transcript)
-            if (hasThai) setDetectedLang('Thai 🇹🇭')
-            else if (hasBangla) setDetectedLang('Bangla 🇧🇩')
-            else setDetectedLang('English 🇬🇧')
-
-            setStage(2)
-            const note = await api.generateNote(sessionId)
-            navigate(`/note/${note.id}`, { replace: true })
-        } catch (err) {
-            setError(err.message || 'Processing failed')
+        const audioBlob = location.state?.audioBlob;
+        if (!audioBlob) {
+            setError('No audio data found');
+            return;
         }
-    }
+        processAudio(audioBlob);
+    }, []);
+
+    const processAudio = async (audioBlob) => {
+        try {
+            // Step 1: Upload & Transcribe
+            setCurrentStep(0);
+            const transcription = await transcriptionApi.transcribe(audioBlob);
+            
+            // Step 2: Generate Note
+            setCurrentStep(1);
+            const note = await notesApi.generateNote(sessionId, 'soap');
+            
+            setCurrentStep(2);
+            setNoteId(note.id);
+            
+            // Navigate to note editor after short delay
+            setTimeout(() => {
+                navigate(`/scribe/app/note/${note.id}`, { replace: true });
+            }, 800);
+            
+        } catch (err) {
+            console.error('Processing error:', err);
+            setError(err.message || 'Processing failed. Please try again.');
+        }
+    };
 
     return (
-        <div className="min-h-dvh flex flex-col items-center justify-center bg-background p-8 relative overflow-hidden">
-            {/* Background glow */}
-            <div className="fixed top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-primary/10 blur-3xl pointer-events-none" />
+        <DashboardLayout>
+            <div className="min-h-dvh bg-background flex items-center justify-center p-4 relative">
+                {/* Ambient Background Glow */}
+                <div className="ambient-glow" />
 
-            {/* Orb with rings */}
-            <div className="relative mb-14">
-                {/* Outer ring */}
-                {!error && (
-                    <motion.div
-                        animate={{ scale: [1, 1.3, 1], opacity: [0.15, 0.05, 0.15] }}
-                        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                        className="absolute -top-[30px] -left-[30px] w-[160px] h-[160px] rounded-full border border-primary/20"
-                    />
-                )}
-                {/* Inner ring */}
-                {!error && (
-                    <motion.div
-                        animate={{ scale: [1, 1.15, 1], opacity: [0.25, 0.1, 0.25] }}
-                        transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: 0.3 }}
-                        className="absolute -top-[15px] -left-[15px] w-[130px] h-[130px] rounded-full border border-primary/15"
-                    />
-                )}
-                {/* Orb */}
                 <motion.div
-                    animate={error
-                        ? { scale: [1, 1.02, 1] }
-                        : { scale: [1, 1.06, 1] }
-                    }
-                    transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                    className={`w-[100px] h-[100px] rounded-full ${
-                        error 
-                            ? 'bg-gradient-to-br from-red-400 via-red-500 to-red-700 shadow-red-glow' 
-                            : 'orb-core'
-                    }`}
-                />
-            </div>
-
-            {error ? (
-                <motion.div
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-center max-w-xs"
+                    className="w-full max-w-md relative z-10"
                 >
-                    <h2 className="text-lg font-bold text-foreground mb-2">
-                        Processing failed
-                    </h2>
-                    <p className="text-sm text-muted-foreground mb-8">
-                        {error}
-                    </p>
-                    <div className="flex gap-2 justify-center">
-                        <Button
-                            variant="outline"
-                            onClick={() => navigate('/')}
-                            className="h-10 px-4 border-slate-700 text-muted-foreground"
-                        >
-                            <Home size={15} className="mr-2" />
-                            Home
-                        </Button>
-                        <Button
-                            onClick={() => { setError(null); setStage(0); processAudio() }}
-                            className="h-10 px-4 bg-gradient-to-r from-primary to-primary-hover text-primary-foreground shadow-primary-glow"
-                        >
-                            <RotateCcw size={14} className="mr-2" />
-                            Try Again
-                        </Button>
-                    </div>
-                </motion.div>
-            ) : (
-                <div className="text-center w-full max-w-sm">
-                    <motion.p
-                        key={stage}
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-xl font-bold text-foreground mb-2 -tracking-wide"
-                    >
-                        {STAGES[stage]?.label}
-                    </motion.p>
-
-                    <motion.p
-                        key={`sub-${stage}`}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.15 }}
-                        className="text-sm text-muted-foreground mb-2 font-normal"
-                    >
-                        {STAGES[stage]?.sublabel}
-                    </motion.p>
-
-                    <Badge variant="secondary" className="inline-flex items-center gap-1.5 px-3 py-1.5 mb-4 bg-primary/15">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                        <span className="text-xs font-semibold text-muted-foreground">
-                            ~{STAGES[stage]?.timeEstimate}
-                        </span>
-                    </Badge>
-
-                    {stage >= 1 && detectedLang && (
+                    {/* Header */}
+                    <div className="text-center mb-8">
                         <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white/8 mb-4"
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                            className="inline-block mb-6"
                         >
-                            <span className="text-xs text-muted-foreground">
-                                Detected:
-                            </span>
-                            <span className="text-xs font-semibold text-foreground">
-                                {detectedLang}
-                            </span>
+                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center shadow-lg shadow-primary-glow/50">
+                                <Loader2 size={32} className="text-white animate-spin" />
+                            </div>
+                        </motion.div>
+                        
+                        <h1 className="text-2xl font-bold text-white mb-2">
+                            Processing Consultation
+                        </h1>
+                        <p className="text-muted-foreground text-sm">
+                            AI is generating your clinical note
+                        </p>
+                    </div>
+
+                    {/* Progress Card */}
+                    <Card className="border-border bg-card shadow-xl">
+                        <CardContent className="p-6 space-y-4">
+                            {STEPS.map((step, index) => (
+                                <motion.div
+                                    key={step.id}
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{
+                                        opacity: index <= currentStep ? 1 : 0.4,
+                                        x: 0,
+                                    }}
+                                    transition={{ delay: index * 0.1 }}
+                                    className="flex items-center gap-4"
+                                >
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                                        index < currentStep
+                                            ? 'bg-success text-white'
+                                            : index === currentStep
+                                            ? 'bg-primary text-white shadow-lg shadow-primary-glow/50'
+                                            : 'bg-background-tertiary text-muted-foreground'
+                                    }`}>
+                                        {index < currentStep ? (
+                                            <CheckCircle2 size={20} />
+                                        ) : (
+                                            <step.icon size={20} />
+                                        )}
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className={`text-sm font-medium ${
+                                            index <= currentStep ? 'text-white' : 'text-muted-foreground'
+                                        }`}>
+                                            {step.label}
+                                        </p>
+                                        {index === currentStep && index < STEPS.length - 1 && (
+                                            <motion.div
+                                                initial={{ width: 0 }}
+                                                animate={{ width: '100%' }}
+                                                transition={{ duration: 2 }}
+                                                className="h-0.5 bg-gradient-to-r from-primary to-transparent mt-2"
+                                            />
+                                        )}
+                                    </div>
+                                    {index === currentStep && index < STEPS.length - 1 && (
+                                        <Loader2 size={16} className="text-primary animate-spin" />
+                                    )}
+                                </motion.div>
+                            ))}
+                        </CardContent>
+                    </Card>
+
+                    {/* Error State */}
+                    {error && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="mt-6 p-4 bg-critical/10 border border-critical/20 rounded-xl text-critical text-sm text-center"
+                        >
+                            <p className="font-medium mb-2">Processing Failed</p>
+                            <p>{error}</p>
+                            <Button
+                                onClick={() => navigate(`/scribe/app/record/${sessionId}`)}
+                                variant="destructive"
+                                className="mt-3 h-10 px-6"
+                            >
+                                Try Again
+                            </Button>
                         </motion.div>
                     )}
 
-                    {STAGES[stage]?.detail && (
-                        <motion.p
+                    {/* Success - Navigate to note */}
+                    {currentStep === 2 && noteId && (
+                        <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            transition={{ delay: 0.3 }}
-                            className="text-xs text-muted-foreground mb-6 max-w-xs"
+                            className="mt-6 text-center"
                         >
-                            {STAGES[stage]?.detail}
-                        </motion.p>
+                            <p className="text-success text-sm font-medium">
+                                Note generated successfully!
+                            </p>
+                            <p className="text-muted-foreground text-xs mt-1">
+                                Redirecting to editor...
+                            </p>
+                        </motion.div>
                     )}
-
-                    <div className="flex gap-1.5 justify-center">
-                        {STAGES.map((s, i) => (
-                            <motion.div
-                                key={s.key}
-                                animate={{
-                                    width: i === stage ? 32 : 8,
-                                    background: i <= stage
-                                        ? 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-hover)) 100%)'
-                                        : 'rgba(255,255,255,0.1)'
-                                }}
-                                transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-                                className="h-2 rounded-md"
-                            />
-                        ))}
-                    </div>
-                </div>
-            )}
-        </div>
-    )
+                </motion.div>
+            </div>
+        </DashboardLayout>
+    );
 }

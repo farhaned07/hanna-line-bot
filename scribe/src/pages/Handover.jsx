@@ -1,228 +1,187 @@
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { Copy, FileDown, Sparkles, AlertTriangle, Users, Clock, Loader2 } from 'lucide-react'
-import { useAuth } from '../hooks/useAuth'
-import { api } from '../api/client'
-import { t } from '../i18n'
-import TabBar from '../components/TabBar'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { useToast } from '@/hooks/use-toast'
+import { useState } from 'react';
+import { FileText, Users, Clock, AlertTriangle } from 'lucide-react';
+import { handoverApi } from '@/lib/api';
+import { Button } from '@/components/ui/Button';
+import { Card, CardContent } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
 export default function Handover() {
-    const { user } = useAuth()
-    const { toast } = useToast()
-    const [handover, setHandover] = useState(null)
-    const [loading, setLoading] = useState(false)
-    const [copied, setCopied] = useState(false)
-    const [generating, setGenerating] = useState(false)
-
-    useEffect(() => {
-        generateHandover()
-    }, [])
+    const [handover, setHandover] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
     const generateHandover = async () => {
-        setGenerating(true)
-        setLoading(true)
+        setLoading(true);
+        setError(null);
         try {
-            const data = await api.generateHandover()
-            setHandover(data.handover || data)
+            const data = await handoverApi.generate();
+            setHandover(data);
         } catch (err) {
-            setHandover({ patients: [] })
+            setError(err.message || 'Failed to generate handover');
         } finally {
-            setLoading(false)
-            setGenerating(false)
+            setLoading(false);
         }
-    }
-
-    const handleCopy = () => {
-        if (!handover) return
-        const text = handover.patients.map((p, i) =>
-            `${i + 1}. ${p.name}${p.is_urgent ? ' ⚠️' : ''}\n   ${p.summary}`
-        ).join('\n\n')
-        navigator.clipboard.writeText(text)
-        setCopied(true)
-        toast({
-            title: "Copied to clipboard",
-            description: "Handover summary copied",
-            duration: 2000
-        })
-        setTimeout(() => setCopied(false), 2000)
-    }
-
-    const handleExportPdf = () => {
-        if (!handover) return
-        api.downloadHandoverPdf(handover).catch(err => {
-            toast({
-                title: "Export failed",
-                description: "Please try again",
-                variant: 'destructive'
-            })
-        })
-    }
-
-    const patients = handover?.patients || []
-    const urgentCount = patients.filter(p => p.is_urgent).length
+    };
 
     return (
-        <div className="min-h-dvh bg-background pb-24">
-            <div className="safe-top px-5 pt-12 pb-5">
-                <h1 className="text-3xl font-extrabold text-foreground -tracking-wide">
-                    {t('handover.title')}
-                </h1>
-            </div>
+        <DashboardLayout>
+            <div className="min-h-dvh bg-background relative">
+                {/* Ambient Background Glow */}
+                <div className="ambient-glow" />
 
-            <div className="px-5">
-                {loading ? (
-                    <div className="space-y-3">
-                        {[1, 2, 3].map(i => (
-                            <Card key={i} className="h-20 bg-card border-border animate-pulse" />
-                        ))}
-                    </div>
-                ) : handover ? (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.4 }}
-                    >
-                        {/* Shift Info */}
-                        <div className="mb-2">
-                            <div className="flex items-center gap-2 mb-2">
-                                <Badge variant="primary" className="text-xs font-semibold">
-                                    {t('handover.generated', { count: patients.length })}
-                                </Badge>
-                                {urgentCount > 0 && (
-                                    <Badge variant="destructive" className="text-xs font-semibold">
-                                        <AlertTriangle size={12} className="mr-1" />
-                                        {urgentCount} {t('handover.urgent')}
-                                    </Badge>
-                                )}
+                {/* Header */}
+                <div className="safe-top px-6 pt-8 pb-6 relative z-10">
+                    <h1 className="text-3xl font-bold text-white gradient-text mb-2">
+                        Shift Handover
+                    </h1>
+                    <p className="text-muted-foreground text-sm">
+                        Generate end-of-shift summary for incoming team
+                    </p>
+                </div>
+
+                {/* Content */}
+                <div className="px-6 relative z-10">
+                    {!handover && !loading && (
+                        <Card className="border-border bg-card p-8 text-center">
+                            <CardContent className="space-y-4">
+                                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
+                                    <FileText size={32} className="text-primary" />
+                                </div>
+                                <h3 className="text-lg font-semibold text-white">
+                                    No Handover Generated
+                                </h3>
+                                <p className="text-muted-foreground text-sm max-w-xs mx-auto">
+                                    Generate a comprehensive shift handover summary from today's patient encounters
+                                </p>
+                                <Button
+                                    onClick={generateHandover}
+                                    className="mt-4 h-12 px-8 bg-gradient-to-r from-primary to-primary-hover"
+                                >
+                                    Generate Handover
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {loading && (
+                        <div className="text-center py-16">
+                            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                            <p className="text-muted-foreground">Generating handover summary...</p>
+                        </div>
+                    )}
+
+                    {handover && (
+                        <div className="space-y-6">
+                            {/* Summary Stats */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <Card className="border-border bg-card">
+                                    <CardContent className="p-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                                                <Users size={20} className="text-primary" />
+                                            </div>
+                                            <div>
+                                                <p className="text-2xl font-bold text-white">
+                                                    {handover.patient_count || 0}
+                                                </p>
+                                                <p className="text-xs text-muted-foreground">
+                                                    Patients Seen
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                                <Card className="border-border bg-card">
+                                    <CardContent className="p-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-lg bg-critical/10 flex items-center justify-center">
+                                                <AlertTriangle size={20} className="text-critical" />
+                                            </div>
+                                            <div>
+                                                <p className="text-2xl font-bold text-white">
+                                                    {handover.urgent_count || 0}
+                                                </p>
+                                                <p className="text-xs text-muted-foreground">
+                                                    Urgent Follow-ups
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
                             </div>
-                            
-                            {handover.date && (
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                    <Clock size={14} />
-                                    <span>{handover.date}</span>
+
+                            {/* Shift Info */}
+                            <Card className="border-border bg-card">
+                                <CardContent className="p-4">
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <Clock size={18} className="text-muted-foreground" />
+                                        <span className="text-sm font-semibold text-white">
+                                            {handover.shift_label || 'Today\'s Shift'}
+                                        </span>
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">
+                                        Generated by {handover.clinician || 'Clinician'}
+                                    </p>
+                                </CardContent>
+                            </Card>
+
+                            {/* Patients List */}
+                            {handover.patients && handover.patients.length > 0 && (
+                                <div className="space-y-3">
+                                    <h3 className="text-sm font-semibold text-white">
+                                        Patient Summary
+                                    </h3>
+                                    {handover.patients.map((patient, index) => (
+                                        <Card key={index} className="border-border bg-card">
+                                            <CardContent className="p-4">
+                                                <div className="flex items-start justify-between mb-2">
+                                                    <div>
+                                                        <p className="font-semibold text-white">
+                                                            {patient.name || `Patient ${index + 1}`}
+                                                        </p>
+                                                        <p className="text-xs text-muted-foreground mt-1">
+                                                            {patient.summary || 'No summary available'}
+                                                        </p>
+                                                    </div>
+                                                    {patient.urgent && (
+                                                        <Badge variant="destructive" className="text-xs">
+                                                            Urgent
+                                                        </Badge>
+                                                    )}
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    ))}
                                 </div>
                             )}
-                        </div>
 
-                        {/* Summary Cards */}
-                        <div className="grid grid-cols-2 gap-3 mb-4">
-                            <Card className="border-border bg-card shadow-md">
-                                <CardContent className="p-3">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                                            <Users size={16} className="text-primary" />
-                                        </div>
-                                        <div>
-                                            <p className="text-xs text-muted-foreground font-medium">Patients</p>
-                                            <p className="text-lg font-bold text-foreground">{patients.length}</p>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                            
-                            <Card className="border-border bg-card shadow-md">
-                                <CardContent className="p-3">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-8 h-8 rounded-lg bg-destructive/10 flex items-center justify-center">
-                                            <AlertTriangle size={16} className="text-destructive" />
-                                        </div>
-                                        <div>
-                                            <p className="text-xs text-muted-foreground font-medium">Urgent</p>
-                                            <p className="text-lg font-bold text-foreground">{urgentCount}</p>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </div>
-
-                        {/* Patient List */}
-                        <div className="space-y-2 mb-4">
-                            {patients.map((patient, index) => (
-                                <motion.div
-                                    key={index}
-                                    initial={{ opacity: 0, y: 8 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: index * 0.05 }}
+                            {/* Actions */}
+                            <div className="flex gap-3 pt-4">
+                                <Button
+                                    variant="outline"
+                                    onClick={generateHandover}
+                                    className="flex-1"
                                 >
-                                    <Card className={`border-border bg-card shadow-sm ${patient.is_urgent ? 'border-destructive/50 bg-destructive/5' : ''}`}>
-                                        <CardContent className="p-4">
-                                            <div className="flex items-start justify-between mb-2">
-                                                <div className="flex items-center gap-2">
-                                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center text-primary-foreground text-xs font-bold">
-                                                        {patient.name?.[0]?.toUpperCase() || 'P'}
-                                                    </div>
-                                                    <div>
-                                                        <h3 className="text-sm font-semibold text-foreground">
-                                                            {patient.name || `Patient ${index + 1}`}
-                                                        </h3>
-                                                        {patient.hn && (
-                                                            <p className="text-xs text-muted-foreground">
-                                                                HN: {patient.hn}
-                                                            </p>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                                {patient.is_urgent && (
-                                                    <Badge variant="destructive" className="text-xs">
-                                                        <AlertTriangle size={10} className="mr-1" />
-                                                        Urgent
-                                                    </Badge>
-                                                )}
-                                            </div>
-                                            <p className="text-sm text-muted-foreground leading-relaxed">
-                                                {patient.summary}
-                                            </p>
-                                            {patient.tasks && patient.tasks.length > 0 && (
-                                                <div className="mt-2 flex flex-wrap gap-1">
-                                                    {patient.tasks.map((task, i) => (
-                                                        <Badge key={i} variant="secondary" className="text-xs">
-                                                            {task}
-                                                        </Badge>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </CardContent>
-                                    </Card>
-                                </motion.div>
-                            ))}
+                                    Regenerate
+                                </Button>
+                                <Button
+                                    onClick={() => window.print()}
+                                    className="flex-1 bg-gradient-to-r from-primary to-primary-hover"
+                                >
+                                    Print / PDF
+                                </Button>
+                            </div>
                         </div>
+                    )}
 
-                        {/* Actions */}
-                        <div className="flex gap-2">
-                            <Button
-                                variant="outline"
-                                onClick={handleCopy}
-                                className="flex-1 h-11 border-border bg-card hover:bg-accent text-foreground"
-                            >
-                                <Copy size={16} className="mr-2" />
-                                {copied ? 'Copied' : 'Copy'}
-                            </Button>
-                            <Button
-                                variant="outline"
-                                onClick={handleExportPdf}
-                                className="flex-1 h-11 border-border bg-card hover:bg-accent text-foreground"
-                            >
-                                <FileDown size={16} className="mr-2" />
-                                PDF
-                            </Button>
+                    {error && (
+                        <div className="mt-6 p-4 bg-critical/10 border border-critical/20 rounded-xl text-critical text-sm text-center">
+                            {error}
                         </div>
-                    </motion.div>
-                ) : (
-                    <div className="text-center py-12">
-                        <div className="text-5xl mb-4">📋</div>
-                        <p className="text-muted-foreground mb-6">No handover data available</p>
-                        <Button onClick={generateHandover}>
-                            Generate Handover
-                        </Button>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
-
-            <TabBar />
-        </div>
-    )
+        </DashboardLayout>
+    );
 }

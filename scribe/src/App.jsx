@@ -1,57 +1,34 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
-import { useCallback } from 'react'
-import { Toaster } from '@/components/ui/toaster'
-import AuthGuard from './components/AuthGuard'
-import Login from './pages/Login'
-import Onboarding from './pages/Onboarding'
-import Home from './pages/Home'
-import Record from './pages/Record'
-import Processing from './pages/Processing'
-import NoteView from './pages/NoteView'
-import NoteEditor from './pages/NoteEditor'
-import Handover from './pages/Handover'
-import Settings from './pages/Settings'
-import SessionTimeoutWarning from './components/SessionTimeoutWarning'
-import { useAuth } from './hooks/useAuth'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ToastProvider } from './hooks/useToast.jsx';
 
-export default function App() {
-    const { logout } = useAuth()
+// Pages
+import Home from './pages/Home';
+import Record from './pages/Record';
+import Processing from './pages/Processing';
+import NoteEditor from './pages/NoteEditor';
+import Settings from './pages/Settings';
+import Handover from './pages/Handover';
 
-    const handleLogout = useCallback(() => {
-        logout()
-        window.location.href = '/login'
-    }, [logout])
-
-    const handleExtendSession = useCallback(() => {
-        // Session extended - user was active
-    }, [])
-
+function App() {
     return (
-        <div className="min-h-dvh bg-background">
-            <Routes>
-                {/* Public routes */}
-                <Route path="/login" element={<Login />} />
-                <Route path="/onboarding" element={<Onboarding />} />
+        <BrowserRouter>
+            <ToastProvider>
+                <Routes>
+                    {/* Main Routes */}
+                    <Route path="/scribe/app" element={<Home />} />
+                    <Route path="/scribe/app/record/:sessionId" element={<Record />} />
+                    <Route path="/scribe/app/processing/:sessionId" element={<Processing />} />
+                    <Route path="/scribe/app/note/:noteId" element={<NoteEditor />} />
+                    <Route path="/scribe/app/settings" element={<Settings />} />
+                    <Route path="/scribe/app/handover" element={<Handover />} />
 
-                {/* Protected routes */}
-                <Route path="/" element={<AuthGuard><Home /></AuthGuard>} />
-                <Route path="/record/:sessionId" element={<AuthGuard><Record /></AuthGuard>} />
-                <Route path="/processing/:sessionId" element={<AuthGuard><Processing /></AuthGuard>} />
-                <Route path="/note/:noteId" element={<AuthGuard><NoteView /></AuthGuard>} />
-                <Route path="/note/:noteId/edit" element={<AuthGuard><NoteEditor /></AuthGuard>} />
-                <Route path="/handover" element={<AuthGuard><Handover /></AuthGuard>} />
-                <Route path="/settings" element={<AuthGuard><Settings /></AuthGuard>} />
-                <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-
-            {/* Session Timeout Warning (only on protected routes) */}
-            <SessionTimeoutWarning
-                onLogout={handleLogout}
-                onExtend={handleExtendSession}
-            />
-            
-            {/* Toast Notifications */}
-            <Toaster />
-        </div>
-    )
+                    {/* Redirects */}
+                    <Route path="/" element={<Navigate to="/scribe/app" replace />} />
+                    <Route path="*" element={<Navigate to="/scribe/app" replace />} />
+                </Routes>
+            </ToastProvider>
+        </BrowserRouter>
+    );
 }
+
+export default App;

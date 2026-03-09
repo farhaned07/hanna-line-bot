@@ -1,63 +1,63 @@
-import { useState, useEffect, useCallback } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Sparkles, Wand2, Check, Save, Loader2 } from 'lucide-react'
-import { motion } from 'framer-motion'
-import { useEditor, EditorContent } from '@tiptap/react'
-import StarterKit from '@tiptap/starter-kit'
-import Placeholder from '@tiptap/extension-placeholder'
-import { api } from '../api/client'
-import { t, getLocale } from '../i18n'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { useToast } from '@/hooks/use-toast'
+import { useState, useEffect, useCallback } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { ArrowLeft, Sparkles, Wand2, Check, Save, Loader2, Copy, Download, Mic } from 'lucide-react';
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Placeholder from '@tiptap/extension-placeholder';
+import { notesApi } from '@/lib/api';
+import { Button } from '@/components/ui/Button';
+import { Card, CardContent } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
+import { useToast } from '@/hooks/useToast';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
-const SECTION_ORDER = ['subjective', 'objective', 'assessment', 'plan']
+const SECTION_ORDER = ['subjective', 'objective', 'assessment', 'plan'];
 const SECTION_LABELS = {
     subjective: 'Subjective',
     objective: 'Objective',
     assessment: 'Assessment',
     plan: 'Plan'
-}
-
-const SECTION_ICONS = {
-    subjective: '💬',
-    objective: '🔬',
-    assessment: '📋',
-    plan: '📌'
-}
+};
 
 const SECTION_GRADIENTS = {
     subjective: 'from-indigo-500 to-purple-600',
     objective: 'from-emerald-500 to-teal-600',
     assessment: 'from-amber-500 to-yellow-600',
     plan: 'from-violet-500 to-indigo-600'
-}
+};
 
 function SectionEditor({ sectionKey, content, onChange, onRegenerate, isRegenerating }) {
     const editor = useEditor({
         extensions: [
             StarterKit.configure({
-                heading: false, codeBlock: false,
-                blockquote: false, horizontalRule: false
+                heading: false,
+                codeBlock: false,
+                blockquote: false,
+                horizontalRule: false,
             }),
             Placeholder.configure({
-                placeholder: `Enter ${SECTION_LABELS[sectionKey] || sectionKey} notes...`
-            })
+                placeholder: `Enter ${SECTION_LABELS[sectionKey]} notes...`,
+            }),
         ],
         content: content || '',
         onUpdate: ({ editor }) => {
-            onChange(editor.getHTML())
-        }
-    })
+            onChange(editor.getHTML());
+        },
+        editorProps: {
+            attributes: {
+                class: 'prose prose-invert prose-sm max-w-none focus:outline-none min-h-[120px] px-4 py-3 text-white',
+            },
+        },
+    });
 
     useEffect(() => {
         if (editor && content !== editor.getHTML()) {
-            editor.commands.setContent(content || '')
+            editor.commands.setContent(content || '');
         }
-    }, [content])
+    }, [content]);
 
-    if (!editor) return null
+    if (!editor) return null;
 
     return (
         <motion.div
@@ -69,7 +69,7 @@ function SectionEditor({ sectionKey, content, onChange, onRegenerate, isRegenera
             <div className="flex items-center justify-between mb-2 pl-0.5">
                 <div className="flex items-center gap-2">
                     <div className={`w-6 h-6 rounded-lg bg-gradient-to-br ${SECTION_GRADIENTS[sectionKey]} flex items-center justify-center text-xs shadow-lg`}>
-                        {SECTION_ICONS[sectionKey]}
+                        <span>●</span>
                     </div>
                     <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
                         {SECTION_LABELS[sectionKey]}
@@ -96,224 +96,234 @@ function SectionEditor({ sectionKey, content, onChange, onRegenerate, isRegenera
             {/* Editor Card */}
             <Card className="border-border bg-card shadow-sm">
                 <CardContent className="p-0">
-                    <EditorContent 
-                        editor={editor} 
-                        className="prose prose-sm dark:prose-invert max-w-none p-4 min-h-[120px] focus:outline-none"
+                    <EditorContent
+                        editor={editor}
+                        className="prose prose-invert prose-sm max-w-none focus:outline-none"
                     />
                 </CardContent>
             </Card>
         </motion.div>
-    )
+    );
 }
 
 export default function NoteEditor() {
-    const { noteId } = useParams()
-    const navigate = useNavigate()
-    const { toast } = useToast()
-    const [note, setNote] = useState(null)
-    const [saving, setSaving] = useState(false)
-    const [regenerating, setRegenerating] = useState(null)
-    const [commandInput, setCommandInput] = useState('')
-    const [showCommand, setShowCommand] = useState(false)
+    const { noteId } = useParams();
+    const navigate = useNavigate();
+    const { toast } = useToast();
+    const [note, setNote] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [regenerating, setRegenerating] = useState(null);
+    const [content, setContent] = useState({});
 
     useEffect(() => {
-        loadNote()
-    }, [noteId])
+        loadNote();
+    }, [noteId]);
 
     const loadNote = async () => {
         try {
-            const data = await api.getNote(noteId)
-            setNote(data)
-        } catch (err) {
+            const data = await notesApi.get(noteId);
+            setNote(data);
+            setContent(typeof data.content === 'string' ? JSON.parse(data.content) : data.content);
+        } catch (error) {
             toast({
-                title: "Error",
-                description: "Failed to load note",
-                variant: 'destructive'
-            })
-        }
-    }
-
-    const handleSave = async () => {
-        setSaving(true)
-        try {
-            await api.updateNote(noteId, { content: note.content })
-            toast({
-                title: "Note saved",
-                description: "Your changes have been saved",
-                duration: 2000
-            })
-        } catch (err) {
-            toast({
-                title: "Save failed",
-                description: "Please try again",
-                variant: 'destructive'
-            })
+                title: 'Error',
+                description: 'Failed to load note',
+                variant: 'destructive',
+            });
         } finally {
-            setSaving(false)
+            setLoading(false);
         }
-    }
+    };
+
+    const handleSectionChange = useCallback((section, value) => {
+        setContent(prev => ({ ...prev, [section]: value }));
+    }, []);
 
     const handleRegenerate = async (section) => {
-        setRegenerating(section)
+        setRegenerating(section);
         try {
-            const result = await api.regenerateSection(noteId, section, '')
-            setNote(prev => ({
-                ...prev,
-                content: { ...prev.content, [section]: result.content[section] }
-            }))
+            const result = await notesApi.regenerateSection(noteId, section);
+            setContent(prev => ({ ...prev, [section]: result.content }));
             toast({
-                title: "Section regenerated",
-                description: "AI has updated this section",
-                duration: 2000
-            })
-        } catch (err) {
+                title: 'Section regenerated',
+                description: `${SECTION_LABELS[section]} has been updated`,
+            });
+        } catch (error) {
             toast({
-                title: "Regenerate failed",
-                description: "Please try again",
-                variant: 'destructive'
-            })
+                title: 'Error',
+                description: error.message,
+                variant: 'destructive',
+            });
         } finally {
-            setRegenerating(null)
+            setRegenerating(null);
         }
-    }
+    };
 
-    const handleCommand = async () => {
-        if (!commandInput.trim()) return
-        setSaving(true)
+    const handleSave = async () => {
+        setSaving(true);
         try {
-            const result = await api.hannaCommand(noteId, commandInput, note.content)
-            setNote(prev => ({ ...prev, content: result.content }))
-            setCommandInput('')
-            setShowCommand(false)
+            await notesApi.update(noteId, content);
             toast({
-                title: "Command executed",
-                description: "AI has applied your changes",
-                duration: 2000
-            })
-        } catch (err) {
+                title: 'Saved',
+                description: 'Note has been updated',
+            });
+        } catch (error) {
             toast({
-                title: "Command failed",
-                description: "Please try again",
-                variant: 'destructive'
-            })
+                title: 'Error',
+                description: 'Failed to save note',
+                variant: 'destructive',
+            });
         } finally {
-            setSaving(false)
+            setSaving(false);
         }
-    }
+    };
 
-    const updateSection = (section, content) => {
-        setNote(prev => ({
-            ...prev,
-            content: { ...prev.content, [section]: content }
-        }))
-    }
+    const handleFinalize = async () => {
+        if (!confirm('Finalize this note? It will be marked as complete.')) return;
+        
+        try {
+            await notesApi.finalize(noteId);
+            toast({
+                title: 'Note finalized',
+                description: 'This note has been marked as complete',
+            });
+            navigate('/scribe/app');
+        } catch (error) {
+            toast({
+                title: 'Error',
+                description: error.message,
+                variant: 'destructive',
+            });
+        }
+    };
 
-    if (!note) {
+    const handleCopy = () => {
+        const text = Object.entries(content)
+            .map(([key, val]) => `${SECTION_LABELS[key]}\n${val.replace(/<[^>]*>/g, '')}`)
+            .join('\n\n');
+        navigator.clipboard.writeText(text);
+        toast({
+            title: 'Copied',
+            description: 'Note copied to clipboard',
+        });
+    };
+
+    if (loading) {
         return (
-            <div className="min-h-dvh flex items-center justify-center bg-background">
-                <Loader2 className="w-8 h-8 animate-spin text-primary" />
-            </div>
-        )
+            <DashboardLayout>
+                <div className="min-h-dvh bg-background flex items-center justify-center">
+                    <div className="text-center">
+                        <Loader2 size={32} className="animate-spin text-primary mx-auto mb-4" />
+                        <p className="text-muted-foreground">Loading note...</p>
+                    </div>
+                </div>
+            </DashboardLayout>
+        );
     }
 
     return (
-        <div className="min-h-dvh bg-background pb-28">
-            {/* Top Bar */}
-            <div className="safe-top flex items-center justify-between px-4 pt-4 pb-4">
-                <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => navigate(`/note/${noteId}`)}
-                    className="w-10 h-10 rounded-lg border-border bg-card hover:bg-accent text-foreground"
-                >
-                    <ArrowLeft size={18} />
-                </Button>
-                
-                <div className="flex items-center gap-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setShowCommand(!showCommand)}
-                        className="h-9 text-xs"
-                    >
-                        <Wand2 size={14} className="mr-1.5" />
-                        Command
-                    </Button>
-                    <Button
-                        onClick={handleSave}
-                        disabled={saving}
-                        className="h-9 px-4 bg-gradient-to-r from-primary to-primary-hover text-primary-foreground shadow-primary-glow"
-                        size="sm"
-                    >
-                        {saving ? (
-                            <Loader2 size={14} className="animate-spin" />
-                        ) : (
-                            <>
-                                <Save size={14} className="mr-1.5" />
-                                Save
-                            </>
-                        )}
-                    </Button>
-                </div>
-            </div>
+        <DashboardLayout>
+            <div className="min-h-dvh bg-background pb-24 relative">
+                {/* Ambient Background Glow */}
+                <div className="ambient-glow" />
 
-            {/* Command Bar */}
-            {showCommand && (
-                <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    className="px-4 mb-4"
-                >
-                    <Card className="border-border bg-card shadow-md">
-                        <CardContent className="p-3">
-                            <div className="flex gap-2">
-                                <input
-                                    type="text"
-                                    value={commandInput}
-                                    onChange={(e) => setCommandInput(e.target.value)}
-                                    onKeyPress={(e) => e.key === 'Enter' && handleCommand()}
-                                    placeholder={t('editor.tellHanna') || 'Tell Hanna to edit...'}
-                                    className="flex-1 h-10 px-3 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                                />
+                {/* Header */}
+                <div className="safe-top sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border">
+                    <div className="px-6 py-4">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
                                 <Button
-                                    onClick={handleCommand}
-                                    disabled={!commandInput.trim() || saving}
-                                    size="sm"
-                                    className="h-10 px-4"
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => navigate(-1)}
+                                    className="w-9 h-9 rounded-lg"
                                 >
-                                    <Sparkles size={14} className="mr-1.5" />
-                                    Apply
+                                    <ArrowLeft size={18} />
+                                </Button>
+                                <div>
+                                    <h1 className="text-lg font-bold text-white">
+                                        {note?.patient_name || 'Patient'}
+                                    </h1>
+                                    <p className="text-xs text-muted-foreground">
+                                        {note?.patient_hn || 'No HN'} • {note?.template_type?.toUpperCase() || 'SOAP'}
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={handleCopy}
+                                    className="h-9"
+                                >
+                                    <Copy size={16} className="mr-1" />
+                                    Copy
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={handleSave}
+                                    disabled={saving}
+                                    className="h-9"
+                                >
+                                    {saving ? <Loader2 size={16} className="animate-spin mr-1" /> : <Save size={16} className="mr-1" />}
+                                    Save
                                 </Button>
                             </div>
-                        </CardContent>
-                    </Card>
-                </motion.div>
-            )}
+                        </div>
+                    </div>
+                </div>
 
-            {/* Header */}
-            <div className="px-4 mb-4">
-                <div className="flex items-center gap-2 mb-2">
-                    <Sparkles size={16} className="text-primary" />
-                    <span className="text-xs text-muted-foreground font-medium">
-                        {t('editor.editing')} · {note.template_type?.toUpperCase()}
-                    </span>
+                {/* Content */}
+                <div className="px-6 py-6 relative z-10">
+                    {/* AI Attribution Banner */}
+                    <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mb-6 p-4 rounded-xl bg-primary/10 border border-primary/20"
+                    >
+                        <div className="flex items-start gap-3">
+                            <Sparkles size={18} className="text-primary mt-0.5" />
+                            <div className="flex-1">
+                                <p className="text-sm font-medium text-white">
+                                    AI-Generated Note
+                                </p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                    Review and edit all sections before finalizing. This note requires your clinical verification.
+                                </p>
+                            </div>
+                        </div>
+                    </motion.div>
+
+                    {/* Sections */}
+                    <div className="space-y-6">
+                        {SECTION_ORDER.map((section) => (
+                            <SectionEditor
+                                key={section}
+                                sectionKey={section}
+                                content={content[section]}
+                                onChange={(value) => handleSectionChange(section, value)}
+                                onRegenerate={handleRegenerate}
+                                isRegenerating={regenerating === section}
+                            />
+                        ))}
+                    </div>
+                </div>
+
+                {/* Finalize Button */}
+                <div className="fixed bottom-0 left-0 right-0 lg:pl-72 p-6 bg-gradient-to-t from-background to-transparent">
+                    <div className="max-w-3xl mx-auto">
+                        <Button
+                            onClick={handleFinalize}
+                            className="w-full h-14 bg-gradient-to-r from-success to-success-dark text-white font-semibold shadow-lg shadow-success/30 hover:shadow-success/40 hover:-translate-y-0.5 transition-all"
+                        >
+                            <Check size={20} className="mr-2" />
+                            Finalize Note
+                        </Button>
+                    </div>
                 </div>
             </div>
-
-            {/* Section Editors */}
-            <div className="px-4">
-                {SECTION_ORDER.map((section) => (
-                    <SectionEditor
-                        key={section}
-                        sectionKey={section}
-                        content={note.content?.[section] || ''}
-                        onChange={(html) => updateSection(section, html)}
-                        onRegenerate={handleRegenerate}
-                        isRegenerating={regenerating === section}
-                    />
-                ))}
-            </div>
-        </div>
-    )
+        </DashboardLayout>
+    );
 }
