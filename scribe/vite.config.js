@@ -5,7 +5,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 import path from 'path'
 
 export default defineConfig({
-    base: '/scribe/app/',
+    base: '/',
     plugins: [
         react(),
         tailwindcss(),
@@ -16,7 +16,7 @@ export default defineConfig({
             manifest: false,
             workbox: {
                 globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,json}'],
-                navigateFallback: '/scribe/app/index.html',
+                navigateFallback: '/index.html',
                 navigateFallbackDenylist: [/^\/api\//],
                 runtimeCaching: [
                     {
@@ -78,7 +78,7 @@ export default defineConfig({
         }
     },
     server: {
-        port: 5174,
+        port: 3000,
         host: true,
         proxy: {
             '/api': {
