@@ -4,17 +4,8 @@
     "installCommand": "npm install",
     "framework": "vite",
     "github": {
-        "silent": false,
-        "autoJobCancelation": false
+        "enabled": true,
+        "autoJobCancelation": true
     },
-    "rewrites": [
-        {
-            "source": "/api/scribe/:path*",
-            "destination": "https://hanna-line-bot-production.up.railway.app/api/scribe/:path*"
-        },
-        {
-            "source": "/scribe/app/:path*",
-            "destination": "/scribe/app/index.html"
-        }
-    ]
+    "trailingSlash": true
 }
