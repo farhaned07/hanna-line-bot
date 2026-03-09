@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Mic, Search, X, ChevronRight, FileText, Clock, CheckCircle2, Trash2, Share2 } from 'lucide-react'
+import { Plus, Search, X, FileText, Shield } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { api } from '../api/client'
 import { t, getGreeting } from '../i18n'
-import { useSwipeGesture } from '../hooks/useSwipeGesture'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import TabBar from '../components/TabBar'
 import NewSessionSheet from '../components/NewSessionSheet'
 import UpgradeModal from '../components/UpgradeModal'
@@ -40,7 +44,7 @@ export default function Home() {
             const data = await api.getSessions()
             setSessions(data.sessions || [])
         } catch (err) {
-            // Silently fail — will show empty state
+            // Silently fail
         } finally {
             setLoading(false)
         }
@@ -94,24 +98,17 @@ export default function Home() {
     const handleDeleteSession = async (sessionId) => {
         try {
             await api.deleteSession(sessionId)
-            // Reload sessions
             loadSessions()
         } catch (err) {
             console.error('Delete failed:', err)
-            alert('Failed to delete session')
         }
     }
 
     const handleExportSession = async (sessionId) => {
         try {
-            // Navigate to note and trigger export
             const session = await api.getSession(sessionId)
             if (session.notes?.[0]?.id) {
                 navigate(`/note/${session.notes[0].id}`)
-                // Export will be triggered by user in note view
-                setTimeout(() => {
-                    alert('Swipe right to export - opening note...')
-                }, 500)
             }
         } catch (err) {
             console.error('Export failed:', err)
@@ -119,264 +116,167 @@ export default function Home() {
     }
 
     return (
-        <div style={{ minHeight: '100dvh', background: '#FAFAFA', paddingBottom: 90 }}>
+        <div className="min-h-screen bg-background pb-24">
             {/* Header */}
-            <div className="safe-top" style={{ padding: '0 20px 24px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
-                    <p style={{ fontSize: 14, color: '#9CA3AF', fontWeight: 500 }}>
+            <div className="px-6 pt-12 pb-6 border-b border-border bg-background">
+                <div className="flex items-center gap-2 mb-6">
+                    <Shield className="w-6 h-6 text-blue-400" />
+                    <span className="text-sm font-semibold text-muted-foreground">Hanna Scribe</span>
+                </div>
+                
+                <div className="mb-6">
+                    <p className="text-xs text-muted-foreground mb-1">
                         {getGreeting()}
                     </p>
-                    <div style={{
-                        display: 'inline-flex', alignItems: 'center', gap: 6,
-                        fontWeight: 700, fontSize: 13, color: '#6366F1',
-                        letterSpacing: '-0.3px'
-                    }}>
-                        <span style={{
-                            width: 8, height: 8, borderRadius: '50%',
-                            background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
-                            boxShadow: '0 0 8px rgba(99,102,241,0.5)'
-                        }} />
-                        hanna scribe
-                    </div>
+                    <h1 className="text-2xl font-semibold text-foreground">
+                        {user?.display_name || user?.email?.split('@')[0] || 'Doctor'}
+                    </h1>
                 </div>
-                <h1 style={{
-                    fontSize: 30, fontWeight: 800, color: '#111827',
-                    letterSpacing: '-1px', lineHeight: 1.1
-                }}>
-                    {user?.display_name || user?.email || 'Doctor'}
-                </h1>
+
+                {/* Stats */}
+                {billingStats && (
+                    <Card className="border-border bg-card shadow-lg">
+                        <CardContent className="p-4">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-lg bg-background flex items-center justify-center">
+                                    <FileText className="w-5 h-5 text-muted-foreground" />
+                                </div>
+                                <div>
+                                    <p className="text-xs text-muted-foreground font-medium">Notes</p>
+                                    <p className="text-xl font-semibold text-foreground">
+                                        {billingStats.notes_count || 0}
+                                        <span className="text-xs font-normal text-muted-foreground ml-1">
+                                            {billingStats.plan === 'free' ? '/ 10' : ''}
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
             </div>
 
-            {/* Search Bar */}
-            <div style={{ padding: '0 20px', marginBottom: 28 }}>
-                <div style={{ position: 'relative' }}>
-                    <Search size={16} style={{
-                        position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)',
-                        color: '#9CA3AF'
-                    }} />
-                    <input
-                        type="text"
-                        placeholder={t('home.commandBar')}
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        style={{
-                            width: '100%', padding: '13px 40px 13px 40px',
-                            borderRadius: 14, background: '#fff',
-                            border: '1px solid #F0F0F0', fontSize: 14,
-                            color: '#374151', outline: 'none',
-                            boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)',
-                            transition: 'border-color 0.2s, box-shadow 0.2s',
-                            fontFamily: 'inherit'
-                        }}
-                        onFocus={(e) => {
-                            e.target.style.borderColor = '#6366F1'
-                            e.target.style.boxShadow = '0 0 0 3px rgba(99,102,241,0.08), 0 1px 3px rgba(0,0,0,0.04)'
-                        }}
-                        onBlur={(e) => {
-                            e.target.style.borderColor = '#F0F0F0'
-                            e.target.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)'
-                        }}
-                    />
-                    {searchQuery ? (
-                        <button
-                            onClick={() => setSearchQuery('')}
-                            style={{
-                                position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
-                                background: '#F3F4F6', border: 'none', cursor: 'pointer',
-                                color: '#9CA3AF', width: 22, height: 22, borderRadius: 11,
-                                display: 'flex', alignItems: 'center', justifyContent: 'center'
-                            }}
-                        >
-                            <X size={12} />
-                        </button>
-                    ) : (
-                        <Mic size={16} style={{
-                            position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)',
-                            color: '#6366F1'
-                        }} />
-                    )}
-                </div>
+            {/* Search */}
+            <div className="px-6 py-4">
+                <Card className="border-border bg-card shadow-lg">
+                    <CardContent className="p-2">
+                        <div className="flex items-center gap-2">
+                            <Search className="w-5 h-5 text-muted-foreground ml-2" />
+                            <Input
+                                type="text"
+                                placeholder="Search patients..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-sm h-10 bg-background text-foreground placeholder:text-muted-foreground"
+                            />
+                            {searchQuery && (
+                                <button
+                                    onClick={() => setSearchQuery('')}
+                                    className="w-8 h-8 rounded-full bg-background hover:bg-accent flex items-center justify-center transition-colors"
+                                >
+                                    <X className="w-3 h-3 text-muted-foreground" />
+                                </button>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
 
-            {/* Sessions List */}
-            <div style={{ padding: '0 20px' }}>
+            {/* Content */}
+            <ScrollArea className="h-[calc(100vh-280px)] px-6 py-4">
                 {loading ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    <div className="space-y-3">
                         {[1, 2, 3].map(i => (
-                            <div key={i} style={{
-                                height: 80, borderRadius: 16,
-                                background: 'linear-gradient(90deg, #F3F4F6 25%, #FAFAFA 50%, #F3F4F6 75%)',
-                                backgroundSize: '200% 100%',
-                                animation: 'shimmer 1.5s ease-in-out infinite'
-                            }} />
+                            <Card key={i} className="h-20 bg-card border-border animate-pulse" />
                         ))}
                     </div>
                 ) : Object.keys(groups).length === 0 ? (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                        style={{ textAlign: 'center', padding: '60px 32px 32px' }}
-                    >
-                        {/* Illustration */}
-                        <div style={{
-                            width: 120, height: 120, margin: '0 auto 24px',
-                            borderRadius: 40,
-                            background: 'linear-gradient(135deg, rgba(99,102,241,0.1) 0%, rgba(139,92,246,0.15) 100%)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            boxShadow: '0 8px 24px rgba(99,102,241,0.15)',
-                            position: 'relative'
-                        }}>
-                            {/* Animated phone icon */}
-                            <div style={{
-                                width: 60, height: 80, borderRadius: 12,
-                                background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
-                                position: 'relative',
-                                boxShadow: '0 4px 12px rgba(99,102,241,0.3)'
-                            }}>
-                                {/* Screen glow */}
-                                <div style={{
-                                    position: 'absolute', top: 8, left: 4, right: 4, bottom: 8,
-                                    background: 'rgba(255,255,255,0.2)', borderRadius: 8
-                                }} />
-                                {/* Mic icon */}
-                                <div style={{
-                                    position: 'absolute', top: '50%', left: '50%',
-                                    transform: 'translate(-50%, -50%)',
-                                    width: 24, height: 24, borderRadius: 12,
-                                    background: 'white',
-                                    animation: 'pulse 2s ease-in-out infinite'
-                                }} />
-                            </div>
-                        </div>
-                        
-                        {/* Title */}
-                        <h3 style={{
-                            fontSize: 22, fontWeight: 800, color: '#111827',
-                            marginBottom: 8, letterSpacing: '-0.5px'
-                        }}>
-                            Create your first clinical note
-                        </h3>
-                        
-                        {/* Subtitle */}
-                        <p style={{
-                            fontSize: 15, color: '#6B7280', lineHeight: 1.6,
-                            maxWidth: 280, margin: '0 auto 16px'
-                        }}>
-                            Tap the button below to start recording. Takes about 60 seconds.
-                        </p>
-                        
-                        {/* Time estimate */}
-                        <div style={{
-                            display: 'inline-flex', alignItems: 'center', gap: 6,
-                            padding: '6px 14px', borderRadius: 20,
-                            background: 'rgba(99,102,241,0.08)',
-                            marginBottom: 32
-                        }}>
-                            <div style={{
-                                width: 6, height: 6, borderRadius: 3,
-                                background: '#6366F1',
-                                animation: 'pulse 1.5s ease-in-out infinite'
-                            }} />
-                            <span style={{ fontSize: 13, color: '#6366F1', fontWeight: 600 }}>
-                                3 steps to your first note
-                            </span>
-                        </div>
-                        
-                        {/* Steps */}
-                        <div style={{
-                            display: 'flex', flexDirection: 'column', gap: 12,
-                            maxWidth: 280, margin: '0 auto 32px', textAlign: 'left'
-                        }}>
-                            {[
-                                { icon: '🎙️', text: 'Tap record & speak' },
-                                { icon: '⚡', text: 'AI writes your note' },
-                                { icon: '📋', text: 'Review & finalize' }
-                            ].map((step, i) => (
-                                <div key={i} style={{
-                                    display: 'flex', alignItems: 'center', gap: 10,
-                                    padding: '10px 14px', borderRadius: 12,
-                                    background: '#F9FAFB'
-                                }}>
-                                    <span style={{ fontSize: 20 }}>{step.icon}</span>
-                                    <span style={{ fontSize: 14, color: '#374151', fontWeight: 500 }}>
-                                        {step.text}
-                                    </span>
-                                </div>
-                            ))}
-                        </div>
-                    </motion.div>
+                    <ModernEmptyState onCreate={() => setShowNewSession(true)} />
                 ) : (
-                    Object.entries(groups).map(([label, items], groupIndex) => (
-                        <div key={label} style={{ marginBottom: 24 }}>
-                            <div style={{
-                                display: 'flex', alignItems: 'center', gap: 8,
-                                marginBottom: 10, paddingLeft: 4
-                            }}>
-                                <h2 style={{
-                                    fontSize: 12, fontWeight: 700, color: '#9CA3AF',
-                                    textTransform: 'uppercase', letterSpacing: '0.8px',
-                                    marginBottom: 0
-                                }}>
-                                    {label}
-                                </h2>
-                                <span style={{
-                                    fontSize: 11, color: '#9CA3AF', fontWeight: 600,
-                                    background: '#F3F4F6', padding: '2px 8px', borderRadius: 10
-                                }}>
-                                    {items.length}
-                                </span>
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                                {items.map((session, i) => (
-                                    <SwipeableSessionCard
-                                        key={session.id}
-                                        session={session}
-                                        onTap={handleSessionTap}
-                                        onDelete={handleDeleteSession}
-                                        onExport={handleExportSession}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    ))
+                    <div className="space-y-6 pb-6">
+                        {Object.entries(groups).map(([label, items]) => (
+                            <motion.div
+                                key={label}
+                                initial={{ opacity: 0, y: 12 }}
+                                animate={{ opacity: 1, y: 0 }}
+                            >
+                                <div className="flex items-center justify-between mb-3">
+                                    <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                                        {label}
+                                    </h2>
+                                    <Badge variant="secondary" className="text-xs font-semibold bg-card text-muted-foreground border border-border">
+                                        {items.length}
+                                    </Badge>
+                                </div>
+                                <div className="space-y-2">
+                                    {items.map(session => (
+                                        <SwipeableSessionCard
+                                            key={session.id}
+                                            session={session}
+                                            onTap={handleSessionTap}
+                                            onDelete={handleDeleteSession}
+                                            onExport={handleExportSession}
+                                        />
+                                    ))}
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
                 )}
-            </div>
+            </ScrollArea>
 
             {/* FAB */}
             <motion.button
-                whileTap={{ scale: 0.88 }}
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.3, type: "spring", stiffness: 400, damping: 25 }}
+                whileTap={{ scale: 0.9 }}
                 whileHover={{ scale: 1.05 }}
                 onClick={handleFabClick}
-                aria-label="New session"
-                style={{
-                    position: 'fixed',
-                    bottom: 'calc(80px + env(safe-area-inset-bottom, 0px))',
-                    right: 20,
-                    width: 56, height: 56, borderRadius: 18,
-                    background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
-                    color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    boxShadow: '0 4px 16px rgba(99,102,241,0.4), 0 2px 4px rgba(99,102,241,0.2)',
-                    border: 'none', cursor: 'pointer', zIndex: 50,
-                }}
+                className="fixed bottom-28 right-6 w-16 h-16 bg-blue-400 hover:bg-blue-400/90 rounded-lg flex items-center justify-center shadow-lg transition-all z-50"
             >
-                <Plus size={24} strokeWidth={2.5} />
+                <Plus className="w-7 h-7 text-white" strokeWidth={2.5} />
             </motion.button>
 
-            {/* New Session Bottom Sheet */}
+            {/* Modals */}
             <AnimatePresence>
-                {showNewSession && (
-                    <NewSessionSheet
-                        onClose={() => setShowNewSession(false)}
-                        onCreated={handleSessionCreated}
-                    />
-                )}
-                {showUpgradeModal && (
-                    <UpgradeModal onClose={() => setShowUpgradeModal(false)} />
-                )}
+                {showNewSession && <NewSessionSheet onClose={() => setShowNewSession(false)} onCreated={handleSessionCreated} />}
+                {showUpgradeModal && <UpgradeModal onClose={() => setShowUpgradeModal(false)} />}
             </AnimatePresence>
 
             <TabBar />
         </div>
+    )
+}
+
+// Modern Empty State
+function ModernEmptyState({ onCreate }) {
+    return (
+        <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center py-12 px-4"
+        >
+            <div className="relative w-32 h-32 mx-auto mb-6">
+                <div className="relative w-full h-full bg-card rounded-2xl flex items-center justify-center border border-border">
+                    <FileText className="w-12 h-12 text-muted-foreground" />
+                </div>
+            </div>
+
+            <h3 className="text-xl font-semibold text-foreground mb-2">
+                No clinical notes yet
+            </h3>
+            <p className="text-muted-foreground text-sm mb-8 max-w-xs mx-auto">
+                Create your first AI-powered SOAP note in under 60 seconds
+            </p>
+
+            <Button
+                onClick={onCreate}
+                className="h-12 px-8 bg-blue-400 hover:bg-blue-400/90 text-white font-semibold shadow-lg"
+            >
+                <Plus className="w-5 h-5 mr-2" />
+                Create Your First Note
+            </Button>
+        </motion.div>
     )
 }

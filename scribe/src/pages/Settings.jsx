@@ -6,11 +6,17 @@ import { api } from '../api/client'
 import { t, getLocale, setLocale } from '../i18n'
 import TabBar from '../components/TabBar'
 import UpgradeModal from '../components/UpgradeModal'
-import { User, ChevronRight, Globe, FileText, Zap, Info, HelpCircle, LogOut } from 'lucide-react'
+import MedicalDisclaimer from '../components/MedicalDisclaimer'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { useToast } from '@/hooks/use-toast'
+import { User, ChevronRight, Globe, FileText, Zap, Info, HelpCircle, LogOut, CreditCard, Bell, Shield } from 'lucide-react'
 
 export default function Settings() {
     const { user, logout } = useAuth()
     const navigate = useNavigate()
+    const { toast } = useToast()
     const [lang, setLang] = useState(getLocale())
     const [noteLang, setNoteLang] = useState(localStorage.getItem('scribe_note_lang') || 'en')
     const [autoFinalize, setAutoFinalize] = useState(localStorage.getItem('scribe_auto_finalize') === 'true')
@@ -31,17 +37,32 @@ export default function Settings() {
     const toggleLang = (newLang) => {
         setLang(newLang)
         setLocale(newLang)
+        toast({
+            title: "Language updated",
+            description: `App language changed to ${newLang === 'en' ? 'English' : 'ไทย'}`,
+            duration: 2000
+        })
     }
 
     const toggleNoteLang = (newLang) => {
         setNoteLang(newLang)
         localStorage.setItem('scribe_note_lang', newLang)
+        toast({
+            title: "Note language updated",
+            description: `Notes will be generated in ${newLang === 'en' ? 'English' : 'ไทย'}`,
+            duration: 2000
+        })
     }
 
     const toggleAutoFinalize = () => {
         const next = !autoFinalize
         setAutoFinalize(next)
         localStorage.setItem('scribe_auto_finalize', next.toString())
+        toast({
+            title: autoFinalize ? 'Auto-finalize disabled' : 'Auto-finalize enabled',
+            description: next ? 'Notes will require manual finalization' : 'Notes will be auto-finalized',
+            duration: 2000
+        })
     }
 
     const isPro = billingStats?.plan && billingStats.plan !== 'free'
@@ -49,276 +70,302 @@ export default function Settings() {
     const anim = (delay) => ({
         initial: { opacity: 0, y: 10 },
         animate: { opacity: 1, y: 0 },
-        transition: { delay, ease: [0.25, 0.46, 0.45, 0.94] }
+        transition: { delay: delay * 0.05, duration: 0.2 }
     })
 
     return (
-        <div style={{ minHeight: '100dvh', background: '#FAFAFA', paddingBottom: 90 }}>
-            <div className="safe-top" style={{ padding: '0 20px 24px' }}>
-                <h1 style={{ fontSize: 30, fontWeight: 800, color: '#111827', letterSpacing: '-1px' }}>
-                    Settings
-                </h1>
+        <div className="min-h-dvh bg-background pb-24">
+            {/* Header */}
+            <div className="safe-top px-6 pt-12 pb-6 border-b border-border">
+                <motion.h1 
+                    {...anim(0)}
+                    className="text-2xl font-bold text-foreground mb-2"
+                >
+                    {t('settings.title')}
+                </motion.h1>
+                <motion.p 
+                    {...anim(0.1)}
+                    className="text-sm text-muted-foreground"
+                >
+                    Manage your account and preferences
+                </motion.p>
             </div>
 
-            <div style={{ padding: '0 20px' }}>
-                {/* Profile */}
-                <motion.div {...anim(0)}>
-                    <div style={{
-                        background: '#fff', borderRadius: 16, padding: '16px',
-                        border: '1px solid #F0F0F0', boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                        display: 'flex', alignItems: 'center', gap: 14, marginBottom: 28
-                    }}>
-                        <div style={{
-                            width: 48, height: 48, borderRadius: 14,
-                            background: 'linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(139,92,246,0.12) 100%)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center'
-                        }}>
-                            <User size={22} color="#6366F1" />
-                        </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                            <p style={{ fontWeight: 700, fontSize: 16, color: '#111827', letterSpacing: '-0.2px' }}>
-                                {user?.display_name || 'Doctor'}
-                            </p>
-                            <p style={{ fontSize: 13, color: '#9CA3AF', marginTop: 1 }}>
-                                {user?.email}
-                            </p>
-                        </div>
-                        <ChevronRight size={16} color="#D1D5DB" />
-                    </div>
-                </motion.div>
-
-                {/* Subscription */}
-                <motion.div {...anim(0.05)}>
-                    <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 8, paddingLeft: 2 }}>
-                        Subscription
-                    </p>
-                    <div style={{
-                        background: '#fff', borderRadius: 16, padding: '16px',
-                        border: '1px solid #F0F0F0', boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                        marginBottom: 28
-                    }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: isPro ? 0 : 14 }}>
-                            <div>
-                                <p style={{ fontWeight: 700, fontSize: 16, color: '#111827', letterSpacing: '-0.2px' }}>
-                                    Hanna {billingStats?.plan ? billingStats.plan.charAt(0).toUpperCase() + billingStats.plan.slice(1) : 'Free'}
-                                </p>
-                                <p style={{ fontSize: 13, color: '#9CA3AF', marginTop: 2 }}>
-                                    {isPro ? 'Unlimited Notes' : 'Basic limits apply'}
-                                </p>
-                            </div>
-                            <span style={{
-                                fontSize: 11, fontWeight: 700,
-                                padding: '4px 10px', borderRadius: 8,
-                                background: isPro
-                                    ? 'linear-gradient(135deg, rgba(16,185,129,0.1) 0%, rgba(52,211,153,0.15) 100%)'
-                                    : 'linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(139,92,246,0.12) 100%)',
-                                color: isPro ? '#059669' : '#6366F1',
-                                letterSpacing: '0.5px'
-                            }}>
-                                {isPro ? 'PRO' : 'FREE'}
-                            </span>
-                        </div>
-
-                        {!isPro && (
-                            <>
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, fontSize: 13 }}>
-                                    <span style={{ color: '#6B7280' }}>{billingStats?.notes_count_this_month || 0} / 10 notes</span>
-                                    <span style={{ color: '#111827', fontWeight: 600 }}>{10 - (billingStats?.notes_count_this_month || 0)} left</span>
-                                </div>
-                                <div style={{ width: '100%', height: 6, background: '#F3F4F6', borderRadius: 3, marginBottom: 16, overflow: 'hidden' }}>
-                                    <div style={{
-                                        width: `${Math.min(((billingStats?.notes_count_this_month || 0) / 10) * 100, 100)}%`,
-                                        height: '100%',
-                                        background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
-                                        borderRadius: 3, transition: 'width 0.5s ease'
-                                    }} />
-                                </div>
-                                <motion.button
-                                    whileTap={{ scale: 0.97 }}
-                                    onClick={() => setShowUpgradeModal(true)}
-                                    style={{
-                                        width: '100%', padding: '12px 0', borderRadius: 12,
-                                        background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
-                                        color: '#fff', border: 'none', fontWeight: 700, fontSize: 14,
-                                        cursor: 'pointer',
-                                        boxShadow: '0 4px 14px rgba(99,102,241,0.3)'
-                                    }}
-                                >
-                                    Upgrade to Pro
-                                </motion.button>
-                            </>
-                        )}
-                    </div>
-                </motion.div>
-
-                {/* Language */}
-                <motion.div {...anim(0.1)}>
-                    <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 8, paddingLeft: 2 }}>
-                        {t('settings.language')}
-                    </p>
-                    <div style={{
-                        background: '#fff', borderRadius: 16, padding: '0',
-                        border: '1px solid #F0F0F0', boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                        marginBottom: 28, overflow: 'hidden'
-                    }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px' }}>
-                            <span style={{ fontSize: 15, color: '#111827', fontWeight: 500 }}>{t('settings.appLang')}</span>
-                            <div style={{ display: 'flex', borderRadius: 10, background: '#F3F4F6', padding: 3, gap: 2 }}>
-                                {['TH', 'EN'].map(l => (
-                                    <button key={l} onClick={() => toggleLang(l.toLowerCase())}
-                                        style={{
-                                            padding: '6px 14px', borderRadius: 8, border: 'none',
-                                            fontSize: 12, fontWeight: 700, cursor: 'pointer',
-                                            letterSpacing: '0.5px',
-                                            background: lang === l.toLowerCase() ? 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)' : 'transparent',
-                                            color: lang === l.toLowerCase() ? '#fff' : '#9CA3AF',
-                                            boxShadow: lang === l.toLowerCase() ? '0 2px 8px rgba(99,102,241,0.25)' : 'none',
-                                            transition: 'all 0.2s'
-                                        }}
-                                    >{l}</button>
-                                ))}
-                            </div>
-                        </div>
-                        <div style={{ height: 1, background: '#F3F4F6', margin: '0 16px' }} />
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px' }}>
-                            <span style={{ fontSize: 15, color: '#111827', fontWeight: 500 }}>{t('settings.noteLang')}</span>
-                            <div style={{ display: 'flex', borderRadius: 10, background: '#F3F4F6', padding: 3, gap: 2 }}>
-                                {['EN', 'TH'].map(l => (
-                                    <button key={l} onClick={() => toggleNoteLang(l.toLowerCase())}
-                                        style={{
-                                            padding: '6px 14px', borderRadius: 8, border: 'none',
-                                            fontSize: 12, fontWeight: 700, cursor: 'pointer',
-                                            letterSpacing: '0.5px',
-                                            background: noteLang === l.toLowerCase() ? 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)' : 'transparent',
-                                            color: noteLang === l.toLowerCase() ? '#fff' : '#9CA3AF',
-                                            boxShadow: noteLang === l.toLowerCase() ? '0 2px 8px rgba(99,102,241,0.25)' : 'none',
-                                            transition: 'all 0.2s'
-                                        }}
-                                    >{l}</button>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                </motion.div>
-
-                {/* Defaults */}
-                <motion.div {...anim(0.15)}>
-                    <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 8, paddingLeft: 2 }}>
-                        {t('settings.defaults')}
-                    </p>
-                    <div style={{
-                        background: '#fff', borderRadius: 16, padding: '0',
-                        border: '1px solid #F0F0F0', boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                        marginBottom: 28, overflow: 'hidden'
-                    }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px' }}>
-                            <span style={{ fontSize: 15, color: '#111827', fontWeight: 500 }}>{t('settings.defaultTemplate')}</span>
-                            <span style={{
-                                fontSize: 12, fontWeight: 700, color: '#6366F1',
-                                background: 'rgba(99,102,241,0.08)', padding: '4px 10px', borderRadius: 8,
-                                letterSpacing: '0.5px'
-                            }}>SOAP</span>
-                        </div>
-                        <div style={{ height: 1, background: '#F3F4F6', margin: '0 16px' }} />
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px' }}>
-                            <span style={{ fontSize: 15, color: '#111827', fontWeight: 500 }}>{t('settings.autoFinalize')}</span>
-                            <button
-                                onClick={toggleAutoFinalize}
-                                className={`ios-toggle ${autoFinalize ? 'on' : ''}`}
-                                style={{ background: autoFinalize ? 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)' : '#E5E7EB' }}
-                            />
-                        </div>
-                    </div>
-                </motion.div>
-
-                {/* About */}
+            {/* Content */}
+            <div className="px-6 py-6 space-y-6">
+                {/* Profile Section */}
                 <motion.div {...anim(0.2)}>
-                    <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 8, paddingLeft: 2 }}>
-                        {t('settings.about')}
-                    </p>
-                    <div style={{
-                        background: '#fff', borderRadius: 16, padding: '0',
-                        border: '1px solid #F0F0F0', boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                        marginBottom: 28, overflow: 'hidden'
-                    }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px' }}>
-                            <span style={{ fontSize: 15, color: '#111827', fontWeight: 500 }}>{t('settings.version')}</span>
-                            <span style={{ fontSize: 13, color: '#9CA3AF', fontWeight: 500 }}>1.2.0</span>
-                        </div>
-                        <div style={{ height: 1, background: '#F3F4F6', margin: '0 16px' }} />
-                        <button style={{
-                            width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                            padding: '14px 16px', background: 'none', border: 'none', cursor: 'pointer'
-                        }}>
-                            <span style={{ fontSize: 15, color: '#111827', fontWeight: 500 }}>{t('settings.help')}</span>
-                            <ChevronRight size={16} color="#D1D5DB" />
-                        </button>
-                        
-                        {/* PDPA Compliance */}
-                        <hr style={{ border: 'none', borderTop: '1px solid #F0F0F0', margin: '16px 0' }} />
-                        <div style={{ padding: '0 16px', marginBottom: '12px' }}>
-                            <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12' }}>
-                                Data & Privacy (PDPA)
-                            </p>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                                    <FileText size={18} color="#6366F1" />
-                                    <span style={{ fontSize: 14, color: '#111827', fontWeight: 600 }}>Export My Data</span>
+                    <Card className="border-border bg-card shadow-md">
+                        <CardContent className="p-0">
+                            <div className="flex items-center gap-4 p-4 border-b border-border">
+                                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center text-primary-foreground font-bold text-lg shadow-lg">
+                                    {user?.display_name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'}
                                 </div>
-                                <motion.button
-                                    whileTap={{ scale: 0.95 }}
-                                    onClick={() => alert('Data export feature coming soon. Contact support@hanna.care for immediate request.')}
-                                    style={{
-                                        padding: '8px 16px', borderRadius: 10,
-                                        background: '#F3F4F6', border: 'none',
-                                        color: '#6366F1', fontWeight: 600, fontSize: 13,
-                                        cursor: 'pointer'
-                                    }}
-                                >
-                                    Export
-                                </motion.button>
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                                    <Zap size={18} color="#EF4444" />
-                                    <span style={{ fontSize: 14, color: '#EF4444', fontWeight: 600 }}>Delete Account</span>
+                                <div className="flex-1">
+                                    <h3 className="font-semibold text-foreground">
+                                        {user?.display_name || user?.email?.split('@')[0] || 'User'}
+                                    </h3>
+                                    <p className="text-xs text-muted-foreground">
+                                        {user?.email || 'user@example.com'}
+                                    </p>
                                 </div>
-                                <motion.button
-                                    whileTap={{ scale: 0.95 }}
-                                    onClick={() => {
-                                        if (window.confirm('⚠️ Are you sure? This will permanently delete all your data. This action cannot be undone.')) {
-                                            alert('Account deletion feature coming soon. Contact support@hanna.care for immediate request.');
-                                        }
-                                    }}
-                                    style={{
-                                        padding: '8px 16px', borderRadius: 10,
-                                        background: '#FEF2F2', border: 'none',
-                                        color: '#EF4444', fontWeight: 600, fontSize: 13,
-                                        cursor: 'pointer'
-                                    }}
-                                >
-                                    Delete
-                                </motion.button>
+                                <Button variant="ghost" size="icon" className="text-muted-foreground">
+                                    <User size={20} />
+                                </Button>
                             </div>
-                        </div>
+                            
+                            {/* Plan Badge */}
+                            <div className="p-4 bg-accent/50">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-xs text-muted-foreground font-medium mb-1">Current Plan</p>
+                                        <Badge variant={isPro ? 'success' : 'secondary'} className="font-semibold">
+                                            {billingStats?.plan?.toUpperCase() || 'FREE'}
+                                        </Badge>
+                                    </div>
+                                    {!isPro && (
+                                        <Button
+                                            size="sm"
+                                            onClick={() => setShowUpgradeModal(true)}
+                                            className="bg-gradient-to-r from-primary to-primary-hover text-primary-foreground shadow-primary-glow"
+                                        >
+                                            Upgrade
+                                        </Button>
+                                    )}
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </motion.div>
+
+                {/* Usage Stats */}
+                {billingStats && (
+                    <motion.div {...anim(0.3)}>
+                        <Card className="border-border bg-card shadow-md">
+                            <CardContent className="p-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-lg bg-background flex items-center justify-center">
+                                        <FileText className="w-5 h-5 text-muted-foreground" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="text-xs text-muted-foreground font-medium">Notes This Month</p>
+                                        <p className="text-xl font-semibold text-foreground">
+                                            {billingStats.notes_count || 0}
+                                            {billingStats.plan === 'free' && (
+                                                <span className="text-xs font-normal text-muted-foreground ml-1">
+                                                    / 10
+                                                </span>
+                                            )}
+                                        </p>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </motion.div>
+                )}
+
+                {/* Language Settings */}
+                <motion.div {...anim(0.4)}>
+                    <div className="mb-4">
+                        <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 px-1">
+                            {t('settings.language')}
+                        </p>
                     </div>
+                    
+                    <Card className="border-border bg-card shadow-md">
+                        <CardContent className="p-0">
+                            {/* App Language */}
+                            <div className="flex items-center justify-between p-4 border-b border-border">
+                                <div className="flex items-center gap-3">
+                                    <Globe size={18} className="text-primary" />
+                                    <div>
+                                        <p className="text-sm font-semibold text-foreground">{t('settings.appLanguage')}</p>
+                                        <p className="text-xs text-muted-foreground">Interface language</p>
+                                    </div>
+                                </div>
+                                <div className="flex gap-2">
+                                    <Button
+                                        variant={lang === 'en' ? 'default' : 'outline'}
+                                        size="sm"
+                                        onClick={() => toggleLang('en')}
+                                        className="h-8 text-xs"
+                                    >
+                                        EN
+                                    </Button>
+                                    <Button
+                                        variant={lang === 'th' ? 'default' : 'outline'}
+                                        size="sm"
+                                        onClick={() => toggleLang('th')}
+                                        className="h-8 text-xs"
+                                    >
+                                        TH
+                                    </Button>
+                                </div>
+                            </div>
+
+                            {/* Note Language */}
+                            <div className="flex items-center justify-between p-4">
+                                <div className="flex items-center gap-3">
+                                    <FileText size={18} className="text-primary" />
+                                    <div>
+                                        <p className="text-sm font-semibold text-foreground">{t('settings.noteOutput')}</p>
+                                        <p className="text-xs text-muted-foreground">AI note generation language</p>
+                                    </div>
+                                </div>
+                                <div className="flex gap-2">
+                                    <Button
+                                        variant={noteLang === 'en' ? 'default' : 'outline'}
+                                        size="sm"
+                                        onClick={() => toggleNoteLang('en')}
+                                        className="h-8 text-xs"
+                                    >
+                                        EN
+                                    </Button>
+                                    <Button
+                                        variant={noteLang === 'th' ? 'default' : 'outline'}
+                                        size="sm"
+                                        onClick={() => toggleNoteLang('th')}
+                                        className="h-8 text-xs"
+                                    >
+                                        TH
+                                    </Button>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </motion.div>
+
+                {/* Preferences */}
+                <motion.div {...anim(0.5)}>
+                    <div className="mb-4">
+                        <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 px-1">
+                            {t('settings.defaults')}
+                        </p>
+                    </div>
+                    
+                    <Card className="border-border bg-card shadow-md">
+                        <CardContent className="p-0">
+                            {/* Auto-finalize */}
+                            <div className="flex items-center justify-between p-4">
+                                <div className="flex items-center gap-3">
+                                    <CheckCheck size={18} className="text-primary" />
+                                    <div>
+                                        <p className="text-sm font-semibold text-foreground">{t('settings.autoFinalize')}</p>
+                                        <p className="text-xs text-muted-foreground">Automatically finalize notes</p>
+                                    </div>
+                                </div>
+                                <Button
+                                    variant={autoFinalize ? 'default' : 'outline'}
+                                    size="sm"
+                                    onClick={toggleAutoFinalize}
+                                    className="h-6 w-11 px-0.5"
+                                >
+                                    <div className={`w-5 h-5 rounded-full bg-primary-foreground shadow-md transition-transform ${autoFinalize ? 'translate-x-5' : ''}`} />
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </motion.div>
+
+                {/* Help & Support */}
+                <motion.div {...anim(0.6)}>
+                    <div className="mb-4">
+                        <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 px-1">
+                            {t('settings.about')}
+                        </p>
+                    </div>
+                    
+                    <Card className="border-border bg-card shadow-md">
+                        <CardContent className="p-0">
+                            <button
+                                onClick={() => window.open('https://hanna.care/help', '_blank')}
+                                className="w-full flex items-center justify-between p-4 hover:bg-accent transition-colors"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <HelpCircle size={18} className="text-primary" />
+                                    <span className="text-sm font-semibold text-foreground">{t('settings.help')}</span>
+                                </div>
+                                <ChevronRight size={16} className="text-muted-foreground" />
+                            </button>
+
+                            <div className="border-t border-border" />
+
+                            <div className="flex items-center justify-between p-4">
+                                <div className="flex items-center gap-3">
+                                    <Info size={18} className="text-primary" />
+                                    <div>
+                                        <p className="text-sm font-semibold text-foreground">Version</p>
+                                        <p className="text-xs text-muted-foreground">Current build</p>
+                                    </div>
+                                </div>
+                                <Badge variant="secondary" className="font-mono text-xs">
+                                    1.0.0
+                                </Badge>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </motion.div>
+
+                {/* PDPA & Data */}
+                <motion.div {...anim(0.7)}>
+                    <div className="mb-4">
+                        <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 px-1">
+                            Data & Privacy (PDPA)
+                        </p>
+                    </div>
+                    
+                    <Card className="border-border bg-card shadow-md">
+                        <CardContent className="p-0">
+                            <button
+                                onClick={() => toast({ title: 'Data export', description: 'Contact support@hanna.care for data export' })}
+                                className="w-full flex items-center justify-between p-4 hover:bg-accent transition-colors"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <FileText size={18} className="text-primary" />
+                                    <span className="text-sm font-semibold text-foreground">Export My Data</span>
+                                </div>
+                                <ChevronRight size={16} className="text-muted-foreground" />
+                            </button>
+
+                            <div className="border-t border-border" />
+
+                            <button
+                                onClick={() => {
+                                    if (window.confirm('⚠️ Are you sure? This will permanently delete all your data.')) {
+                                        toast({ 
+                                            title: 'Account deletion', 
+                                            description: 'Contact support@hanna.care for account deletion',
+                                            variant: 'destructive'
+                                        })
+                                    }
+                                }}
+                                className="w-full flex items-center justify-between p-4 hover:bg-destructive/10 transition-colors"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <Zap size={18} className="text-destructive" />
+                                    <span className="text-sm font-semibold text-destructive">Delete Account</span>
+                                </div>
+                                <ChevronRight size={16} className="text-destructive" />
+                            </button>
+                        </CardContent>
+                    </Card>
+                </motion.div>
+
+                {/* Medical Disclaimer */}
+                <motion.div {...anim(0.8)}>
+                    <MedicalDisclaimer />
                 </motion.div>
 
                 {/* Sign Out */}
-                <motion.div {...anim(0.25)}>
-                    <motion.button
-                        whileTap={{ scale: 0.97 }}
+                <motion.div {...anim(0.9)}>
+                    <Button
+                        variant="destructive"
                         onClick={() => { logout(); navigate('/login', { replace: true }) }}
-                        style={{
-                            width: '100%', padding: '14px', borderRadius: 14,
-                            background: '#fff', border: '1px solid #F0F0F0',
-                            color: '#EF4444', fontWeight: 600, fontSize: 15,
-                            cursor: 'pointer', marginBottom: 20,
-                            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                        }}
+                        className="w-full h-11 font-semibold"
                     >
+                        <LogOut size={18} className="mr-2" />
                         {t('settings.signOut')}
-                    </motion.button>
+                    </Button>
                 </motion.div>
             </div>
 

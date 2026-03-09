@@ -1,26 +1,29 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Pause, Play, Square } from 'lucide-react'
+import { X, Pause, Play, Square, Mic } from 'lucide-react'
+import ErrorBoundary from '../components/ErrorBoundary'
+import RecordingErrorFallback from '../components/RecordingErrorFallback'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import { useRecorder } from '../hooks/useRecorder'
 import { useHapticFeedback } from '../hooks/useHapticFeedback'
 import { api } from '../api/client'
 import { t } from '../i18n'
 
-export default function Record() {
+function RecordContent() {
     const { sessionId } = useParams()
     const navigate = useNavigate()
     const recorder = useRecorder()
     const haptic = useHapticFeedback()
     const [session, setSession] = useState(null)
-    const [transcript, setTranscript] = useState('')
     const [showDiscard, setShowDiscard] = useState(false)
     const [micError, setMicError] = useState(false)
 
     useEffect(() => {
         loadSession()
         recorder.start().catch(err => {
-            console.error('Mic access denied:', err)
             setMicError(true)
             haptic.error()
         })
@@ -32,7 +35,6 @@ export default function Record() {
             const data = await api.getSession(sessionId)
             setSession(data)
         } catch (err) {
-            console.error('Failed to load session:', err)
             setSession({ patient_name: 'Patient', template_type: 'soap' })
         }
     }
@@ -40,7 +42,6 @@ export default function Record() {
     const handleDone = useCallback(async () => {
         haptic.recordingStop()
         recorder.stop()
-        // Wait for audioBlob to be set by the recorder's onstop callback (via ref)
         const waitForBlob = () => new Promise((resolve) => {
             const check = setInterval(() => {
                 if (recorder.audioBlobRef.current) {
@@ -48,7 +49,6 @@ export default function Record() {
                     resolve(recorder.audioBlobRef.current)
                 }
             }, 50)
-            // Timeout after 3s
             setTimeout(() => { clearInterval(check); resolve(null) }, 3000)
         })
         const blob = await waitForBlob()
@@ -63,115 +63,91 @@ export default function Record() {
         navigate('/', { replace: true })
     }
 
+    const getDurationHint = () => {
+        if (recorder.duration > 300) return { text: 'Consider wrapping up', color: 'text-destructive' }
+        if (recorder.duration > 120) return { text: 'Perfect length', color: 'text-warning' }
+        if (recorder.duration > 30) return { text: 'Keep talking...', color: 'text-muted-foreground' }
+        return { text: 'Start speaking', color: 'text-muted-foreground' }
+    }
+
+    const durationHint = getDurationHint()
+
     return (
-        <div style={{
-            minHeight: '100dvh', display: 'flex', flexDirection: 'column',
-            background: 'linear-gradient(180deg, #0F0F1A 0%, #131328 30%, #161630 100%)'
-        }}>
+        <div className="min-h-dvh flex flex-col bg-gradient-to-b from-background via-background to-slate-900">
             {/* Mic Permission Error */}
             {micError && (
-                <div style={{
-                    position: 'fixed', inset: 0, zIndex: 100,
-                    background: 'linear-gradient(180deg, #0F0F1A, #131328)',
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                    padding: 32, textAlign: 'center'
-                }}>
-                    <div style={{ fontSize: 48, marginBottom: 20 }}>🎙️</div>
-                    <h2 style={{ color: '#fff', fontSize: 20, fontWeight: 700, marginBottom: 8 }}>
+                <div className="fixed inset-0 z-100 flex flex-col items-center justify-center bg-gradient-to-b from-background to-slate-900 p-8 text-center">
+                    <div className="text-5xl mb-5">🎙️</div>
+                    <h2 className="text-xl font-bold text-foreground mb-2">
                         Microphone Access Required
                     </h2>
-                    <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14, lineHeight: 1.6, maxWidth: 300, marginBottom: 32 }}>
+                    <p className="text-muted-foreground text-sm leading-relaxed max-w-xs mb-8">
                         Please allow microphone access in your browser settings to record consultations.
                     </p>
-                    <button
+                    <Button
                         onClick={() => { setMicError(false); recorder.start().catch(() => setMicError(true)) }}
-                        style={{
-                            padding: '14px 32px', borderRadius: 12, background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
-                            color: '#fff', fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer',
-                            marginBottom: 12, boxShadow: '0 4px 14px rgba(99,102,241,0.35)'
-                        }}
+                        className="mb-3 h-11 px-8 bg-gradient-to-r from-primary to-primary-hover text-primary-foreground font-semibold shadow-lg"
                     >
                         Try Again
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         onClick={() => navigate('/', { replace: true })}
-                        style={{
-                            padding: '12px 24px', borderRadius: 12, background: 'transparent',
-                            color: 'rgba(255,255,255,0.5)', fontWeight: 600, fontSize: 14,
-                            border: '1px solid rgba(255,255,255,0.15)', cursor: 'pointer'
-                        }}
+                        variant="outline"
+                        className="h-10 px-6 border-slate-700 text-muted-foreground"
                     >
                         Go Back
-                    </button>
+                    </Button>
                 </div>
             )}
+
             {/* Top Bar */}
-            <div className="safe-top" style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: '0 20px 12px'
-            }}>
-                <button
+            <div className="safe-top flex items-center justify-between px-5 pb-3">
+                <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => setShowDiscard(true)}
-                    style={{
-                        width: 36, height: 36, borderRadius: 18,
-                        background: 'rgba(255,255,255,0.08)', border: 'none',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        cursor: 'pointer', color: 'rgba(255,255,255,0.6)'
-                    }}
+                    className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white/60"
                 >
                     <X size={18} />
-                </button>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span className="recording-dot" style={{
-                        width: 8, height: 8, borderRadius: 4, background: '#FF3B30',
-                        display: 'inline-block'
-                    }} />
-                    <span style={{
-                        color: 'rgba(255,255,255,0.85)', fontSize: 15, fontWeight: 600,
-                        fontVariantNumeric: 'tabular-nums', fontFamily: 'var(--font-sans)'
-                    }}>
+                </Button>
+                
+                <div className="flex items-center gap-2">
+                    <span className="recording-dot w-2 h-2 rounded-full bg-red-500 inline-block" />
+                    <span className="text-white/85 text-sm font-semibold tabular-nums font-sans">
                         {recorder.formattedDuration}
                     </span>
                 </div>
-                <div style={{ width: 36 }} /> {/* Spacer for centering */}
+                
+                <div className="w-9" /> {/* Spacer for centering */}
             </div>
 
             {/* Patient Info */}
-            <div style={{ textAlign: 'center', padding: '0 20px', marginBottom: 32 }}>
-                <h2 style={{ color: 'white', fontWeight: 600, fontSize: 18 }}>
+            <div className="text-center px-5 mb-8">
+                <h2 className="text-white font-semibold text-base">
                     {session?.patient_name || 'Patient'}
                 </h2>
                 {session?.patient_hn && (
-                    <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, marginTop: 4 }}>
+                    <p className="text-white/40 text-xs mt-1">
                         HN {session.patient_hn}
                     </p>
                 )}
             </div>
 
             {/* Orb */}
-            <div style={{
-                flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                position: 'relative'
-            }}>
-                <div style={{ position: 'relative' }}>
+            <div className="flex-1 flex items-center justify-center relative">
+                <div className="relative">
                     {/* Ripple rings */}
                     {recorder.isRecording && !recorder.isPaused && (
                         <>
                             <motion.div
                                 animate={{ scale: [1, 3], opacity: [0.25, 0] }}
                                 transition={{ duration: 2.5, repeat: Infinity, ease: 'easeOut' }}
-                                style={{
-                                    position: 'absolute', inset: -20,
-                                    borderRadius: '50%', border: '1px solid rgba(99,102,241,0.2)'
-                                }}
+                                className="absolute inset--5 rounded-full border border-primary/20"
                             />
                             <motion.div
                                 animate={{ scale: [1, 2.5], opacity: [0.2, 0] }}
                                 transition={{ duration: 2.5, repeat: Infinity, ease: 'easeOut', delay: 0.8 }}
-                                style={{
-                                    position: 'absolute', inset: -20,
-                                    borderRadius: '50%', border: '1px solid rgba(99,102,241,0.15)'
-                                }}
+                                className="absolute inset--5 rounded-full border border-primary/15"
                             />
                         </>
                     )}
@@ -187,96 +163,66 @@ export default function Record() {
                             duration: recorder.isPaused ? 3 : 2,
                             repeat: Infinity, ease: 'easeInOut'
                         }}
-                        style={{
-                            width: 140, height: 140, borderRadius: '50%',
-                            position: 'relative', zIndex: 10,
-                            background: 'radial-gradient(circle at 38% 35%, #A5B4FC, #6366F1 45%, #4F46E5 70%, #4338CA)',
-                            boxShadow: '0 0 80px rgba(99,102,241,0.4), 0 0 160px rgba(99,102,241,0.15), inset 0 0 30px rgba(255,255,255,0.1)'
-                        }}
+                        className="orb-core"
                     />
                 </div>
             </div>
 
             {/* Status */}
-            <div style={{ textAlign: 'center', marginBottom: 12 }}>
-                <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13, fontWeight: 500 }}>
+            <div className="text-center mb-3">
+                <p className="text-white/45 text-xs font-medium">
                     {recorder.isPaused ? t('recording.paused') : t('recording.listening')}
                 </p>
             </div>
 
             {/* Large Timer Display */}
-            <div style={{ textAlign: 'center', marginBottom: 24, padding: '0 20px' }}>
+            <div className="text-center mb-6 px-5">
                 <motion.div
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ duration: 0.3 }}
-                    style={{
-                        fontSize: 56, fontWeight: 800, color: 'white',
-                        fontVariantNumeric: 'tabular-nums', letterSpacing: '-2px',
-                        textShadow: '0 2px 12px rgba(0,0,0,0.3)'
-                    }}
+                    className="text-6xl font-extrabold text-white tabular-nums -tracking-wider text-shadow-lg"
                 >
                     {recorder.formattedDuration}
                 </motion.div>
-                {/* Context hint */}
-                <div style={{
-                    fontSize: 13,
-                    color: recorder.duration > 300 ? '#EF4444' : recorder.duration > 120 ? '#F59E0B' : 'rgba(255,255,255,0.5)',
-                    fontWeight: 600, marginTop: 8
-                }}>
-                    {recorder.duration > 300 ? 'Consider wrapping up' : recorder.duration > 120 ? 'Perfect length' : recorder.duration > 30 ? 'Keep talking...' : 'Start speaking'}
+                {/* Duration hint */}
+                <div className={`text-xs font-semibold mt-2 ${durationHint.color}`}>
+                    {durationHint.text}
                 </div>
             </div>
 
             {/* Recording Tips */}
-            <div style={{
-                margin: '0 20px 20px', padding: '16px 18px',
-                borderRadius: 16,
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.06)',
-                textAlign: 'center'
-            }}>
-                <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, lineHeight: 1.6 }}>
-                    🎤 Speak clearly and naturally. Transcription happens after you stop.
-                </p>
-            </div>
+            <Card className="mx-5 mb-5 bg-white/4 border-white/6">
+                <CardContent className="py-4 px-5 text-center">
+                    <p className="text-white/50 text-xs leading-relaxed">
+                        🎤 Speak clearly and naturally. Transcription happens after you stop.
+                    </p>
+                </CardContent>
+            </Card>
 
             {/* Controls */}
-            <div className="safe-bottom" style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                gap: 32, paddingBottom: 40, paddingTop: 8
-            }}>
+            <div className="safe-bottom flex items-center justify-center gap-8 pb-10 pt-2">
                 {/* Pause/Resume */}
-                <button
+                <Button
+                    variant="outline"
+                    size="icon"
                     onClick={recorder.isPaused ? recorder.resume : recorder.pause}
-                    style={{
-                        width: 52, height: 52, borderRadius: 26,
-                        background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        cursor: 'pointer', color: 'rgba(255,255,255,0.8)',
-                        transition: 'background 0.2s'
-                    }}
+                    className="w-13 h-13 rounded-full bg-white/8 border-white/12 text-white/80 hover:bg-white/10"
                 >
                     {recorder.isPaused ? <Play size={20} /> : <Pause size={20} />}
-                </button>
+                </Button>
 
                 {/* Done */}
-                <button
+                <Button
                     onClick={handleDone}
-                    style={{
-                        width: 64, height: 64, borderRadius: 32,
-                        background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)', border: 'none',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        cursor: 'pointer', color: 'white',
-                        boxShadow: '0 4px 20px rgba(99,102,241,0.4)',
-                        transition: 'transform 0.15s'
-                    }}
+                    className="w-16 h-16 rounded-full bg-gradient-to-r from-primary to-primary-hover text-white border-none shadow-primary-glow hover:shadow-primary-glow-hover transition-transform"
+                    size="icon"
                 >
-                    <Square size={20} fill="white" />
-                </button>
+                    <Square size={20} className="fill-white" />
+                </Button>
 
                 {/* Spacer for symmetry */}
-                <div style={{ width: 52 }} />
+                <div className="w-13" />
             </div>
 
             {/* Discard Dialog */}
@@ -286,50 +232,51 @@ export default function Record() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        style={{
-                            position: 'fixed', inset: 0, zIndex: 50,
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)'
-                        }}
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 backdrop-blur-md"
+                        onClick={() => setShowDiscard(false)}
                     >
                         <motion.div
                             initial={{ scale: 0.92, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.92, opacity: 0 }}
-                            style={{
-                                background: 'white', borderRadius: 20, padding: 24,
-                                margin: '0 32px', maxWidth: 320, width: '100%',
-                                boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
-                            }}
+                            className="bg-card rounded-2xl p-6 max-w-xs w-full mx-8 shadow-2xl"
+                            onClick={(e) => e.stopPropagation()}
                         >
-                            <p style={{
-                                fontWeight: 600, textAlign: 'center', marginBottom: 20,
-                                fontSize: 16, color: 'var(--color-ink)'
-                            }}>
+                            <p className="font-semibold text-center mb-5 text-foreground text-base">
                                 {t('recording.discard')}
                             </p>
-                            <div style={{ display: 'flex', gap: 10 }}>
-                                <button
+                            <div className="flex gap-2.5">
+                                <Button
                                     onClick={() => setShowDiscard(false)}
-                                    className="btn-secondary" style={{ flex: 1 }}
+                                    variant="secondary"
+                                    className="flex-1 h-10"
                                 >
                                     {t('recording.discardCancel')}
-                                </button>
-                                <button
+                                </Button>
+                                <Button
                                     onClick={handleDiscard}
-                                    style={{
-                                        flex: 1, padding: 13, borderRadius: 12,
-                                        background: 'var(--color-red)', color: 'white',
-                                        fontWeight: 600, fontSize: 14, border: 'none', cursor: 'pointer'
-                                    }}
+                                    variant="destructive"
+                                    className="flex-1 h-10"
                                 >
                                     {t('recording.discardConfirm')}
-                                </button>
+                                </Button>
                             </div>
                         </motion.div>
                     </motion.div>
                 )}
             </AnimatePresence>
         </div>
+    )
+}
+
+// Export with Error Boundary
+export default function Record() {
+    return (
+        <ErrorBoundary 
+            componentName="Record"
+            fallback={RecordingErrorFallback}
+        >
+            <RecordContent />
+        </ErrorBoundary>
     )
 }

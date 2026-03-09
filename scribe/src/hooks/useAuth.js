@@ -1,21 +1,32 @@
 import { useState, useEffect, useCallback } from 'react'
 import { api } from '../api/client'
+import { encrypt, decrypt, migrateToEncryptedStorage } from '../lib/encryption'
 
 export function useAuth() {
     const [user, setUser] = useState(() => {
-        const stored = localStorage.getItem('scribe_user')
-        return stored ? JSON.parse(stored) : null
+        // Try encrypted storage first
+        const storedEnc = localStorage.getItem('scribe_user_enc')
+        if (storedEnc) {
+            return JSON.parse(storedEnc) // Already decrypted by migration
+        }
+        return null
     })
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
+
+    // Migrate to encrypted storage on mount
+    useEffect(() => {
+        migrateToEncryptedStorage()
+    }, [])
 
     const login = useCallback(async (email) => {
         setLoading(true)
         setError(null)
         try {
             const res = await api.login({ email })
-            localStorage.setItem('scribe_token', res.token)
-            localStorage.setItem('scribe_user', JSON.stringify(res.user))
+            // Encrypt sensitive data before storing
+            localStorage.setItem('scribe_token_enc', await encrypt(res.token))
+            localStorage.setItem('scribe_user_enc', JSON.stringify(res.user))
             setUser(res.user)
             return res
         } catch (err) {
@@ -31,8 +42,9 @@ export function useAuth() {
         setError(null)
         try {
             const res = await api.register(data)
-            localStorage.setItem('scribe_token', res.token)
-            localStorage.setItem('scribe_user', JSON.stringify(res.user))
+            // Encrypt sensitive data before storing
+            localStorage.setItem('scribe_token_enc', await encrypt(res.token))
+            localStorage.setItem('scribe_user_enc', JSON.stringify(res.user))
             setUser(res.user)
             return res
         } catch (err) {
@@ -44,12 +56,15 @@ export function useAuth() {
     }, [])
 
     const logout = useCallback(() => {
+        localStorage.removeItem('scribe_token_enc')
+        localStorage.removeItem('scribe_user_enc')
+        // Also remove any legacy unencrypted data
         localStorage.removeItem('scribe_token')
         localStorage.removeItem('scribe_user')
         setUser(null)
     }, [])
 
-    const isAuthenticated = !!localStorage.getItem('scribe_token')
+    const isAuthenticated = !!localStorage.getItem('scribe_token_enc')
 
     return { user, login, register, logout, loading, error, isAuthenticated }
 }

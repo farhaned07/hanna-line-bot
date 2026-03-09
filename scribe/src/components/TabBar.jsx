@@ -31,7 +31,7 @@ export default function TabBar() {
                         <Icon
                             size={24}
                             strokeWidth={isActive ? 2.5 : 2}
-                            style={{ color: isActive ? 'var(--color-accent)' : 'var(--color-ink3)' }}
+                            className={isActive ? 'text-blue-400' : 'text-muted-foreground'}
                             aria-hidden="true"
                         />
                         <span className="tab-label">{label}</span>

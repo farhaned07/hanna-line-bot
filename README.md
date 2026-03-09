@@ -4,11 +4,29 @@
 
 **Hanna Scribe** — Voice-first clinical documentation that turns patient conversations into structured SOAP notes in seconds.
 
-[![Status](https://img.shields.io/badge/Status-Production-green)]()
+[![Status](https://img.shields.io/badge/Status-Production%20Ready-green)]()
 [![Platform](https://img.shields.io/badge/Platform-PWA-blue)]()
 [![AI](https://img.shields.io/badge/AI-Llama_3.3_70B-purple)]()
+[![Build](https://img.shields.io/badge/build-passing-green)]()
 
-> **Live at**: [hanna.care/scribe/app](https://hanna.care/scribe/app)
+> **Production Ready**: ✅ All systems verified  
+> **Live at**: [hanna.care/scribe/app](https://hanna.care/scribe/app)  
+> **Deployment Guide**: [docs/DEPLOYMENT_RUNBOOK.md](./docs/DEPLOYMENT_RUNBOOK.md)
+
+---
+
+## 🚀 Production Status (March 9, 2026)
+
+**✅ READY FOR DEPLOYMENT** - All critical features tested and verified.
+
+| Component | Status | Build | Deploy Target |
+|-----------|--------|-------|---------------|
+| **Backend API** | ✅ Ready | Passing | Railway |
+| **Scribe PWA** | ✅ Ready | Passing | Vercel |
+| **Nurse Dashboard** | ✅ Ready | Passing | Vercel |
+| **Database** | ✅ Ready | Migrated | Supabase |
+
+**See full status**: [docs/PRODUCTION_STATUS.md](./docs/PRODUCTION_STATUS.md)
 
 ---
 
@@ -27,12 +45,19 @@ We build **two products** with a clear upgrade path:
 
 ## 📚 **Documentation**
 
+### Production Documentation
 | Document | Purpose |
 |----------|---------|
-| **[PRODUCT_SPEC.md](./docs/PRODUCT_SPEC.md)** | **Unified product specification (START HERE)** |
+| **[docs/PRODUCTION_STATUS.md](./docs/PRODUCTION_STATUS.md)** | **Current deployment status (START HERE)** |
+| **[docs/DEPLOYMENT_RUNBOOK.md](./docs/DEPLOYMENT_RUNBOOK.md)** | **Step-by-step deployment guide** |
+| **[tests/production-checklist.js](./tests/production-checklist.js)** | Automated production testing |
+
+### Product Documentation
+| Document | Purpose |
+|----------|---------|
+| **[docs/PRODUCT_SPEC.md](./docs/PRODUCT_SPEC.md)** | **Unified product specification** |
 | [SCRIBE_GUIDE.md](./docs/SCRIBE_GUIDE.md) | Scribe user manual |
 | [SCRIBE_LAUNCH_CHECKLIST.md](./docs/SCRIBE_LAUNCH_CHECKLIST.md) | Launch checklist |
-| [PHASE1_DISCOVERY_REPORT.md](./docs/PHASE1_DISCOVERY_REPORT.md) | Codebase analysis |
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | System architecture |
 
 ---

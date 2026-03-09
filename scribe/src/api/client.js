@@ -1,7 +1,15 @@
+// Use absolute path from root since Vite dev server proxies /api to backend
 const API_BASE = '/api/scribe'
 
-async function request(path, options = {}) {
-    const token = localStorage.getItem('scribe_token')
+/**
+ * Make API request with exponential backoff retry logic
+ * @param {string} path - API path
+ * @param {object} options - Fetch options
+ * @param {number} maxRetries - Maximum retry attempts (default: 3)
+ * @returns {Promise<any>} Response data
+ */
+async function request(path, options = {}, maxRetries = 3) {
+    const token = localStorage.getItem('scribe_token_enc') || localStorage.getItem('scribe_token')
     const headers = {
         'Content-Type': 'application/json',
         ...(token && { Authorization: `Bearer ${token}` }),
@@ -13,18 +21,47 @@ async function request(path, options = {}) {
         delete headers['Content-Type']
     }
 
-    const res = await fetch(`${API_BASE}${path}`, { ...options, headers })
+    let lastError = null
+    let delay = 1000 // Start with 1 second
 
-    if (res.status === 401) {
-        throw new Error('Unauthorized')
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            const res = await fetch(`${API_BASE}${path}`, { ...options, headers })
+
+            if (res.status === 401) {
+                throw new Error('Unauthorized')
+            }
+
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({ error: 'Request failed' }))
+                // Don't retry client errors (4xx)
+                if (res.status >= 400 && res.status < 500) {
+                    throw new Error(err.error || 'Request failed')
+                }
+                throw new Error(err.error || `Server error: ${res.status}`)
+            }
+
+            return res.json()
+        } catch (err) {
+            lastError = err
+            
+            // Don't retry auth errors or client errors
+            if (err.message === 'Unauthorized' || err.message.includes('400')) {
+                throw err
+            }
+
+            // If this was the last attempt, throw the error
+            if (attempt === maxRetries) {
+                throw new Error(`Request failed after ${maxRetries} attempts: ${lastError.message}`)
+            }
+
+            // Wait before retrying (exponential backoff)
+            await new Promise(resolve => setTimeout(resolve, delay))
+            delay *= 2 // Double the delay for next attempt
+        }
     }
 
-    if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: 'Request failed' }))
-        throw new Error(err.error || 'Request failed')
-    }
-
-    return res.json()
+    throw lastError
 }
 
 export const api = {

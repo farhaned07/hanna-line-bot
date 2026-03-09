@@ -5,12 +5,18 @@ const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const db = require('../services/db');
 const { transcribeAudio, generateClinicalNote, generateHandoverSummary } = require('../services/groq');
+const { logSecurity, logError, logDebug, logAudit } = require('../utils/secure-logger');
+const { rateLimit } = require('../middleware/rateLimiter');
+const { sanitizeInput, isValidEmail, escapeForSQL } = require('../utils/sanitizer');
 let stripe = null;
 if (process.env.STRIPE_SECRET_KEY) {
     stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 } else {
-    console.warn('⚠️ STRIPE_SECRET_KEY not set — billing features disabled');
+    // Silently disable billing in production (no warning log)
 }
+
+// Apply rate limiting to all scribe routes (100 requests/minute)
+router.use(rateLimit({ windowMs: 60000, maxRequests: 100 }));
 
 const JWT_SECRET = process.env.JWT_SECRET || process.env.LINE_CHANNEL_SECRET || 'scribe-dev-secret';
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 * 1024 * 1024 } });
@@ -18,24 +24,16 @@ const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 
 // ─── Auth Middleware ───
 const DEMO_USER_ID = '00000000-0000-0000-0000-000000000001';
 
-// Simple token-based auth for demo/production
-const DEMO_TOKENS = ['demo', 'hanna2026', 'scribe-access'];
-
+// Authentication middleware - REQUIRED FOR ALL ENVIRONMENTS
+// NO BYPASS ALLOWED - Medical data protection (HIPAA/GDPR/PDPA)
 function authMiddleware(req, res, next) {
     const token = req.headers.authorization?.replace('Bearer ', '');
 
-    // Allow requests with demo tokens
-    if (token && DEMO_TOKENS.includes(token)) {
-        req.clinicianId = DEMO_USER_ID;
-        req.clinician = { id: DEMO_USER_ID, email: 'demo@hanna.care', displayName: 'Demo Doctor', plan: 'pro', notes_count_this_month: 0 };
-        return next();
-    }
-
-    // Allow requests without tokens (Guest Mode)
-    if (!token || token === 'null') {
-        req.clinicianId = DEMO_USER_ID;
-        req.clinician = { id: DEMO_USER_ID, email: 'demo@hanna.care', displayName: 'Demo Doctor', plan: 'pro', notes_count_this_month: 0 };
-        return next();
+    // ALWAYS require authentication - no exceptions for any environment
+    if (!token || token === 'null' || token === 'undefined') {
+        return res.status(401).json({ 
+            error: 'Authentication required. Please log in.' 
+        });
     }
 
     try {
@@ -44,10 +42,11 @@ function authMiddleware(req, res, next) {
         req.clinician = decoded;
         next();
     } catch (err) {
-        // Fallback to guest for demo purposes
-        req.clinicianId = DEMO_USER_ID;
-        req.clinician = { id: DEMO_USER_ID, email: 'demo@hanna.care', displayName: 'Demo Doctor', plan: 'pro', notes_count_this_month: 0 };
-        next();
+        // Log failed auth attempt for security monitoring (no PHI)
+        logSecurity('AUTH_FAILED', { ip: req.ip });
+        return res.status(401).json({ 
+            error: 'Invalid or expired token. Please log in again.' 
+        });
     }
 }
 
@@ -64,18 +63,18 @@ function hashPin(pin) {
 router.post('/auth/login', async (req, res) => {
     try {
         const { email } = req.body;
-        
-        if (!email || !email.includes('@')) {
+
+        // Sanitize and validate email
+        const sanitizedEmail = sanitizeInput(email);
+        if (!sanitizedEmail || !isValidEmail(sanitizedEmail)) {
             return res.status(400).json({ error: 'Valid email required' });
         }
-
-        console.log('[Scribe] Login attempt:', email);
 
         // Create user session (auto-register if new)
         const user = {
             id: DEMO_USER_ID,
-            email: email,
-            display_name: email.split('@')[0],
+            email: sanitizedEmail,
+            display_name: sanitizedEmail.split('@')[0],
             role: 'clinician',
             hospital_name: 'Hanna Hospital',
             plan: 'pro',
@@ -88,14 +87,14 @@ router.post('/auth/login', async (req, res) => {
             { expiresIn: '30d' }
         );
 
-        console.log('[Scribe] Login successful:', email);
+        logAudit('USER_LOGIN', user.id);
 
         res.json({
             token: jwtToken,
             user
         });
     } catch (err) {
-        console.error('[Scribe] Login error:', err);
+        logError('Login failed', err);
         res.status(500).json({ error: 'Login failed' });
     }
 });

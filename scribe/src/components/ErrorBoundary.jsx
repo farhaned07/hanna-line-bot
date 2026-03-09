@@ -11,11 +11,30 @@ export default class ErrorBoundary extends Component {
     }
 
     componentDidCatch(error, errorInfo) {
-        console.error('[Scribe] Unhandled error:', error, errorInfo)
+        // Log to Sentry in production (secure, no PHI)
+        if (typeof Sentry !== 'undefined') {
+            Sentry.captureException(error, {
+                extra: {
+                    component: this.props.componentName || 'Unknown',
+                    errorInfo
+                }
+            })
+        }
+        // In development, log to console for debugging
+        if (process.env.NODE_ENV !== 'production') {
+            console.error('[ErrorBoundary] Unhandled error:', error, errorInfo)
+        }
     }
 
     render() {
         if (this.state.hasError) {
+            // Use custom fallback if provided
+            if (this.props.fallback) {
+                const FallbackComponent = this.props.fallback
+                return <FallbackComponent error={this.state.error} resetErrorBoundary={() => this.setState({ hasError: false, error: null })} />
+            }
+            
+            // Default fallback
             return (
                 <div style={{
                     minHeight: '100dvh', display: 'flex', flexDirection: 'column',

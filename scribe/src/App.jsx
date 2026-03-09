@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { useState, useCallback } from 'react'
+import { useCallback } from 'react'
+import { Toaster } from '@/components/ui/toaster'
 import AuthGuard from './components/AuthGuard'
 import Login from './pages/Login'
 import Onboarding from './pages/Onboarding'
@@ -23,11 +24,10 @@ export default function App() {
 
     const handleExtendSession = useCallback(() => {
         // Session extended - user was active
-        console.log('Session extended')
     }, [])
 
     return (
-        <div className="min-h-dvh bg-bg">
+        <div className="min-h-dvh bg-background">
             <Routes>
                 {/* Public routes */}
                 <Route path="/login" element={<Login />} />
@@ -49,6 +49,9 @@ export default function App() {
                 onLogout={handleLogout}
                 onExtend={handleExtendSession}
             />
+            
+            {/* Toast Notifications */}
+            <Toaster />
         </div>
     )
 }

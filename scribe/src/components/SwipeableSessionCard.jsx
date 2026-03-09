@@ -41,12 +41,7 @@ export default function SwipeableSessionCard({ session, onTap, onDelete, onExpor
     const rightActionOpacity = Math.min(swipe.swipeDistance / 100, 1)
 
     return (
-        <div style={{
-            position: 'relative',
-            overflow: 'hidden',
-            borderRadius: 16,
-            marginBottom: 8
-        }}>
+        <div className="relative overflow-hidden rounded-2xl mb-2">
             {/* Background Actions */}
             <div style={{
                 position: 'absolute',

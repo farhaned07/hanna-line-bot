@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
+import path from 'path'
 
 export default defineConfig({
     base: '/scribe/app/',
@@ -12,7 +13,7 @@ export default defineConfig({
             registerType: 'autoUpdate',
             includeAssets: ['favicon.svg', 'icons/*.png', 'manifest.json'],
             useCredentials: true,
-            manifest: false, // Use the static manifest.json in public folder
+            manifest: false,
             workbox: {
                 globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,json}'],
                 navigateFallback: '/scribe/app/index.html',
@@ -51,9 +52,21 @@ export default defineConfig({
             }
         })
     ],
+    resolve: {
+        alias: {
+            '@': path.resolve(__dirname, './src'),
+        },
+    },
     build: {
         target: 'esnext',
-        minify: 'esbuild',
+        minify: 'terser',
+        terserOptions: {
+            compress: {
+                drop_console: true,
+                drop_debugger: true,
+                pure_funcs: ['console.log', 'console.debug', 'console.info', 'console.trace'],
+            },
+        },
         rollupOptions: {
             output: {
                 manualChunks: {
@@ -69,7 +82,7 @@ export default defineConfig({
         host: true,
         proxy: {
             '/api': {
-                target: 'http://localhost:3000',
+                target: 'http://localhost:3001',
                 changeOrigin: true
             }
         }

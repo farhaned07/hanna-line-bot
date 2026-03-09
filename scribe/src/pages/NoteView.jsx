@@ -1,10 +1,15 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, Check, Copy, Pencil, CheckCheck, Download, Share2, ChevronDown, ChevronUp, Sparkles, Users } from 'lucide-react'
+import { ArrowLeft, Check, Copy, Pencil, CheckCheck, Download, Share2, ChevronDown, ChevronUp, Sparkles, Users, AlertTriangle } from 'lucide-react'
 import { api } from '../api/client'
 import { t } from '../i18n'
 import FollowupEnrollmentModal from '../components/FollowupEnrollmentModal'
+import MedicalDisclaimer from '../components/MedicalDisclaimer'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent } from '@/components/ui/card'
+import { useToast } from '@/hooks/use-toast'
 
 const SECTION_LABELS = {
     subjective: 'Subjective',
@@ -21,16 +26,16 @@ const SECTION_ICONS = {
 }
 
 const SECTION_GRADIENTS = {
-    subjective: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    objective: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
-    assessment: 'linear-gradient(135deg, #F2994A 0%, #F2C94C 100%)',
-    plan: 'linear-gradient(135deg, #a855f7 0%, #6366f1 100%)'
+    subjective: 'from-indigo-500 to-purple-600',
+    objective: 'from-emerald-500 to-teal-600',
+    assessment: 'from-amber-500 to-yellow-600',
+    plan: 'from-violet-500 to-indigo-600'
 }
-
 
 export default function NoteView() {
     const { noteId } = useParams()
     const navigate = useNavigate()
+    const { toast } = useToast()
     const [note, setNote] = useState(null)
     const [session, setSession] = useState(null)
     const [loading, setLoading] = useState(true)
@@ -52,7 +57,6 @@ export default function NoteView() {
                 setSession(sess)
             }
         } catch (err) {
-            console.error('Failed to load note:', err)
             setNote(null)
         } finally {
             setLoading(false)
@@ -64,16 +68,11 @@ export default function NoteView() {
             await api.finalizeNote(noteId)
             setNote(prev => ({ ...prev, is_final: true, updated_at: new Date().toISOString() }))
             setJustFinalized(true)
-            // Show follow-up enrollment modal after finalizing
-            setTimeout(() => {
-                setShowFollowupModal(true)
-            }, 500)
+            setTimeout(() => setShowFollowupModal(true), 500)
         } catch (err) {
             setNote(prev => ({ ...prev, is_final: true, updated_at: new Date().toISOString() }))
             setJustFinalized(true)
-            setTimeout(() => {
-                setShowFollowupModal(true)
-            }, 500)
+            setTimeout(() => setShowFollowupModal(true), 500)
         }
     }
 
@@ -81,6 +80,11 @@ export default function NoteView() {
         const text = note.content_text || formatNoteText(note.content)
         await navigator.clipboard.writeText(text)
         setCopied(true)
+        toast({
+            title: "Copied to clipboard",
+            description: "The note has been copied.",
+            duration: 2000
+        })
         setTimeout(() => setCopied(false), 2000)
     }
 
@@ -105,16 +109,19 @@ export default function NoteView() {
         return new Date(dateStr).toLocaleDateString()
     }
 
+    const renderContent = (text) => {
+        if (!text) return ''
+        if (/<[a-z][\s\S]*>/i.test(text)) return text
+        return text.replace(/\n/g, '<br>')
+    }
+
     if (loading) {
         return (
-            <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#FAFAFA' }}>
+            <div className="min-h-dvh flex items-center justify-center bg-background">
                 <motion.div
                     animate={{ rotate: 360 }}
                     transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                    style={{
-                        width: 32, height: 32, borderRadius: '50%',
-                        border: '3px solid #E5E7EB', borderTopColor: '#6366F1'
-                    }}
+                    className="w-8 h-8 border-2 border-border border-t-primary rounded-full"
                 />
             </div>
         )
@@ -122,90 +129,51 @@ export default function NoteView() {
 
     if (!note) {
         return (
-            <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#FAFAFA', gap: 16 }}>
-                <div style={{ fontSize: 48 }}>📄</div>
-                <p style={{ color: '#6B7280', fontSize: 16, fontWeight: 500 }}>Note not found</p>
-                <button
-                    onClick={() => navigate('/')}
-                    style={{
-                        padding: '12px 28px', borderRadius: 12,
-                        background: '#6366F1', color: '#fff',
-                        fontWeight: 600, fontSize: 14, border: 'none', cursor: 'pointer',
-                    }}
-                >
+            <div className="min-h-dvh flex flex-col items-center justify-center bg-background p-6 text-center">
+                <div className="text-5xl mb-4">📄</div>
+                <p className="text-muted-foreground text-base mb-6">Note not found</p>
+                <Button onClick={() => navigate('/')}>
                     Back to Home
-                </button>
+                </Button>
             </div>
         )
     }
 
     const content = note.content || {}
 
-    // Convert plain text to HTML if needed (AI returns plain text with \n, dangerouslySetInnerHTML ignores \n)
-    const renderContent = (text) => {
-        if (!text) return ''
-        // If it already contains HTML tags, return as-is
-        if (/<[a-z][\s\S]*>/i.test(text)) return text
-        // Convert plain text newlines to <br> tags
-        return text.replace(/\n/g, '<br>')
-    }
-
     return (
-        <div style={{ minHeight: '100dvh', background: '#FAFAFA', paddingBottom: 110 }}>
+        <div className="min-h-dvh bg-background pb-28">
             {/* Top Nav Bar */}
-            <div className="safe-top" style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: '0 16px 16px'
-            }}>
-                <motion.button
-                    whileTap={{ scale: 0.9 }}
+            <div className="safe-top flex items-center justify-between px-4 pb-4">
+                <Button
+                    variant="outline"
+                    size="icon"
                     onClick={() => navigate('/')}
-                    style={{
-                        width: 40, height: 40, borderRadius: 14,
-                        background: '#fff', border: '1px solid #F0F0F0',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        cursor: 'pointer', color: '#374151',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.04)',
-                    }}
+                    className="w-10 h-10 rounded-lg border-border bg-card hover:bg-accent text-foreground shadow-sm"
                 >
                     <ArrowLeft size={18} />
-                </motion.button>
-                <motion.div
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    style={{
-                        display: 'flex', alignItems: 'center', gap: 6,
-                        padding: '6px 14px', borderRadius: 20,
-                        background: note.is_final
-                            ? 'linear-gradient(135deg, rgba(16,185,129,0.1) 0%, rgba(52,211,153,0.15) 100%)'
-                            : 'linear-gradient(135deg, rgba(245,158,11,0.1) 0%, rgba(251,191,36,0.15) 100%)',
-                        fontSize: 12, fontWeight: 600,
-                        border: `1px solid ${note.is_final ? 'rgba(16,185,129,0.2)' : 'rgba(245,158,11,0.2)'}`,
-                        color: note.is_final ? '#059669' : '#D97706'
-                    }}
+                </Button>
+                
+                <Badge
+                    variant={note.is_final ? 'success' : 'warning'}
+                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold"
                 >
                     {note.is_final && <Check size={12} />}
                     {note.is_final ? 'Clinician-reviewed' : 'Draft · Not reviewed'}
-                </motion.div>
+                </Badge>
             </div>
 
-            <div style={{ padding: '0 20px' }}>
+            <div className="px-5">
                 {/* AI Attribution */}
                 <motion.div
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}
+                    className="flex items-center gap-2.5 mb-4"
                 >
-                    <div style={{
-                        width: 28, height: 28, borderRadius: 10,
-                        background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        boxShadow: '0 2px 8px rgba(99,102,241,0.3)'
-                    }}>
-                        <Sparkles size={14} color="#fff" />
+                    <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center shadow-primary-glow">
+                        <Sparkles size={14} className="text-primary-foreground" />
                     </div>
-                    <span style={{ fontSize: 12, color: '#9CA3AF', fontWeight: 500, letterSpacing: '0.2px' }}>
+                    <span className="text-xs text-muted-foreground font-medium tracking-wide">
                         Generated by Hanna AI · {timeAgo(note.created_at)}
                     </span>
                 </motion.div>
@@ -216,39 +184,26 @@ export default function NoteView() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.15 }}
                 >
-                    <h1 style={{
-                        fontSize: 26, fontWeight: 800, color: '#111827',
-                        letterSpacing: '-0.8px', lineHeight: 1.15
-                    }}>
+                    <h1 className="text-2xl font-extrabold text-foreground -tracking-wide leading-tight">
                         {session?.patient_name || 'Patient Note'}
                     </h1>
-                    <div style={{
-                        display: 'flex', alignItems: 'center', gap: 8, marginTop: 6,
-                        flexWrap: 'wrap'
-                    }}>
+                    <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                         {session?.patient_hn && (
-                            <span style={{
-                                fontSize: 12, color: '#6366F1', fontWeight: 600,
-                                background: 'rgba(99,102,241,0.08)', padding: '3px 10px',
-                                borderRadius: 8
-                            }}>
+                            <Badge variant="primary" className="text-xs font-semibold px-2.5 py-0.5">
                                 HN {session.patient_hn}
-                            </span>
+                            </Badge>
                         )}
-                        <span style={{ fontSize: 12, color: '#9CA3AF', fontWeight: 500 }}>
+                        <span className="text-xs text-muted-foreground font-medium">
                             {new Date(note.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
-                        <span style={{
-                            fontSize: 11, color: '#6366F1', fontWeight: 700,
-                            letterSpacing: '0.5px'
-                        }}>
+                        <Badge variant="primary" className="text-[11px] font-bold tracking-wide">
                             {note.template_type?.toUpperCase()}
-                        </span>
+                        </Badge>
                     </div>
                 </motion.div>
 
                 {/* Divider */}
-                <div style={{ height: 1, background: 'linear-gradient(90deg, transparent, #E5E7EB 20%, #E5E7EB 80%, transparent)', margin: '20px 0' }} />
+                <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent my-5" />
 
                 {/* SOAP Sections */}
                 {Object.entries(SECTION_LABELS).map(([key, label], index) => {
@@ -258,61 +213,42 @@ export default function NoteView() {
                             key={key}
                             initial={{ opacity: 0, y: 12 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.2 + index * 0.08, ease: [0.25, 0.46, 0.45, 0.94] }}
-                            style={{ marginBottom: 20 }}
+                            transition={{ delay: 0.2 + index * 0.08 }}
+                            className="mb-5"
                         >
                             {/* Section Header */}
-                            <div style={{
-                                display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10
-                            }}>
-                                <div style={{
-                                    width: 28, height: 28, borderRadius: 8,
-                                    background: SECTION_GRADIENTS[key],
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    fontSize: 14,
-                                    boxShadow: `0 2px 8px ${key === 'subjective' ? 'rgba(102,126,234,0.3)' : key === 'objective' ? 'rgba(17,153,142,0.3)' : key === 'assessment' ? 'rgba(242,153,74,0.3)' : 'rgba(168,85,247,0.3)'}`
-                                }}>
+                            <div className="flex items-center gap-2.5 mb-2.5">
+                                <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${SECTION_GRADIENTS[key]} flex items-center justify-center text-base shadow-lg`}>
                                     {SECTION_ICONS[key]}
                                 </div>
-                                <h3 style={{
-                                    fontSize: 13, fontWeight: 700, textTransform: 'uppercase',
-                                    letterSpacing: '1.2px', color: '#374151'
-                                }}>
+                                <h3 className="text-[13px] font-bold text-muted-foreground uppercase tracking-widest">
                                     {label}
                                 </h3>
                             </div>
 
                             {/* Section Content Card */}
-                            <div style={{
-                                background: '#fff',
-                                borderRadius: 16,
-                                padding: '16px 18px',
-                                border: '1px solid #F3F4F6',
-                                boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)',
-                            }}>
-                                <div style={{
-                                    fontSize: 15, color: '#374151', lineHeight: 1.75,
-                                    letterSpacing: '-0.1px'
-                                }}
-                                    dangerouslySetInnerHTML={{ __html: renderContent(content[key]) }}
-                                />
-                            </div>
+                            <Card className="border-border bg-card shadow-sm">
+                                <CardContent className="p-4 pt-4">
+                                    <div
+                                        className="text-sm text-foreground leading-relaxed -tracking-wide"
+                                        dangerouslySetInnerHTML={{ __html: renderContent(content[key]) }}
+                                    />
+                                </CardContent>
+                            </Card>
                         </motion.div>
                     )
                 })}
 
                 {/* Free-form content */}
                 {content.text && (
-                    <div style={{
-                        background: '#fff', borderRadius: 16,
-                        padding: '16px 18px', marginBottom: 24,
-                        border: '1px solid #F3F4F6',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)',
-                    }}>
-                        <div style={{ fontSize: 15, color: '#374151', lineHeight: 1.75 }}
-                            dangerouslySetInnerHTML={{ __html: renderContent(content.text) }}
-                        />
-                    </div>
+                    <Card className="border-border bg-card shadow-sm mb-6">
+                        <CardContent className="p-4 pt-4">
+                            <div
+                                className="text-sm text-foreground leading-relaxed"
+                                dangerouslySetInnerHTML={{ __html: renderContent(content.text) }}
+                            />
+                        </CardContent>
+                    </Card>
                 )}
 
                 {/* Transcript Toggle */}
@@ -321,36 +257,28 @@ export default function NoteView() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.5 }}
+                        className="mb-4"
                     >
-                        <button
+                        <Button
+                            variant="outline"
                             onClick={() => setShowTranscript(!showTranscript)}
-                            style={{
-                                width: '100%', padding: '14px 16px',
-                                background: '#fff', borderRadius: 14,
-                                border: '1px solid #F3F4F6', cursor: 'pointer',
-                                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                                marginBottom: 16,
-                                boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
-                            }}
+                            className="w-full h-11 justify-between border-border bg-card hover:bg-accent text-foreground"
                         >
-                            <span style={{ fontSize: 14, color: '#6B7280', fontWeight: 500 }}>
+                            <span className="text-sm font-medium">
                                 {showTranscript ? 'Hide' : 'View'} transcript
                             </span>
-                            {showTranscript ? <ChevronUp size={16} color="#9CA3AF" /> : <ChevronDown size={16} color="#9CA3AF" />}
-                        </button>
+                            {showTranscript ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                        </Button>
+                        
                         <AnimatePresence>
                             {showTranscript && (
                                 <motion.div
                                     initial={{ height: 0, opacity: 0 }}
                                     animate={{ height: 'auto', opacity: 1 }}
                                     exit={{ height: 0, opacity: 0 }}
-                                    style={{
-                                        overflow: 'hidden', padding: '16px',
-                                        background: '#F9FAFB', borderRadius: 14,
-                                        marginBottom: 16, border: '1px solid #F3F4F6'
-                                    }}
+                                    className="overflow-hidden mt-2 p-4 bg-accent/50 rounded-lg border border-border"
                                 >
-                                    <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
+                                    <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
                                         {session.transcript}
                                     </p>
                                 </motion.div>
@@ -360,101 +288,62 @@ export default function NoteView() {
                 )}
             </div>
 
+            {/* Medical Disclaimer */}
+            <div className="px-5 pb-4">
+                <MedicalDisclaimer />
+            </div>
+
             {/* Bottom Actions */}
-            <div style={{
-                position: 'fixed', bottom: 0, left: 0, right: 0,
-                padding: '14px 20px',
-                paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 14px)',
-                background: 'rgba(250,250,250,0.85)',
-                backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
-                borderTop: '1px solid rgba(0,0,0,0.05)',
-            }}>
-                <div style={{ display: 'flex', gap: 8 }}>
+            <div className="fixed bottom-0 left-0 right-0 p-4 pb-[max(env(safe-area-inset-bottom,0px),14px)] bg-background/85 backdrop-blur-xl border-t border-border/50">
+                <div className="flex gap-2">
                     {/* Copy */}
-                    <motion.button
-                        whileTap={{ scale: 0.93 }}
+                    <Button
+                        variant="outline"
                         onClick={handleCopy}
-                        style={{
-                            flex: 1, padding: '13px 12px', borderRadius: 14,
-                            background: '#fff', border: '1px solid #E5E7EB',
-                            color: copied ? '#059669' : '#374151',
-                            fontWeight: 600, fontSize: 13, cursor: 'pointer',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                            boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
-                            transition: 'all 0.2s'
-                        }}
+                        className="flex-1 h-11 border-border bg-card hover:bg-accent text-foreground"
                     >
-                        {copied ? <CheckCheck size={15} /> : <Copy size={15} />}
+                        {copied ? <CheckCheck size={15} className="mr-1.5 text-success" /> : <Copy size={15} className="mr-1.5" />}
                         {copied ? 'Copied' : 'Copy'}
-                    </motion.button>
+                    </Button>
 
                     {/* PDF */}
-                    <motion.button
-                        whileTap={{ scale: 0.93 }}
+                    <Button
+                        variant="outline"
                         onClick={handleDownloadPdf}
-                        style={{
-                            flex: 1, padding: '13px 12px', borderRadius: 14,
-                            background: '#fff', border: '1px solid #E5E7EB',
-                            color: '#374151',
-                            fontWeight: 600, fontSize: 13, cursor: 'pointer',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                            boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
-                        }}
+                        className="flex-1 h-11 border-border bg-card hover:bg-accent text-foreground"
                     >
-                        <Download size={15} />
+                        <Download size={15} className="mr-1.5" />
                         PDF
-                    </motion.button>
+                    </Button>
 
                     {/* Edit or Finalize */}
                     {!note.is_final ? (
                         <>
-                            <motion.button
-                                whileTap={{ scale: 0.93 }}
+                            <Button
+                                variant="outline"
                                 onClick={() => navigate(`/note/${noteId}/edit`)}
-                                style={{
-                                    flex: 1, padding: '13px 12px', borderRadius: 14,
-                                    background: '#fff', border: '1px solid #E5E7EB',
-                                    color: '#374151',
-                                    fontWeight: 600, fontSize: 13, cursor: 'pointer',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                                    boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
-                                }}
+                                className="flex-1 h-11 border-border bg-card hover:bg-accent text-foreground"
                             >
-                                <Pencil size={14} />
+                                <Pencil size={14} className="mr-1.5" />
                                 Edit
-                            </motion.button>
-                            <motion.button
-                                whileTap={{ scale: 0.93 }}
+                            </Button>
+                            <Button
                                 onClick={handleFinalize}
-                                style={{
-                                    flex: 1.2, padding: '13px 12px', borderRadius: 14,
-                                    background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
-                                    color: '#fff', border: 'none',
-                                    fontWeight: 600, fontSize: 13, cursor: 'pointer',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                                    boxShadow: '0 4px 14px rgba(99,102,241,0.35)',
-                                }}
+                                className="flex-[1.2] h-11 bg-gradient-to-r from-primary to-primary-hover text-primary-foreground border-none shadow-primary-glow"
                             >
-                                <Check size={14} />
+                                <Check size={14} className="mr-1.5" />
                                 Finalize
-                            </motion.button>
+                            </Button>
                         </>
                     ) : (
-                        <motion.button
-                            whileTap={{ scale: 0.93 }}
+                        <Button
+                            variant="outline"
                             onClick={() => navigate(`/note/${noteId}/edit`)}
-                            style={{
-                                flex: 1, padding: '13px 12px', borderRadius: 14,
-                                background: '#fff', border: '1px solid #E5E7EB',
-                                color: '#374151',
-                                fontWeight: 600, fontSize: 13, cursor: 'pointer',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                                boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
-                            }}
+                            className="flex-1 h-11 border-border bg-card hover:bg-accent text-foreground"
                         >
-                            <Pencil size={14} />
+                            <Pencil size={14} className="mr-1.5" />
                             Amend
-                        </motion.button>
+                        </Button>
                     )}
                 </div>
             </div>
