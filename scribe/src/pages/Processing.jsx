@@ -5,7 +5,8 @@ import { CheckCircle2, Loader2, Mic, FileText, Sparkles } from 'lucide-react';
 import { transcriptionApi, notesApi } from '@/lib/api';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
-import DashboardLayout from '@/components/layout/DashboardLayout';
+import { Badge } from '@/components/ui/Badge';
+import MobileLayout from '@/components/layout/MobileLayout';
 
 const STEPS = [
     { id: 'upload', label: 'Uploading audio', icon: Mic },
@@ -35,19 +36,19 @@ export default function Processing() {
             // Step 1: Upload & Transcribe
             setCurrentStep(0);
             const transcription = await transcriptionApi.transcribe(audioBlob);
-            
+
             // Step 2: Generate Note
             setCurrentStep(1);
             const note = await notesApi.generateNote(sessionId, 'soap');
-            
+
             setCurrentStep(2);
             setNoteId(note.id);
-            
+
             // Navigate to note editor after short delay
             setTimeout(() => {
-                navigate(`/scribe/app/note/${note.id}`, { replace: true });
+                navigate(`/note/${note.id}`, { replace: true });
             }, 800);
-            
+
         } catch (err) {
             console.error('Processing error:', err);
             setError(err.message || 'Processing failed. Please try again.');
@@ -55,11 +56,8 @@ export default function Processing() {
     };
 
     return (
-        <DashboardLayout>
+        <MobileLayout showTabBar={false}>
             <div className="min-h-dvh bg-background flex items-center justify-center p-4 relative">
-                {/* Ambient Background Glow */}
-                <div className="ambient-glow" />
-
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -76,7 +74,7 @@ export default function Processing() {
                                 <Loader2 size={32} className="text-white animate-spin" />
                             </div>
                         </motion.div>
-                        
+
                         <h1 className="text-2xl font-bold text-white mb-2">
                             Processing Consultation
                         </h1>
@@ -86,7 +84,7 @@ export default function Processing() {
                     </div>
 
                     {/* Progress Card */}
-                    <Card className="border-border bg-card shadow-xl">
+                    <Card className="border-border-default bg-card shadow-xl">
                         <CardContent className="p-6 space-y-4">
                             {STEPS.map((step, index) => (
                                 <motion.div
@@ -145,9 +143,9 @@ export default function Processing() {
                             <p className="font-medium mb-2">Processing Failed</p>
                             <p>{error}</p>
                             <Button
-                                onClick={() => navigate(`/scribe/app/record/${sessionId}`)}
+                                onClick={() => navigate(`/record/${sessionId}`)}
                                 variant="destructive"
-                                className="mt-3 h-10 px-6"
+                                className="mt-3 h-11 px-6"
                             >
                                 Try Again
                             </Button>
@@ -161,16 +159,17 @@ export default function Processing() {
                             animate={{ opacity: 1 }}
                             className="mt-6 text-center"
                         >
-                            <p className="text-success text-sm font-medium">
+                            <Badge variant="success" className="text-sm">
+                                <CheckCircle2 size={14} className="mr-1" />
                                 Note generated successfully!
-                            </p>
-                            <p className="text-muted-foreground text-xs mt-1">
+                            </Badge>
+                            <p className="text-muted-foreground text-xs mt-2">
                                 Redirecting to editor...
                             </p>
                         </motion.div>
                     )}
                 </motion.div>
             </div>
-        </DashboardLayout>
+        </MobileLayout>
     );
 }

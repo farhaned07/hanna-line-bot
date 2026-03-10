@@ -1,16 +1,18 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Sparkles, Wand2, Check, Save, Loader2, Copy, Download, Mic } from 'lucide-react';
+import { ArrowLeft, Sparkles, Check, Save, Loader2, Copy } from 'lucide-react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import { notesApi } from '@/lib/api';
 import { Button } from '@/components/ui/Button';
-import { Card, CardContent } from '@/components/ui/Card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { useToast } from '@/hooks/useToast';
-import DashboardLayout from '@/components/layout/DashboardLayout';
+import MobileLayout from '@/components/layout/MobileLayout';
+import ExportModal from '@/components/scribe/ExportModal';
 
 const SECTION_ORDER = ['subjective', 'objective', 'assessment', 'plan'];
 const SECTION_LABELS = {
@@ -27,6 +29,9 @@ const SECTION_GRADIENTS = {
     plan: 'from-violet-500 to-indigo-600'
 };
 
+/**
+ * Section Editor Component
+ */
 function SectionEditor({ sectionKey, content, onChange, onRegenerate, isRegenerating }) {
     const editor = useEditor({
         extensions: [
@@ -94,11 +99,11 @@ function SectionEditor({ sectionKey, content, onChange, onRegenerate, isRegenera
             </div>
 
             {/* Editor Card */}
-            <Card className="border-border bg-card shadow-sm">
+            <Card className="border-border-default bg-card shadow-sm">
                 <CardContent className="p-0">
                     <EditorContent
                         editor={editor}
-                        className="prose prose-invert prose-sm max-w-none focus:outline-none"
+                        className="prose prose-invert prose-sm max-w-none"
                     />
                 </CardContent>
             </Card>
@@ -106,6 +111,152 @@ function SectionEditor({ sectionKey, content, onChange, onRegenerate, isRegenera
     );
 }
 
+/**
+ * Care Plan Tab Component
+ */
+function CarePlanTab({ note, content }) {
+    const { toast } = useToast();
+    const [carePlan, setCarePlan] = useState(null);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        // Auto-generate care plan from SOAP note
+        generateCarePlan();
+    }, []);
+
+    const generateCarePlan = async () => {
+        setLoading(true);
+        try {
+            // Simulate care plan generation from SOAP content
+            // In production, this would call the backend API
+            const plan = {
+                medications: extractMedications(content?.plan || ''),
+                followUp: extractFollowUp(content?.plan || ''),
+                lifestyle: extractLifestyle(content?.plan || ''),
+                education: extractEducation(content?.assessment || ''),
+            };
+            setCarePlan(plan);
+        } catch (err) {
+            toast({
+                title: 'Error',
+                description: 'Failed to generate care plan',
+                variant: 'destructive',
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const extractMedications = (plan) => {
+        // Simple extraction - in production, use AI
+        return ['Continue current medications as prescribed'];
+    };
+
+    const extractFollowUp = (plan) => {
+        return 'Follow-up in 2 weeks or as needed';
+    };
+
+    const extractLifestyle = (plan) => {
+        return ['Maintain healthy diet', 'Regular exercise as tolerated', 'Adequate rest'];
+    };
+
+    const extractEducation = (assessment) => {
+        return ['Monitor symptoms and report any changes', 'Take medications as directed'];
+    };
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center py-12">
+                <Loader2 size={32} className="animate-spin text-primary" />
+                <p className="text-muted-foreground ml-4">Generating care plan...</p>
+            </div>
+        );
+    }
+
+    return (
+        <div className="space-y-4">
+            {/* Medications */}
+            <Card className="border-border-default bg-card">
+                <CardHeader className="pb-3">
+                    <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+                            <Pill size={18} className="text-white" />
+                        </div>
+                        <CardTitle className="text-base">Medications</CardTitle>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    <ul className="space-y-2">
+                        {carePlan?.medications.map((med, i) => (
+                            <li key={i} className="flex items-start gap-2 text-sm text-foreground">
+                                <Check size={16} className="text-success mt-0.5 flex-shrink-0" />
+                                <span>{med}</span>
+                            </li>
+                        ))}
+                    </ul>
+                </CardContent>
+            </Card>
+
+            {/* Follow-up */}
+            <Card className="border-border-default bg-card">
+                <CardHeader className="pb-3">
+                    <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
+                            <ClipboardList size={18} className="text-white" />
+                        </div>
+                        <CardTitle className="text-base">Follow-up Plan</CardTitle>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-sm text-foreground">{carePlan?.followUp}</p>
+                </CardContent>
+            </Card>
+
+            {/* Lifestyle Recommendations */}
+            <Card className="border-border-default bg-card">
+                <CardHeader className="pb-3">
+                    <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-yellow-600 flex items-center justify-center">
+                            <Heart size={18} className="text-white" />
+                        </div>
+                        <CardTitle className="text-base">Lifestyle Recommendations</CardTitle>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    <ul className="space-y-2">
+                        {carePlan?.lifestyle.map((item, i) => (
+                            <li key={i} className="flex items-start gap-2 text-sm text-foreground">
+                                <Check size={16} className="text-success mt-0.5 flex-shrink-0" />
+                                <span>{item}</span>
+                            </li>
+                        ))}
+                    </ul>
+                </CardContent>
+            </Card>
+
+            {/* Patient Education */}
+            <Card className="border-border-default bg-card">
+                <CardHeader className="pb-3">
+                    <CardTitle className="text-base">Patient Education</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <ul className="space-y-2">
+                        {carePlan?.education.map((item, i) => (
+                            <li key={i} className="flex items-start gap-2 text-sm text-foreground">
+                                <Check size={16} className="text-info mt-0.5 flex-shrink-0" />
+                                <span>{item}</span>
+                            </li>
+                        ))}
+                    </ul>
+                </CardContent>
+            </Card>
+        </div>
+    );
+}
+
+/**
+ * Main Note Editor Component
+ */
 export default function NoteEditor() {
     const { noteId } = useParams();
     const navigate = useNavigate();
@@ -115,6 +266,8 @@ export default function NoteEditor() {
     const [saving, setSaving] = useState(false);
     const [regenerating, setRegenerating] = useState(null);
     const [content, setContent] = useState({});
+    const [activeTab, setActiveTab] = useState('soap');
+    const [showExport, setShowExport] = useState(false);
 
     useEffect(() => {
         loadNote();
@@ -181,14 +334,15 @@ export default function NoteEditor() {
 
     const handleFinalize = async () => {
         if (!confirm('Finalize this note? It will be marked as complete.')) return;
-        
+
         try {
             await notesApi.finalize(noteId);
-            toast({
-                title: 'Note finalized',
-                description: 'This note has been marked as complete',
-            });
-            navigate('/scribe/app');
+            
+            // Update local state
+            setNote({ ...note, is_final: true, finalized_at: new Date().toISOString() });
+            
+            // Show export options modal
+            setShowExport(true);
         } catch (error) {
             toast({
                 title: 'Error',
@@ -211,25 +365,25 @@ export default function NoteEditor() {
 
     if (loading) {
         return (
-            <DashboardLayout>
+            <MobileLayout showTabBar={false}>
                 <div className="min-h-dvh bg-background flex items-center justify-center">
                     <div className="text-center">
                         <Loader2 size={32} className="animate-spin text-primary mx-auto mb-4" />
                         <p className="text-muted-foreground">Loading note...</p>
                     </div>
                 </div>
-            </DashboardLayout>
+            </MobileLayout>
         );
     }
 
     return (
-        <DashboardLayout>
+        <MobileLayout>
             <div className="min-h-dvh bg-background pb-24 relative">
                 {/* Ambient Background Glow */}
                 <div className="ambient-glow" />
 
                 {/* Header */}
-                <div className="safe-top sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border">
+                <div className="safe-top sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border-default">
                     <div className="px-6 py-4">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
@@ -296,34 +450,60 @@ export default function NoteEditor() {
                         </div>
                     </motion.div>
 
-                    {/* Sections */}
-                    <div className="space-y-6">
-                        {SECTION_ORDER.map((section) => (
-                            <SectionEditor
-                                key={section}
-                                sectionKey={section}
-                                content={content[section]}
-                                onChange={(value) => handleSectionChange(section, value)}
-                                onRegenerate={handleRegenerate}
-                                isRegenerating={regenerating === section}
-                            />
-                        ))}
-                    </div>
+                    {/* Tabs: SOAP / Care Plan */}
+                    <Tabs defaultValue="soap" value={activeTab} onValueChange={setActiveTab} className="w-full">
+                        <TabsList className="grid grid-cols-2 w-full mb-6">
+                            <TabsTrigger value="soap" className="min-h-[48px]">
+                                <FileText size={18} className="mr-2" />
+                                SOAP Note
+                            </TabsTrigger>
+                            <TabsTrigger value="careplan" className="min-h-[48px]">
+                                <Heart size={18} className="mr-2" />
+                                Care Plan
+                            </TabsTrigger>
+                        </TabsList>
+
+                        {/* SOAP Tab */}
+                        <TabsContent value="soap" className="space-y-6">
+                            {SECTION_ORDER.map((section) => (
+                                <SectionEditor
+                                    key={section}
+                                    sectionKey={section}
+                                    content={content[section]}
+                                    onChange={(value) => handleSectionChange(section, value)}
+                                    onRegenerate={handleRegenerate}
+                                    isRegenerating={regenerating === section}
+                                />
+                            ))}
+                        </TabsContent>
+
+                        {/* Care Plan Tab */}
+                        <TabsContent value="careplan">
+                            <CarePlanTab note={note} content={content} />
+                        </TabsContent>
+                    </Tabs>
                 </div>
 
                 {/* Finalize Button */}
-                <div className="fixed bottom-0 left-0 right-0 lg:pl-72 p-6 bg-gradient-to-t from-background to-transparent">
+                <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-background to-transparent safe-bottom">
                     <div className="max-w-3xl mx-auto">
                         <Button
                             onClick={handleFinalize}
-                            className="w-full h-14 bg-gradient-to-r from-success to-success-dark text-white font-semibold shadow-lg shadow-success/30 hover:shadow-success/40 hover:-translate-y-0.5 transition-all"
+                            className="w-full h-14 bg-gradient-to-r from-success to-green-700 text-white font-semibold shadow-lg shadow-success/30 hover:shadow-success/40 hover:-translate-y-0.5 transition-all"
                         >
                             <Check size={20} className="mr-2" />
                             Finalize Note
                         </Button>
                     </div>
                 </div>
+
+                {/* Export Options Modal */}
+                <ExportModal
+                    isOpen={showExport}
+                    onClose={() => setShowExport(false)}
+                    note={note}
+                />
             </div>
-        </DashboardLayout>
+        </MobileLayout>
     );
 }

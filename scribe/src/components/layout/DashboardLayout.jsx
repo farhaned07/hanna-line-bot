@@ -25,14 +25,14 @@ export default function DashboardLayout({ children }) {
     const user = authApi.getUser();
 
     const navigation = [
-        { name: 'Home', href: '/scribe/app', icon: Home },
-        { name: 'Handover', href: '/scribe/app/handover', icon: FileText },
-        { name: 'Settings', href: '/scribe/app/settings', icon: Settings },
+        { name: 'Home', href: '/', icon: Home },
+        { name: 'Handover', href: '/handover', icon: FileText },
+        { name: 'Settings', href: '/settings', icon: Settings },
     ];
 
     const isActive = (href) => {
-        if (href === '/scribe/app') {
-            return location.pathname === '/scribe/app';
+        if (href === '/') {
+            return location.pathname === '/';
         }
         return location.pathname.startsWith(href);
     };
