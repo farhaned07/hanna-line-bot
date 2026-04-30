@@ -1,7 +1,7 @@
 {
   "name": "hanna-line-bot",
   "version": "1.0.0",
-  "description": "LINE voice-first chronic care bot for Hanna AI Nurse",
+  "description": "Patient LINE follow-up channel for Hanna Care Intelligence. Owns webhook, check-ins, replies, and patient-channel routing.",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
@@ -12,7 +12,13 @@
     "build:scribe": "cd scribe && npm install && npm run build",
     "combine-builds": "node scripts/combine-builds.js"
   },
-  "keywords": [],
+  "keywords": [
+    "hanna",
+    "line-bot",
+    "patient-follow-up",
+    "chronic-care",
+    "care-intelligence"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
