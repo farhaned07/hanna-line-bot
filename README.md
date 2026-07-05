@@ -1,65 +1,42 @@
-# Hanna Care Intelligence
+# Hanna Care Intelligence — LINE Follow-up Bot
 
-Hanna turns clinic visits into guided care.
+LINE bot component for **Hanna Care Intelligence**, focused on patient follow-up, care-plan delivery, and care-team visibility after a clinic visit.
 
-> Hanna creates the documentation, care plan, LINE follow-up, and nurse priority list after each visit.
+This repository represents one component of the broader Hanna care loop.
 
-This repo contains platform/backend documentation and legacy components for the Hanna Care Intelligence ecosystem.
+## Product context
 
-## Current strategy
-
-Hanna is sold as **Care Intelligence**, not as standalone Scribe.
-
-Scribe is the front door. The product is the full care loop:
+Hanna is built around the idea that the clinical visit should not end when the patient leaves the room. The system turns a visit into structured documentation, a patient-friendly care plan, and a follow-up path that care teams can monitor.
 
 ```text
 Visit → Documentation → Care plan → LINE follow-up → Risk signal → Nurse priority → Outcome report
 ```
 
-## What Hanna sells
+## What this component does
 
-Hanna helps chronic care teams:
+- Connects patient follow-up to a familiar messaging channel
+- Supports care-plan delivery after a visit
+- Helps capture follow-up signals that may need nurse attention
+- Fits into a supervised clinical workflow rather than replacing care-team judgment
 
-- document visits faster
-- create care plans from each visit
-- continue follow-up through LINE
-- capture patient risk signals
-- prioritize nurse attention
-- report outcomes to leadership
+## What this demonstrates
 
-## Locked packaging
+- Healthcare workflow decomposition into deployable components
+- Messaging-channel integration for clinical follow-up
+- Product thinking around continuity of care
+- Practical architecture for pilot-ready healthcare AI systems
 
-| Package | Price | Purpose |
-|---|---:|---|
-| Hanna Pilot | ฿60,000/month for 90 days | Prove the care loop with one clinic or department |
-| Hanna Care Intelligence | ฿85,000/month, billed annually | Annual department-level care intelligence system |
-| Hanna Enterprise | From ฿250,000/month, annual only | Multi-department, hospital group, or payer rollout |
+## System role
 
-Do not use the old standalone Scribe Free/Pro/Clinic pricing as the main business model. Do not use the old ฿50,000/month annual price in new material.
-
-## Core components
-
-| Component | Role |
-|---|---|
-| Scribe | Captures the visit and creates clinician-reviewed documentation |
-| Care plan | Converts the visit into patient-friendly next steps |
-| LINE bot | Runs follow-up through a familiar patient channel |
-| Risk engine | Converts symptoms, silence, vitals, and adherence into signals |
-| Nurse dashboard | Shows who needs attention today |
-| Reports | Prove follow-up activity, escalation, and operational value |
-
-## Important documentation
-
-| Document | Purpose |
-|---|---|
-| [`docs/PRODUCT_SPEC.md`](./docs/PRODUCT_SPEC.md) | Current product source of truth |
-| [`docs/REGULATORY_POSTURE.md`](./docs/REGULATORY_POSTURE.md) | Regulatory and safety posture |
-| [`docs/DEPLOYMENT_RUNBOOK.md`](./docs/DEPLOYMENT_RUNBOOK.md) | Deployment guidance |
-| [`docs/FOLLOWUP_SYSTEM_GUIDE.md`](./docs/FOLLOWUP_SYSTEM_GUIDE.md) | Follow-up system guide |
-
-## Product rule
-
-If a feature or document does not support the care loop, pilot conversion, annual renewal, or clinical trust, simplify it, rewrite it, or remove it.
+```text
+Scribe / visit capture
+        ↓
+Structured note + care plan
+        ↓
+LINE follow-up bot
+        ↓
+Risk signal / nurse dashboard / reporting
+```
 
 ## Development
 
@@ -68,8 +45,12 @@ npm install
 npm start
 ```
 
-Environment variables depend on the deployed component and may include Supabase, LINE, AI provider, and auth credentials.
+Environment variables depend on the deployment target and may include LINE, database, AI provider, and authentication credentials.
 
 ## Compliance posture
 
-Hanna is supervised care infrastructure. AI drafts and organizes information; licensed care teams review, confirm, and act. Hanna should not be described as autonomous diagnosis or autonomous treatment.
+Hanna is supervised care infrastructure. AI drafts, organizes, and routes information for review. Licensed clinicians and care teams remain responsible for confirmation, escalation, diagnosis, and treatment decisions.
+
+## Portfolio note
+
+This project shows my forward-deployed engineering approach: break a real healthcare operation into usable system components, then design the technical path from workflow to pilot-ready software.
