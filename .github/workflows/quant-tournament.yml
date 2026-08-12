@@ -1,11 +1,11 @@
-name: PLTR SPCX 3R Quant Tournament
+name: PLTR SPCX 3R Quant Tournament Round 2
 
 on:
   push:
     branches:
-      - quant-tournament-20260812
+      - quant-tournament-r2-20260813
     paths:
-      - quant_tournament_fast.py
+      - quant_tournament_round2.py
       - .github/workflows/quant-tournament.yml
 
 permissions:
@@ -14,7 +14,7 @@ permissions:
 jobs:
   tournament:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -24,14 +24,15 @@ jobs:
           python-version: '3.12'
       - name: Install
         run: python -m pip install --disable-pip-version-check pandas numpy requests pyarrow
-      - name: Run tournament
-        run: python quant_tournament_fast.py
+      - name: Run tournament round 2
+        run: python quant_tournament_round2.py
       - name: Upload results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: pltr-spcx-3r-tournament-fast
+          name: pltr-spcx-3r-tournament-round2
           path: |
-            quant_results_fast/FINAL_TOURNAMENT_FAST.csv
-            quant_results_fast/summary_fast.json
+            quant_results_round2/ROUND2_TOURNAMENT.csv
+            quant_results_round2/ROUND2_FOLDS.csv
+            quant_results_round2/summary_round2.json
           if-no-files-found: warn
