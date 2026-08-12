@@ -5,7 +5,7 @@ on:
     branches:
       - quant-tournament-20260812
     paths:
-      - quant_tournament.py
+      - quant_tournament_fast.py
       - .github/workflows/quant-tournament.yml
 
 permissions:
@@ -14,7 +14,7 @@ permissions:
 jobs:
   tournament:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,13 +25,13 @@ jobs:
       - name: Install
         run: python -m pip install --disable-pip-version-check pandas numpy requests pyarrow
       - name: Run tournament
-        run: python quant_tournament.py
+        run: python quant_tournament_fast.py
       - name: Upload results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: pltr-spcx-3r-tournament
+          name: pltr-spcx-3r-tournament-fast
           path: |
-            quant_results/FINAL_TOURNAMENT.csv
-            quant_results/summary.json
+            quant_results_fast/FINAL_TOURNAMENT_FAST.csv
+            quant_results_fast/summary_fast.json
           if-no-files-found: warn
