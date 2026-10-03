@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>One Brain Cardio — Prototype</title>
+<style>
+:root{
+  --bg:#0b0c0e;--panel:#121417;--panel2:#171a1f;--text:#f5f5f2;--muted:#9ca3ad;
+  --line:#2a2f36;--soft:#20242a;--warn:#d7a34b;--good:#70b58b;--bad:#d36f6f;--blue:#80aef5
+}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,#0a0b0d,#101216 55%,#0b0c0e);color:var(--text);
+font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.shell{max-width:1180px;margin:0 auto;padding:28px 18px 72px}
+.top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:22px}
+.brand{font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:#d7d7d2}
+h1{font-size:34px;line-height:1.05;margin:8px 0 8px;letter-spacing:-.035em}
+.sub{color:var(--muted);max-width:720px;font-size:14px;line-height:1.5}
+.badge{border:1px solid var(--line);padding:8px 10px;border-radius:999px;color:#d8d8d4;font-size:11px;white-space:nowrap}
+.grid{display:grid;grid-template-columns:1.25fr .75fr;gap:16px}
+.card{background:rgba(18,20,23,.92);border:1px solid var(--line);border-radius:18px;padding:18px}
+.card h2{font-size:15px;margin:0 0 14px;font-weight:620;letter-spacing:-.01em}
+.label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em}
+.value{font-size:28px;font-weight:650;letter-spacing:-.03em;margin-top:5px}
+.row{display:flex;gap:12px;align-items:center;justify-content:space-between}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.kpi{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:14px}
+.kpi .n{font-size:22px;margin-top:4px}
+.muted{color:var(--muted)}
+.timeline{height:180px;display:flex;align-items:flex-end;gap:3px;margin-top:10px}
+.bar{flex:1;border-radius:3px 3px 0 0;background:#3f4855;min-width:3px;opacity:.85}
+.bar.flag{background:var(--warn)}
+.legend{display:flex;gap:16px;font-size:11px;color:var(--muted);margin-top:9px}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;background:#3f4855}
+.dot.warn{background:var(--warn)}
+.sensor{height:220px;background:#0c0f13;border:1px solid #20252b;border-radius:14px;overflow:hidden;position:relative}
+canvas{width:100%;height:100%;display:block}
+.overlay{position:absolute;inset:12px;pointer-events:none;display:flex;justify-content:space-between;align-items:flex-start}
+.status{font-size:11px;padding:6px 8px;border:1px solid var(--line);border-radius:999px;background:rgba(8,9,11,.72)}
+button{appearance:none;border:0;border-radius:12px;padding:11px 14px;background:#f3f3ef;color:#111;font-weight:650;cursor:pointer}
+button.secondary{background:#1a1e24;color:#f0f0ec;border:1px solid var(--line)}
+button:disabled{opacity:.45;cursor:not-allowed}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.notice{padding:12px 13px;border-radius:12px;background:#15181d;border:1px solid var(--line);font-size:12px;line-height:1.45}
+.notice strong{color:#fff}
+.reasons{display:grid;gap:8px;margin-top:10px}
+.reason{padding:10px 11px;border:1px solid var(--line);border-radius:11px;background:#15181c;font-size:12px}
+.queue-item{padding:13px;border:1px solid var(--line);border-radius:13px;background:#15181c;margin-top:10px}
+.queue-top{display:flex;justify-content:space-between;gap:10px}
+.priority{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#111;background:var(--warn);padding:5px 7px;border-radius:999px;font-weight:700}
+.small{font-size:11px}
+.footer{margin-top:18px;color:#7f8792;font-size:11px;line-height:1.5}
+@media(max-width:860px){.grid{grid-template-columns:1fr}.top{flex-direction:column}.kpis{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="top">
+    <div>
+      <div class="brand">ONE BRAIN / CARDIO</div>
+      <h1>Continuous signals. Human decisions.</h1>
+      <div class="sub">Hackathon prototype showing how longitudinal patient trends can trigger a nurse review. The smartphone-on-chest check is presented as a signal only — never a diagnosis and never a prediction of decompensation.</div>
+    </div>
+    <div class="badge">SIMULATED PATIENT · DEMO ONLY</div>
+  </div>
+
+  <div class="grid">
+    <div>
+      <section class="card">
+        <div class="row">
+          <div>
+            <div class="label">Patient</div>
+            <div class="value">Mali S. <span class="muted" style="font-size:16px;font-weight:500">· 68</span></div>
+          </div>
+          <div class="badge">Model assumption: 5× nurse capacity</div>
+        </div>
+
+        <div class="kpis">
+          <div class="kpi"><div class="label">Weight / 48h</div><div class="n" id="weight">+1.8 kg</div></div>
+          <div class="kpi"><div class="label">Activity</div><div class="n" id="activity">−42%</div></div>
+          <div class="kpi"><div class="label">Voice trend</div><div class="n" id="voice">0.71</div></div>
+          <div class="kpi"><div class="label">Review score</div><div class="n" id="score">4 / 10</div></div>
+        </div>
+
+        <div style="margin-top:18px">
+          <div class="row"><h2 style="margin:0">30-day simulated trend</h2><div class="small muted">Illustrative patient data</div></div>
+          <div class="timeline" id="timeline"></div>
+          <div class="legend"><span><i class="dot"></i>routine</span><span><i class="dot warn"></i>trend signal</span></div>
+        </div>
+      </section>
+
+      <section class="card" style="margin-top:16px">
+        <div class="row">
+          <div>
+            <h2 style="margin-bottom:4px">Smartphone-on-chest check</h2>
+            <div class="small muted">Accelerometer + gyroscope waveform. Live when browser permits; simulated fallback is labeled.</div>
+          </div>
+          <div class="status" id="sensorStatus">Sensor idle</div>
+        </div>
+
+        <div class="sensor" style="margin-top:12px">
+          <canvas id="wave"></canvas>
+          <div class="overlay"><span class="status">SCG / motion proxy</span><span class="status" id="rate">0 Hz</span></div>
+        </div>
+
+        <div class="actions">
+          <button id="startBtn">Start 2-minute check</button>
+          <button class="secondary" id="simulateBtn">Use simulated signal</button>
+          <button class="secondary" id="stopBtn" disabled>Stop</button>
+        </div>
+
+        <div class="notice" style="margin-top:12px">
+          <strong>Stage-safe claim:</strong> Published research has shown that smartphone motion sensors can distinguish heart-failure patients from controls. This prototype uses signal drift only to trigger nurse review.
+        </div>
+      </section>
+    </div>
+
+    <div>
+      <section class="card">
+        <h2>One Brain assessment</h2>
+        <div class="notice" id="assessment">
+          <strong>Signal drift detected. Nurse review recommended.</strong><br>
+          No diagnosis is produced.
+        </div>
+        <div class="reasons" id="reasons"></div>
+      </section>
+
+      <section class="card" style="margin-top:16px">
+        <div class="row"><h2 style="margin:0">Nurse queue</h2><span class="small muted">1 item</span></div>
+        <div class="queue-item">
+          <div class="queue-top">
+            <div>
+              <div style="font-weight:650">Mali S.</div>
+              <div class="small muted" style="margin-top:3px">Cardio review · created just now</div>
+            </div>
+            <div class="priority">Review</div>
+          </div>
+          <div class="small" style="margin-top:11px;line-height:1.5" id="queueReason">Weight drift + activity drop + SCG signal drift.</div>
+          <div class="actions">
+            <button class="secondary" onclick="resolveQueue()">Reviewed by nurse</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" style="margin-top:16px">
+        <h2>Human boundary</h2>
+        <div class="reason">One Brain decides <strong>when to ask for review</strong>.</div>
+        <div class="reason">The <strong>nurse decides what the signal means</strong>.</div>
+        <div class="reason">The <strong>doctor decides what to do</strong>.</div>
+      </section>
+    </div>
+  </div>
+
+  <div class="footer">
+    Prototype only. Simulated patient and illustrative outcome data. Not a medical device. Not validated for diagnosis, decompensation prediction, treatment recommendation, or clinical use.
+  </div>
+</div>
+
+<script>
+const state = {
+  weightGainKg48h: 1.8,
+  activityDropPct: 42,
+  voiceConcern: 0.71,
+  scgDrift: 0.18,
+  samples: [],
+  running: false,
+  simulated: false,
+  lastT: null,
+  rateSamples: [],
+};
+
+const RULES = {
+  weightGainKg48h: 1.5,
+  activityDropPct: 35,
+  voiceConcernThreshold: 0.65,
+  scgDriftThreshold: 0.28,
+  reviewScoreThreshold: 3,
+};
+
+function evaluate(s){
+  let score = 0, reasons = [];
+  if(s.weightGainKg48h >= RULES.weightGainKg48h){score += 2; reasons.push('Weight drift +' + s.weightGainKg48h.toFixed(1) + ' kg / 48h');}
+  if(s.activityDropPct >= RULES.activityDropPct){score += 1; reasons.push('Activity down ' + Math.round(s.activityDropPct) + '%');}
+  if(s.voiceConcern >= RULES.voiceConcernThreshold){score += 1; reasons.push('Voice/symptom trend changed');}
+  if(s.scgDrift >= RULES.scgDriftThreshold){score += 2; reasons.push('SCG signal drift detected');}
+  score = Math.min(10, score);
+  return {score,reasons,review:score>=RULES.reviewScoreThreshold};
+}
+
+function renderAssessment(){
+  const a = evaluate(state);
+  document.getElementById('score').textContent = a.score + ' / 10';
+  document.getElementById('assessment').innerHTML = a.review
+    ? '<strong>Signal drift detected. Nurse review recommended.</strong><br>No diagnosis is produced.'
+    : '<strong>No nurse review trigger from current prototype rules.</strong><br>No diagnosis is produced.';
+  document.getElementById('reasons').innerHTML = a.reasons.map(r=>'<div class="reason">'+r+'</div>').join('');
+  document.getElementById('queueReason').textContent = a.reasons.join(' + ') || 'No active reasons.';
+}
+
+function buildTimeline(){
+  const el = document.getElementById('timeline');
+  const vals = [31,34,28,33,37,30,35,38,34,32,37,39,36,40,41,38,43,42,46,49,44,50,52,48,55,58,62,67,72,78];
+  el.innerHTML = vals.map((v,i)=>'<div class="bar '+(i>25?'flag':'')+'" style="height:'+v+'%"></div>').join('');
+}
+
+const canvas = document.getElementById('wave');
+const ctx = canvas.getContext('2d');
+function resize(){canvas.width=canvas.clientWidth*devicePixelRatio;canvas.height=canvas.clientHeight*devicePixelRatio;}
+addEventListener('resize',resize); resize();
+
+function draw(){
+  const w=canvas.width,h=canvas.height;
+  ctx.clearRect(0,0,w,h);
+  ctx.strokeStyle='#27303a';ctx.lineWidth=1*devicePixelRatio;
+  for(let i=1;i<4;i++){ctx.beginPath();ctx.moveTo(0,h*i/4);ctx.lineTo(w,h*i/4);ctx.stroke();}
+  const data=state.samples.slice(-240);
+  if(data.length>1){
+    ctx.strokeStyle='#d9dde3';ctx.lineWidth=1.6*devicePixelRatio;ctx.beginPath();
+    data.forEach((v,i)=>{
+      const x=i/(Math.max(1,data.length-1))*w;
+      const y=h/2 - v*h*.14;
+      i?ctx.lineTo(x,y):ctx.moveTo(x,y);
+    });ctx.stroke();
+  }
+  requestAnimationFrame(draw);
+}
+draw();
+
+function pushSample(v,t){
+  state.samples.push(v);
+  if(state.samples.length>1000) state.samples.shift();
+  if(state.lastT){
+    const hz=1000/(t-state.lastT);
+    if(isFinite(hz)&&hz>0&&hz<500){state.rateSamples.push(hz);if(state.rateSamples.length>30)state.rateSamples.shift();}
+    const avg=state.rateSamples.reduce((a,b)=>a+b,0)/Math.max(1,state.rateSamples.length);
+    document.getElementById('rate').textContent = Math.round(avg)+' Hz';
+  }
+  state.lastT=t;
+}
+
+function motionHandler(e){
+  const a=e.accelerationIncludingGravity||{};
+  const r=e.rotationRate||{};
+  const v=((a.x||0)*.5 + (a.y||0)*.3 + (a.z||0)*.2 + (r.alpha||0)*.01);
+  pushSample(v,performance.now());
+  if(state.samples.length>80){
+    const recent=state.samples.slice(-80);
+    const mean=recent.reduce((x,y)=>x+y,0)/recent.length;
+    const variance=recent.reduce((x,y)=>x+(y-mean)*(y-mean),0)/recent.length;
+    state.scgDrift=Math.min(.6,Math.sqrt(variance)/5);
+    renderAssessment();
+  }
+}
+
+let simTimer=null;
+function useSimulation(){
+  stopCapture();
+  state.simulated=true;state.running=true;state.samples=[];
+  document.getElementById('sensorStatus').textContent='SIMULATED SIGNAL';
+  document.getElementById('stopBtn').disabled=false;
+  let phase=0;
+  simTimer=setInterval(()=>{
+    phase+=0.25;
+    const v=Math.sin(phase)*.8 + Math.sin(phase*3.7)*.25 + (Math.random()-.5)*.16;
+    pushSample(v,performance.now());
+    state.scgDrift=.34;
+    renderAssessment();
+  },20);
+}
+
+async function startCapture(){
+  stopCapture();
+  try{
+    if(typeof DeviceMotionEvent!=='undefined' && typeof DeviceMotionEvent.requestPermission==='function'){
+      const p=await DeviceMotionEvent.requestPermission();
+      if(p!=='granted') throw new Error('Motion permission not granted');
+    }
+    if(!('DeviceMotionEvent' in window)) throw new Error('DeviceMotion unsupported');
+    state.running=true;state.simulated=false;state.samples=[];
+    addEventListener('devicemotion',motionHandler);
+    document.getElementById('sensorStatus').textContent='LIVE SENSOR';
+    document.getElementById('stopBtn').disabled=false;
+    document.getElementById('startBtn').disabled=true;
+  }catch(err){
+    document.getElementById('sensorStatus').textContent='Sensor unavailable · simulation ready';
+    useSimulation();
+  }
+}
+
+function stopCapture(){
+  removeEventListener('devicemotion',motionHandler);
+  if(simTimer){clearInterval(simTimer);simTimer=null;}
+  state.running=false;
+  document.getElementById('stopBtn').disabled=true;
+  document.getElementById('startBtn').disabled=false;
+  if(!state.simulated) document.getElementById('sensorStatus').textContent='Sensor idle';
+}
+
+function resolveQueue(){
+  alert('Prototype: nurse review recorded. No diagnosis or treatment action generated.');
+}
+
+document.getElementById('startBtn').addEventListener('click',startCapture);
+document.getElementById('simulateBtn').addEventListener('click',useSimulation);
+document.getElementById('stopBtn').addEventListener('click',stopCapture);
+
+buildTimeline();
+renderAssessment();
+</script>
+</body>
+</html>
