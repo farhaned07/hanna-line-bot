@@ -93,12 +93,15 @@ function createNurseCopilot({ tools, store }) {
                 }
 
                 const actions = planActions(event, patient);
-                await tools.recordDecision({
+                const decisionReceipt = await tools.recordDecision({
                     tenantId: event.tenantId, patientId: event.patientId,
                     eventId: event.eventId, eventType: event.type,
                     decision: actions.map(a => a.tool), // no PHI in decisions
                     idempotencyKey: `${event.tenantId}:${event.eventId}:decision`
                 });
+                if (!decisionReceipt || !decisionReceipt.id) {
+                    throw new Error('Decision audit was not durably acknowledged');
+                }
 
                 const receipts = [];
                 for (let i = 0; i < actions.length; i++) {
