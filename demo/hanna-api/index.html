@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hanna Care Intelligence · OneBrain API Demo</title>
+<style>
+:root{color-scheme:light;--ink:#121c29;--muted:#637386;--line:#dce5ea;--off:#f4f7fa;--teal:#177d79;--tealsoft:#e9f5f2;--red:#b64738;--pink:#fff1ef;--navy:#15283b}
+*{box-sizing:border-box}body{margin:0;background:#f5f8fa;color:var(--ink);font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:14px;line-height:1.5}
+header{background:#fff;border-bottom:1px solid var(--line);padding:17px max(22px,calc((100vw - 1180px)/2));display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-size:23px;font-weight:800;letter-spacing:-1.1px}.brand b{color:var(--teal)}header small{color:var(--muted);display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.pill{border:1px solid #e7d0a2;background:#fff9e9;color:#88652b;padding:7px 11px;border-radius:999px;font-size:11px;font-weight:700}
+main{max-width:1180px;margin:0 auto;padding:30px 22px 60px}
+.hero{max-width:850px;margin:3px 0 25px}.kicker{font-size:11px;font-weight:800;color:var(--teal);letter-spacing:.16em;text-transform:uppercase}
+h1{font-size:clamp(32px,5vw,51px);line-height:1.07;letter-spacing:-.055em;margin:12px 0 12px;font-weight:780}
+.hero p{font-size:16px;color:var(--muted);max-width:760px;margin:0}.columns{display:grid;grid-template-columns:340px minmax(0,1fr);gap:17px;align-items:start}
+.card{background:#fff;border:1px solid var(--line);border-radius:17px;box-shadow:0 8px 28px rgba(30,65,82,.035)}
+.control{padding:22px;position:sticky;top:16px}.card h2{font-size:14px;letter-spacing:-.01em;margin:0}.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
+.control p{color:var(--muted);font-size:12px;margin:0 0 16px}
+.action{display:flex;align-items:center;text-align:left;gap:12px;background:#fff;border:1px solid var(--line);border-radius:11px;padding:12px;width:100%;margin:8px 0;cursor:pointer;color:var(--ink);font:inherit;transition:.15s}
+.action:hover:not(:disabled){border-color:var(--teal);background:#f3faf8}.action:disabled{opacity:.42;cursor:not-allowed}.action:focus-visible,.reset:focus-visible{outline:3px solid #b7d9d6}
+.num{background:#edf3f7;border-radius:9px;width:29px;height:29px;display:grid;place-items:center;color:#506578;flex-shrink:0;font-size:12px;font-weight:750}
+.action strong{display:block;font-size:13px}.action small{font-size:11px;color:var(--muted)}
+.action.primary{background:#eaf6f3;border-color:#b8ddd5}.action.primary .num{background:#177d79;color:#fff}
+.reset{background:none;border:none;color:var(--teal);font-weight:700;cursor:pointer;padding:10px 0 0}
+.note{margin-top:19px;border-top:1px solid var(--line);padding-top:15px;color:#667789;font-size:11px}
+.board{display:grid;gap:15px}.two{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.panel{padding:20px;min-height:223px}.eyebrow{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.13em;text-transform:uppercase;margin-bottom:6px}
+.line-title{display:flex;align-items:center;gap:8px}.line-mark{background:#06c755;color:white;border-radius:8px;padding:4px 7px;font-size:10px;font-weight:850;letter-spacing:.02em}
+.bubble{background:#eff8f3;padding:11px 13px;border-radius:13px 13px 13px 3px;font-size:12px;max-width:97%;margin:17px 0 8px}
+.bubble.patient{background:#d8f4d8;margin-left:auto;border-radius:13px 13px 3px 13px;width:89%}
+.hint{font-size:11px;color:var(--muted)}.status{font-size:10px;font-weight:800;border-radius:999px;padding:5px 9px;color:#527080;background:#eef4f8}
+.status.high{background:#fff4e0;color:#956116}.status.critical{background:#ffedeb;color:#ad403a}.status.routine{background:#e7f6ec;color:#287749}.status.unknown{background:#fff4e0;color:#956116}
+.risk-head{display:flex;align-items:center;gap:9px;margin:10px 0 13px;font-size:17px;font-weight:800;letter-spacing:-.02em}
+.signal{font-size:12px;padding:8px 0;border-bottom:1px solid #edf2f5}.signal:last-child{border:0}.signal::before{content:"•";color:var(--teal);font-weight:900;margin-right:9px}
+.task{border:1px solid #dfebef;border-radius:12px;padding:13px;margin-top:12px;background:#fafcfd}
+.task-top{display:flex;justify-content:space-between;align-items:center;gap:7px}.task strong{font-size:13px}.task p{font-size:11px;color:var(--muted);margin:9px 0 0}.task .meta{font-size:11px;color:#637485;margin-top:8px}
+.mono{font:11px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere;color:#c7f0e2;max-height:265px;overflow:auto}
+.console{background:var(--navy);border-radius:17px;padding:20px;color:#fff}.console .section-head{margin-bottom:10px}.console h2{color:white}.dot{display:inline-block;width:8px;height:8px;background:#68d8ac;border-radius:50%;margin-right:7px}
+.timeline{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.chip{border:1px solid var(--line);border-radius:999px;padding:6px 10px;background:#fff;color:#526575;font-size:11px}
+.chip span{font-weight:800;color:var(--teal)}
+.foot{margin-top:22px;color:#788696;font-size:11px;line-height:1.55}
+.error{color:#b74638;background:#fff1ef;padding:9px 11px;border-radius:8px;margin:7px 0;font-size:12px;display:none}
+@media(max-width:900px){.columns{grid-template-columns:1fr}.control{position:static}.two{grid-template-columns:1fr}main{padding:25px 15px}header{padding:14px 15px}}
+</style>
+</head>
+<body>
+<header>
+  <div><span class="brand">hanna<b>.</b></span><small>Care Intelligence API</small></div>
+  <span class="pill">SANDBOX · SYNTHETIC PATIENTS ONLY</span>
+</header>
+<main>
+<section class="hero">
+  <div class="kicker">OneBrain API · Interactive Product Journey</div>
+  <h1>Know who needs a nurse.</h1>
+  <p>One API connects hospital follow-up, patient conversations, risk signals, and nursing action. Watch one synthetic patient go from discharge to a closed-loop response.</p>
+</section>
+<div class="columns">
+  <section class="card control">
+    <div class="section-head"><h2>Run the patient journey</h2><span class="status">5 steps</span></div>
+    <p>Each step calls a real local API endpoint. LINE and clinical signals are deliberately simulated.</p>
+    <button class="action" id="enroll"><span class="num">01</span><span><strong>Discharge &amp; enroll</strong><small>Hospital sends patient to Hanna API</small></span></button>
+    <button class="action" id="followup"><span class="num">02</span><span><strong>Send Day 1 follow-up</strong><small>Automated LINE template (simulated)</small></span></button>
+    <button class="action" id="respond"><span class="num">03</span><span><strong>Patient reports a problem</strong><small>Missed medication + feeling unwell</small></span></button>
+    <button class="action" id="ack"><span class="num">04</span><span><strong>Nurse acknowledges</strong><small>Prioritized task accepted</small></span></button>
+    <button class="action" id="resolve"><span class="num">05</span><span><strong>Nurse resolves</strong><small>Record follow-through</small></span></button>
+    <div id="error" class="error"></div>
+    <button class="reset" id="reset">↺ Reset synthetic demo</button>
+    <div class="note"><strong>Optional safety scenario:</strong><br>
+      <button class="reset" id="urgent">Simulate emergency-help signal →</button>
+      <p style="margin:5px 0 0">This demonstrates a critical nursing task, not real emergency response.</p>
+    </div>
+  </section>
+  <section class="board">
+    <div class="two">
+      <div class="card panel">
+        <div class="section-head"><div class="line-title"><span class="line-mark">LINE</span><h2>Patient conversation</h2></div><span class="status">Simulated</span></div>
+        <div class="eyebrow">Patient A · Synthetic</div>
+        <div id="line-content"><div class="hint" style="margin-top:22px">Start by enrolling a discharged patient.</div></div>
+      </div>
+      <div class="card panel">
+        <div class="section-head"><h2>OneBrain intelligence</h2><span id="risk-badge" class="status">No signals yet</span></div>
+        <div class="eyebrow">Risk signals → Workflow decision</div>
+        <div id="risk-content"><div class="hint" style="margin-top:27px">New patient information is assessed when it arrives.</div></div>
+      </div>
+    </div>
+    <div class="card panel" style="min-height:150px">
+      <div class="section-head"><h2>Nurse action queue</h2><span class="status" id="task-count">0 tasks</span></div>
+      <div id="tasks"><div class="hint">When a response requires review, a nursing task will appear here.</div></div>
+    </div>
+    <div class="console">
+      <div class="section-head"><h2><span class="dot"></span> Live API trace</h2><span style="font-size:10px;color:#88b5ab">LOCAL · REST JSON</span></div>
+      <pre class="mono" id="trace">Ready. Calls will appear here as you run the demonstration.</pre>
+    </div>
+    <div class="card panel" style="min-height:115px">
+      <div class="section-head"><h2>Care coordination timeline</h2><span class="status">Audit trail</span></div>
+      <div class="timeline" id="timeline"></div>
+    </div>
+  </section>
+</div>
+<div class="foot">Demonstration scope: real local HTTP endpoints and agent orchestration; synthetic policy rules and temporary in-memory storage. Not a deployed hospital integration, not the production OneBrain risk engine, not a validated medical device, and not real LINE messaging. Do not enter real patient information.</div>
+</main>
+<script>
+const el = id => document.getElementById(id);
+let data = null;
+let working = false;
+let responseCounter = 0;
+function safeText(value) { return String(value == null ? '' : value); }
+function showError(message) { el('error').textContent = message; el('error').style.display = message ? 'block' : 'none'; }
+async function api(method, path, body) {
+  const init = { method, headers: {} };
+  if (method === 'POST') { init.headers['Content-Type']='application/json';init.body=JSON.stringify(body || {}); }
+  const res = await fetch(path, init);
+  const json = await res.json();
+  el('trace').textContent = method + ' ' + path + '\n\n' + JSON.stringify(json, null, 2);
+  if (!res.ok) throw new Error(json.error || 'API request failed');
+  return json;
+}
+async function refresh() {
+  const res = await fetch('/v1/demo/state');
+  data = await res.json();
+  render();
+}
+function lineNode(message, patient) {
+  const div = document.createElement('div'); div.className = 'bubble' + (patient ? ' patient' : '');
+  div.textContent = message; return div;
+}
+function render() {
+  if (!data) return;
+  const enrolled = !!data.patient;
+  const followed = data.outbox.some(x=>x.template==='FOLLOWUP_DAY_1');
+  const responded = data.checkins.length > 0;
+  const pending = data.tasks.find(x=>x.status==='pending');
+  const acknowledged = data.tasks.find(x=>x.status==='acknowledged');
+  const resolved = data.tasks.some(x=>x.status==='resolved');
+  const buttons = {enroll:!enrolled,followup:enrolled&&!followed,respond:followed&&!responded,ack:!!pending,resolve:!!acknowledged,urgent:enrolled,reset:true};
+  Object.entries(buttons).forEach(([id,enabled])=>{el(id).disabled = working || !enabled;});
+  ['enroll','followup','respond','ack','resolve'].forEach(id=>el(id).classList.toggle('primary',buttons[id]));
+  const line = el('line-content');line.replaceChildren();
+  if (enrolled) {
+    line.append(lineNode('Hi! This is Hanna. How are you feeling after your hospital visit?',false));
+    if (followed) line.append(lineNode('Day 1 check-in: Have you taken your medication? How are you feeling?',false));
+    if (responded) line.append(lineNode(data.assessment && data.assessment.level==='critical' ?
+      'I am having an urgent symptom and need help.' : 'I missed my medication and I am not feeling well.',true));
+    if (data.outbox.some(x=>x.template==='REVIEW_PENDING')) line.append(lineNode('Your response is recorded for nurse review. This is a simulated message.',false));
+  } else {const hint=document.createElement('div');hint.className='hint';hint.textContent='Start by enrolling a discharged patient.';line.append(hint);}
+  const assessment = data.assessment;
+  const risk = el('risk-content');risk.replaceChildren();
+  const badge=el('risk-badge');badge.className='status'+(assessment?' '+assessment.level:'');
+  badge.textContent=assessment?assessment.level.toUpperCase():'No signals yet';
+  if (assessment) {
+    const head=document.createElement('div');head.className='risk-head';
+    head.textContent=assessment.action==='acknowledge'?'Routine acknowledgment':'Nurse review required';risk.append(head);
+    assessment.signals.forEach(s=>{const div=document.createElement('div');div.className='signal';div.textContent=s;risk.append(div)});
+    const hint=document.createElement('div');hint.className='hint';hint.style.marginTop='9px';hint.textContent='Synthetic rules · Not clinical prediction';risk.append(hint);
+  } else {const div=document.createElement('div');div.className='hint';div.style.marginTop='27px';div.textContent='Waiting for patient signals.';risk.append(div);}
+  const tasks = el('tasks');tasks.replaceChildren();
+  el('task-count').textContent=data.tasks.length+' task'+(data.tasks.length===1?'':'s');
+  if (!data.tasks.length){const div=document.createElement('div');div.className='hint';div.textContent='No nursing action is needed yet.';tasks.append(div);}
+  data.tasks.slice().reverse().forEach(task=>{
+    const wrap=document.createElement('div');wrap.className='task';
+    const top=document.createElement('div');top.className='task-top';
+    const title=document.createElement('strong');title.textContent='Patient A · '+task.taskType.replaceAll('_',' ');
+    const badge=document.createElement('span');badge.className='status '+task.priority;badge.textContent=task.priority.toUpperCase()+' · '+task.status;top.append(title,badge);
+    const reason=document.createElement('p');reason.textContent=task.reason;wrap.append(top,reason);
+    const meta=document.createElement('div');meta.className='meta';meta.textContent=task.owner?'Owner: '+task.owner:'Owner: Awaiting nurse';
+    wrap.append(meta);tasks.append(wrap);
+  });
+  const events=el('timeline');events.replaceChildren();
+  data.timeline.slice(-9).forEach(e=>{const chip=document.createElement('span');chip.className='chip';
+    const label=document.createElement('span');label.textContent=e.kind.toUpperCase()+' · ';
+    chip.append(label,document.createTextNode(e.description));events.append(chip);});
+}
+async function runAction(handler) {
+  if(working)return;working=true;showError('');
+  if(data)render();
+  try {await handler();await refresh();}catch(e){showError(e.message);await refresh();}
+  finally{working=false;render();}
+}
+el('enroll').onclick=()=>runAction(()=>api('POST','/v1/enrollments',{}));
+el('followup').onclick=()=>runAction(()=>api('POST','/v1/events',{type:'followup_due',day:1,eventId:'demo-day-1'}));
+el('respond').onclick=()=>runAction(()=>api('POST','/v1/events',{type:'checkin_response',eventId:'demo-checkin-'+(++responseCounter),patientId:'demo-patient-001',medicationTaken:false,wellBeing:'unwell',symptoms:['fatigue']}));
+el('urgent').onclick=()=>runAction(()=>api('POST','/v1/events',{type:'checkin_response',eventId:'demo-emergency-'+(++responseCounter),patientId:'demo-patient-001',emergencyHelp:true,symptoms:['shortness_of_breath'],wellBeing:'unwell'}));
+el('ack').onclick=()=>runAction(()=>{const task=data.tasks.find(x=>x.status==='pending');return api('POST','/v1/tasks/'+task.id+'/acknowledge',{});});
+el('resolve').onclick=()=>runAction(()=>{const task=data.tasks.find(x=>x.status==='acknowledged');return api('POST','/v1/tasks/'+task.id+'/resolve',{});});
+el('reset').onclick=()=>runAction(()=>api('POST','/v1/demo/reset',{}));
+refresh().catch(e=>showError('Cannot reach local demo server: '+e.message));
+</script>
+</body>
+</html>
