@@ -60,6 +60,11 @@ h1{font-size:clamp(32px,5vw,51px);line-height:1.07;letter-spacing:-.055em;margin
   <section class="card control">
     <div class="section-head"><h2>Run the patient journey</h2><span class="status">5 steps</span></div>
     <p>Each step calls a real local API endpoint. LINE and clinical signals are deliberately simulated.</p>
+    <div style="border:1px solid #cbe4df;border-radius:12px;padding:12px;margin-bottom:13px;background:#f1faf8">
+      <div class="eyebrow">OPTIONAL: LIVE INTERSYSTEMS FHIR SANDBOX</div>
+      <div class="hint" style="margin-bottom:7px">Read a synthetic cardiovascular discharge record from a locally running InterSystems IRIS server.</div>
+      <button class="action" id="fhir-sync"><span class="num">FHIR</span><span><strong>Connect InterSystems IRIS</strong><small id="fhir-status">Checking configuration…</small></span></button>
+    </div>
     <button class="action" id="enroll"><span class="num">01</span><span><strong>Discharge &amp; enroll</strong><small>Hospital sends patient to Hanna API</small></span></button>
     <button class="action" id="followup"><span class="num">02</span><span><strong>Send Day 1 follow-up</strong><small>Automated LINE template (simulated)</small></span></button>
     <button class="action" id="respond"><span class="num">03</span><span><strong>Patient reports a problem</strong><small>Missed medication + feeling unwell</small></span></button>
@@ -73,6 +78,10 @@ h1{font-size:clamp(32px,5vw,51px);line-height:1.07;letter-spacing:-.055em;margin
     </div>
   </section>
   <section class="board">
+    <div class="card panel" style="min-height:105px">
+      <div class="section-head"><h2>Hospital data · FHIR R4</h2><span class="status" id="fhir-badge">Not connected</span></div>
+      <div id="fhir-details" class="hint">Optional: link the official InterSystems IRIS for Health local sandbox. Without it the demo uses synthetic in-memory hospital context.</div>
+    </div>
     <div class="two">
       <div class="card panel">
         <div class="section-head"><div class="line-title"><span class="line-mark">LINE</span><h2>Patient conversation</h2></div><span class="status">Simulated</span></div>
@@ -99,7 +108,7 @@ h1{font-size:clamp(32px,5vw,51px);line-height:1.07;letter-spacing:-.055em;margin
     </div>
   </section>
 </div>
-<div class="foot">Demonstration scope: real local HTTP endpoints and agent orchestration; synthetic policy rules and temporary in-memory storage. Not a deployed hospital integration, not the production OneBrain risk engine, not a validated medical device, and not real LINE messaging. Do not enter real patient information.</div>
+<div class="foot">Demonstration scope: real local HTTP endpoints and agent orchestration, optionally connected to a real InterSystems IRIS for Health FHIR sandbox using synthetic FHIR records only. Synthetic risk policy rules and temporary in-memory storage. Not the production OneBrain risk engine, not a validated medical device, and not real LINE messaging. Do not enter real patient information.</div>
 </main>
 <script>
 const el = id => document.getElementById(id);
@@ -134,9 +143,20 @@ function render() {
   const pending = data.tasks.find(x=>x.status==='pending');
   const acknowledged = data.tasks.find(x=>x.status==='acknowledged');
   const resolved = data.tasks.some(x=>x.status==='resolved');
-  const buttons = {enroll:!enrolled,followup:enrolled&&!followed,respond:followed&&!responded,ack:!!pending,resolve:!!acknowledged,urgent:enrolled,reset:true};
+  const buttons = {enroll:!enrolled,followup:enrolled&&!followed,respond:followed&&!responded,ack:!!pending,resolve:!!acknowledged,urgent:enrolled,reset:true,'fhir-sync':data.intersystems.configured};
   Object.entries(buttons).forEach(([id,enabled])=>{el(id).disabled = working || !enabled;});
   ['enroll','followup','respond','ack','resolve'].forEach(id=>el(id).classList.toggle('primary',buttons[id]));
+  const fhir = data.intersystems || {configured:false,connected:false,record:null};
+  el('fhir-badge').className='status'+(fhir.connected?' routine':'');
+  el('fhir-badge').textContent=fhir.connected?'LIVE LOCAL FHIR':'Not connected';
+  el('fhir-status').textContent=fhir.connected?'Read from local IRIS FHIR server':
+    (fhir.configured?'Ready to connect to local IRIS':'Requires local IRIS + environment configuration');
+  el('fhir-details').textContent=fhir.connected&&fhir.record?
+    'InterSystems IRIS R4 · Synthetic Patient/'+fhir.record.patientFhirId+
+    ' · Encounter: '+(fhir.record.encounterCompleted?'completed':'not found')+
+    ' · Heart rate: '+(fhir.record.heartRateBpm===null?'not available':fhir.record.heartRateBpm+' bpm')+
+    ' · '+fhir.record.conditionContext:
+    'No active InterSystems connection. The optional FHIR step reads synthetic data from a real local IRIS server.';
   const line = el('line-content');line.replaceChildren();
   if (enrolled) {
     line.append(lineNode('Hi! This is Hanna. How are you feeling after your hospital visit?',false));
@@ -178,6 +198,7 @@ async function runAction(handler) {
   try {await handler();await refresh();}catch(e){showError(e.message);await refresh();}
   finally{working=false;render();}
 }
+el('fhir-sync').onclick=()=>runAction(()=>api('POST','/v1/demo/intersystems/sync',{}));
 el('enroll').onclick=()=>runAction(()=>api('POST','/v1/enrollments',{}));
 el('followup').onclick=()=>runAction(()=>api('POST','/v1/events',{type:'followup_due',day:1,eventId:'demo-day-1'}));
 el('respond').onclick=()=>runAction(()=>api('POST','/v1/events',{type:'checkin_response',eventId:'demo-checkin-'+(++responseCounter),patientId:'demo-patient-001',medicationTaken:false,wellBeing:'unwell',symptoms:['fatigue']}));
