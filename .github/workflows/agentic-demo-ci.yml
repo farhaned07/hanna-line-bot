@@ -1,0 +1,36 @@
+name: Hanna Synthetic API Tests
+
+on:
+  push:
+    branches:
+      - feat/agentic-nurse-copilot-foundation
+  pull_request:
+    paths:
+      - 'src/agentic/**'
+      - 'tests/agentic-*.test.js'
+      - 'scripts/hanna-api-demo.js'
+      - 'demo/hanna-api/**'
+      - '.github/workflows/agentic-demo-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Synthetic agent + API tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Unit and journey tests
+        run: node --test tests/agentic-nurse-copilot.test.js tests/agentic-demo-api.test.js
+      - name: JavaScript syntax checks
+        run: |
+          node --check src/agentic/nurseCopilot.js
+          node --check src/agentic/demoApi.js
+          node --check scripts/hanna-api-demo.js
