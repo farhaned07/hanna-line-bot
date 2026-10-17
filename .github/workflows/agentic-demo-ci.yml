@@ -1,0 +1,61 @@
+name: Hanna Synthetic API Tests
+
+on:
+  push:
+    branches:
+      - feat/agentic-nurse-copilot-foundation
+  pull_request:
+    paths:
+      - 'src/agentic/**'
+      - 'tests/agentic-*.test.js'
+      - 'tests/intersystems-fhir.test.js'
+      - 'scripts/hanna-api-demo.js'
+      - 'demo/hanna-api/**'
+      - '.github/workflows/agentic-demo-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Synthetic agent + API tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Unit and journey tests
+        run: node --test tests/agentic-nurse-copilot.test.js tests/agentic-demo-api.test.js tests/intersystems-fhir.test.js
+      - name: JavaScript syntax checks
+        run: |
+          node --check src/agentic/nurseCopilot.js
+          node --check src/agentic/demoApi.js
+          node --check src/agentic/intersystemsFhirAdapter.js
+          node --check scripts/seed-hanna-iris-fhir.js
+          node --check scripts/hanna-api-demo.js
+      - name: Loopback HTTP server smoke test
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/hanna-api-demo.js >/tmp/hanna-demo.log 2>&1 &
+          DEMO_PID=$!
+          trap 'kill "$DEMO_PID" 2>/dev/null || true' EXIT
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4178/v1/health >/tmp/hanna-health.json 2>/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          grep -q 'synthetic-local-demo' /tmp/hanna-health.json
+          curl -fsS http://127.0.0.1:4178/ | grep -q 'OneBrain API'
+          curl -fsS -X POST -H 'Content-Type: application/json' \
+            http://127.0.0.1:4178/v1/enrollments -d '{}' | grep -q 'demo-patient-001'
+          curl -fsS -X POST -H 'Content-Type: application/json' \
+            http://127.0.0.1:4178/v1/events \
+            -d '{"type":"checkin_response","eventId":"http-checkin","medicationTaken":false,"wellBeing":"unwell"}' \
+            | grep -q '"level":"high"'
+          curl -fsS http://127.0.0.1:4178/v1/tasks | grep -q '"priority":"high"'
