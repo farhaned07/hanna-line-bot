@@ -8,6 +8,7 @@ on:
     paths:
       - 'src/agentic/**'
       - 'tests/agentic-*.test.js'
+      - 'tests/intersystems-fhir.test.js'
       - 'scripts/hanna-api-demo.js'
       - 'demo/hanna-api/**'
       - '.github/workflows/agentic-demo-ci.yml'
@@ -28,11 +29,13 @@ jobs:
         with:
           node-version: '22'
       - name: Unit and journey tests
-        run: node --test tests/agentic-nurse-copilot.test.js tests/agentic-demo-api.test.js
+        run: node --test tests/agentic-nurse-copilot.test.js tests/agentic-demo-api.test.js tests/intersystems-fhir.test.js
       - name: JavaScript syntax checks
         run: |
           node --check src/agentic/nurseCopilot.js
           node --check src/agentic/demoApi.js
+          node --check src/agentic/intersystemsFhirAdapter.js
+          node --check scripts/seed-hanna-iris-fhir.js
           node --check scripts/hanna-api-demo.js
       - name: Loopback HTTP server smoke test
         shell: bash
