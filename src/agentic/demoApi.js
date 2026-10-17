@@ -7,7 +7,7 @@ const { createNurseCopilot } = require('./nurseCopilot');
 const TENANT = 'demo-hospital';
 const PATIENT = 'demo-patient-001';
 
-function assessSyntheticSignals(input) {
+function assessSyntheticSignals(input, fhirContext = null) {
     const allowed = new Set(['none', 'fatigue', 'headache', 'chest_pain', 'shortness_of_breath', 'other']);
     const symptoms = input.symptoms == null ? [] : input.symptoms;
     if (!Array.isArray(symptoms) || symptoms.length > 8 ||
@@ -28,6 +28,11 @@ function assessSyntheticSignals(input) {
     if (input.wellBeing === 'unwell') signals.push('Patient reports feeling unwell');
     for (const s of symptoms) if (s !== 'none') signals.push('Reported symptom: ' + s.replaceAll('_', ' '));
     if (input.emergencyHelp === true) signals.push('Patient explicitly requested emergency help');
+    const fhirHeartRate = fhirContext && Number.isFinite(fhirContext.heartRateBpm)
+        ? fhirContext.heartRateBpm : null;
+    if (fhirHeartRate !== null) {
+        signals.push('InterSystems FHIR Observation: ' + fhirHeartRate + ' bpm (synthetic)');
+    }
 
     // Conservative demonstration policy, NOT production OneBrain or a clinical risk model.
     if (input.emergencyHelp === true ||
@@ -39,7 +44,7 @@ function assessSyntheticSignals(input) {
         };
     }
     if (input.medicationTaken === false || input.wellBeing === 'unwell' ||
-        symptoms.some(s => s !== 'none')) {
+        symptoms.some(s => s !== 'none') || (fhirHeartRate !== null && fhirHeartRate >= 110)) {
         return {
             level: 'high', action: 'nurse_review',
             signals, rule: 'demo-concern-review-policy-v1',
@@ -62,7 +67,7 @@ function assessSyntheticSignals(input) {
     };
 }
 
-function createDemoApi() {
+function createDemoApi({ fhirAdapter = null } = {}) {
     let state;
     const claims = new Map();
     const actionReceipts = new Map();
@@ -80,7 +85,8 @@ function createDemoApi() {
         state = {
             demo: true, syntheticOnly: true, patient: null,
             followupSchedule: [], assessment: null, checkins: [],
-            tasks: [], outbox: [], timeline: []
+            tasks: [], outbox: [], timeline: [],
+            intersystems: { configured: !!fhirAdapter, connected: false, record: null }
         };
         sequence = 0;
         claims.clear();
@@ -179,7 +185,30 @@ function createDemoApi() {
             return response(200, snapshot());
         }
         if (method === 'GET' && path === '/v1/health') {
-            return response(200, { ok: true, mode: 'synthetic-local-demo', externalIntegrations: false });
+            return response(200, {
+                ok: true, mode: 'synthetic-local-demo',
+                intersystemsFhir: state.intersystems.connected ? 'connected-local-sandbox' :
+                    (state.intersystems.configured ? 'configured-not-connected' : 'not-configured'),
+                line: 'simulated'
+            });
+        }
+        if (method === 'POST' && path === '/v1/demo/intersystems/sync') {
+            if (!fhirAdapter) {
+                return response(503, { error: 'InterSystems adapter not configured. Start the official IRIS FHIR sandbox and set HANNA_IRIS_FHIR_URL, HANNA_IRIS_USER and HANNA_IRIS_PASSWORD.' });
+            }
+            try {
+                const record = await fhirAdapter.readSyntheticDischarge();
+                // Only normalized, explicitly synthetic metadata enters the demo state.
+                if (!record || record.synthetic !== true || record.dataSource !== 'LIVE_LOCAL_FHIR_SERVER') {
+                    throw new Error('Unexpected FHIR adapter provenance');
+                }
+                state.intersystems = { configured: true, connected: true, record };
+                timeline('intersystems', 'Read synthetic Patient, Encounter and Observation from local InterSystems FHIR server');
+                return response(200, { connected: true, record, simulated: true });
+            } catch (error) {
+                state.intersystems = { configured: true, connected: false, record: null };
+                return response(502, { error: 'Cannot verify synthetic InterSystems FHIR patient in local sandbox' });
+            }
         }
         if (method === 'POST' && path === '/v1/enrollments') {
             if (state.patient) return response(200, { patient: state.patient, alreadyEnrolled: true });
@@ -208,7 +237,10 @@ function createDemoApi() {
             if (isDue && ![1, 3, 7, 14].includes(body.day)) return badRequest('Invalid follow-up day');
             if (!isDue && body.type !== 'checkin_response') return badRequest('Supported event types: checkin_response, followup_due');
             let assessment;
-            try { if (!isDue) assessment = assessSyntheticSignals(body); }
+            try {
+                if (!isDue) assessment = assessSyntheticSignals(
+                    body, state.intersystems.connected ? state.intersystems.record : null);
+            }
             catch (err) { return badRequest(err.message); }
             const event = {
                 tenantId: TENANT, patientId: PATIENT, eventId,
