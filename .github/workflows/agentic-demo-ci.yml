@@ -34,3 +34,25 @@ jobs:
           node --check src/agentic/nurseCopilot.js
           node --check src/agentic/demoApi.js
           node --check scripts/hanna-api-demo.js
+      - name: Loopback HTTP server smoke test
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/hanna-api-demo.js >/tmp/hanna-demo.log 2>&1 &
+          DEMO_PID=$!
+          trap 'kill "$DEMO_PID" 2>/dev/null || true' EXIT
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4178/v1/health >/tmp/hanna-health.json 2>/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          grep -q 'synthetic-local-demo' /tmp/hanna-health.json
+          curl -fsS http://127.0.0.1:4178/ | grep -q 'OneBrain API'
+          curl -fsS -X POST -H 'Content-Type: application/json' \
+            http://127.0.0.1:4178/v1/enrollments -d '{}' | grep -q 'demo-patient-001'
+          curl -fsS -X POST -H 'Content-Type: application/json' \
+            http://127.0.0.1:4178/v1/events \
+            -d '{"type":"checkin_response","eventId":"http-checkin","medicationTaken":false,"wellBeing":"unwell"}' \
+            | grep -q '"level":"high"'
+          curl -fsS http://127.0.0.1:4178/v1/tasks | grep -q '"priority":"high"'
