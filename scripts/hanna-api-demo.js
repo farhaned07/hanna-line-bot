@@ -13,7 +13,14 @@ const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
 const { createDemoApi } = require('../src/agentic/demoApi');
-const api = createDemoApi();
+const { createInterSystemsFhirAdapter } = require('../src/agentic/intersystemsFhirAdapter');
+const hasFhirSettings = !!process.env.HANNA_IRIS_FHIR_URL;
+const fhirAdapter = hasFhirSettings ? createInterSystemsFhirAdapter({
+    baseUrl: process.env.HANNA_IRIS_FHIR_URL,
+    username: process.env.HANNA_IRIS_USER,
+    password: process.env.HANNA_IRIS_PASSWORD
+}) : null;
+const api = createDemoApi({ fhirAdapter });
 const HOST = '127.0.0.1';
 const PORT = Number(process.env.HANNA_DEMO_PORT || 4178);
 const MAX_BODY_BYTES = 16384;
@@ -70,5 +77,6 @@ const server = http.createServer(async (req, res) => {
 server.listen(PORT, HOST, () => {
     console.log('Hanna Care Intelligence · SYNTHETIC DEMO ONLY');
     console.log('Open http://' + HOST + ':' + PORT);
-    console.log('Bound to loopback. No PHI, hospital connections, or live LINE sends.');
+    console.log('Bound to loopback. No PHI or live LINE sends.');
+    console.log(hasFhirSettings ? 'InterSystems FHIR adapter configured for local synthetic IRIS.' : 'InterSystems FHIR: not configured; use the optional hackathon kit setup.');
 });
